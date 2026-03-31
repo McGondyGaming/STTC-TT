@@ -1,6 +1,6 @@
 # Starship Troopers Terran Command Terrain Tool (STTCTT)
 
-A lightweight, browser-based utility for generating and editing terrain maps for *Starship Troopers: Terran Command* custom scenarios.
+## A lightweight, browser-based utility for generating and editing terrain maps for *Starship Troopers: Terran Command* custom scenarios.
 
 This tool allows you to:
 - Convert heightmap images into playable terrain
@@ -10,8 +10,6 @@ This tool allows you to:
 - Export ready-to-use `map.json` and `scenario.json` files
 
 > This tool is not officially supported nor endorsed by The Artistocrats or Slitherine.
-
----
 
 ## Features
 
