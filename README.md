@@ -83,7 +83,6 @@ This tool allows you to:
 
 ### Notes:
  - Internal level range is 0–14 (mapped to editor levels -1 to 13)
- - Image imports always generate Type = 0
  - Terrain edge styles are derived from TerrainTypeId
  - Some terrain blends may not have exact equivalents when remapping edges
 
@@ -94,4 +93,5 @@ This tool allows you to:
 
 ## Known Issues:
  - Modifying elevations in a map with more than one elevation will remove all edges
- - Preview for existing `map.json` files broken
+ - Image imports always generate Type = 0
+ - Preview for existing `map.json` files presents an inverted terrain map as opposed to a heightmap
