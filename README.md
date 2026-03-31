@@ -95,6 +95,7 @@ This tool allows you to:
 
 ## Known Issues:
  - Modifying elevations in a map with more than one elevation will remove all edges
- - Image imports always generate Type = 0 (read: sheer cliffs, no edges)
+ - Image imports may generate Type = 0 (read: sheer cliffs, no edges)
+ - Image imports may generate edges, but only the default type
  - Preview for existing `map.json` files presents an inverted terrain map as opposed to a heightmap
  - Image import results in vertically flipped map
