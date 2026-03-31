@@ -4,9 +4,9 @@
 
 This tool allows you to:
 - Convert heightmap images into playable terrain
-- Load and modify existing `map.json` files
+- Load and modify existing `map.json` and `scenario.json` files
 - Adjust terrain types, elevation levels, and edge styles
-- Preview results in real-time
+- Preview results in real-time with histograms and tile-based visuals
 - Export ready-to-use `map.json` and `scenario.json` files
 
 > This tool is not officially supported nor endorsed by The Artistocrats or Slitherine.
@@ -15,106 +15,44 @@ This tool allows you to:
 
 ### Image to Terrain Conversion
 - Import PNG, BMP, or JPEG heightmaps
-- Automatically resamples to 128×128
-- Adjustable:
-  - Quantization levels (2–15)
-  - Min/max elevation mapping
-- Dark = low terrain, bright = high terrain
+- Automatic resampling to 128x128
+- Configurable quantization (2-15 levels) and elevation mapping
+- Dark values represent low terrain; bright values represent high terrain
 
-### Existing Map Editing
-- Load `map.json`
-- Automatically detects landscape type
-- Preserves original terrain data (optional)
-- Automatically updates `LandscapeId` when scenario file is loaded
+### Map and Scenario Editing
+- Load `map.json` to modify existing landscapes
+- Automatic `LandscapeId` syncing when `scenario.json` is loaded
+- Support for all in-game biomes including Desert, Lava, Space Station, and Metro (plus Underground variants)
 
-### Landscape Support
-Supports all in-game landscape types:
-- Desert
-- Underground
-- Desert City
-- Lava
-- Lava Underground
-- Space Station
-- Metro
-- Metro Underground
+### Terrain and Level Control
+- **Modes:** Default single terrain, Low/High overrides, or per-level assignment
+- **Edge Remapping:** Batch-convert map edges to specific styles (e.g., Cliffs_Lava, Cliffs_Purple)
+- **Modifications:** Shift entire maps up/down, clamp extremes, or adjust specific level bands
+- **History:** 10-step Undo/Redo and state reset
 
-Controls the `LandscapeId` used in `scenario.json`.
-
-### Terrain Control
-Multiple modes:
-- Default (single terrain)
-- Low / High overrides
-- Per-level assignment
-
-Options:
-- Restrict to valid terrain for selected landscape
-- Preserve original terrain from imported maps
-
-### Edge (Cliff) Remapping
-- Convert entire map to a different edge style:
-  - Desert (Cliffs_A)
-  - Underground (Cliffs_Purple)
-  - Lava (Cliffs_Lava)
-  - Metro/Storm (Cliffs_Storm)
-  - Space Station (Spacestation_A)
-- Smart fallback for unsupported terrain blends
-
-### Level Editing Tools
-- Shift entire map up/down
-- Clamp low/high elevations
-- Shift specific level bands
-- Undo / Redo (up to 10 steps)
-- Reset to original state
-
-### Live Preview
-- Tile-based visual preview
-- Histogram of level distribution
-- Terrain colour preview (when map loaded)
-- Stats:
-  - Total tiles
-  - Level range
-  - Non-zero tiles
-
-### Export
-- Export `map.json`
-- Optionally export updated `scenario.json`
-- Preview JSON before export
-
+### Export and Analysis
+- Visual tile preview and elevation distribution histogram
+- Real-time stats for total tiles and level ranges
+- Export validated `map.json` and updated `scenario.json`
 
 ---
 
 ## Usage
 
 ### 1. Load a Source
-Choose one of:
-- Drop/Load a heightmap image
-- Drop/Load an existing `map.json`
-
-Optional:
-- Drop/Load a `scenario.json` to sync the `LandscapeId`
+- Drop or load a heightmap image or an existing `map.json`.
+- Optionally load a `scenario.json` to sync the `LandscapeId`.
 
 ### 2. Adjust Terrain
-- Select landscape type (or use auto-detected)
-- Configure terrain behaviour:
-  - Default terrain
-  - Overrides
-  - Per-level mapping
+- Select the landscape type and configure terrain behavior (Default, Overrides, or Per-Level mapping).
 
-### 3. Modify Levels (Optional)
-Use level tools to:
-- Shift elevation
-- Clamp extremes
-- Adjust specific level ranges
+### 3. Modify Levels
+- Use level tools to shift elevation, clamp extremes, or refine specific bands.
 
-### 4. Preview
-- Inspect terrain visually
-- Check histogram and stats
+### 4. Export
+- Preview the JSON and export your files to the scenario folder.
 
-### 5. Export
-- Export `map.json`
-- Export `scenario.json` if loaded
-
-Default scenario path:
+**Default scenario path:**
 `%USERPROFILE%\Documents\My Games\Starship Troopers\Scenarios`
 
 ---
@@ -136,7 +74,7 @@ Default scenario path:
   ]
 }
 ```
-### map.json
+### scenario.json
 ```json
 {
   "LandscapeId": 0
@@ -153,3 +91,7 @@ Default scenario path:
  - Fixed map resolution: 128×128 only
  - No in-engine validation: Load your map to clean it up
  - Browser-based: no file system integration beyond downloads
+
+## Known Issues:
+ - Modifying elevations in a map with more than one elevation will remove all edges
+ - Preview for existing `map.json` files broken
