@@ -1,4 +1,4 @@
-# Starship Troopers Terran Command Terrain Tool (STTCTT)
+# Starship Troopers Terran Command Terrain Tool (STTC-TT)
 
 ## A lightweight, browser-based utility for generating and editing terrain maps for *Starship Troopers: Terran Command* custom scenarios.
 
