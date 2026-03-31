@@ -11,6 +11,8 @@ This tool allows you to:
 
 > This tool is not officially supported nor endorsed by The Artistocrats or Slitherine.
 
+> Use this tool at your own risk. There is no guarantee it won't eat your map/scenario file. Definitely back your scenario up before using the tool on it.
+
 ## Features
 
 ### Image to Terrain Conversion
