@@ -7,7 +7,7 @@ This tool allows you to:
 - Load and modify existing `map.json` and `scenario.json` files
 - Adjust terrain types, elevation levels, and edge styles
 - Preview results in real-time with histograms and tile-based visuals
-- Export ready-to-use `map.json` and `scenario.json` files
+- Export ready-to-use `map.json` and updated `scenario.json` files
 
 > This tool is not officially supported nor endorsed by The Artistocrats or Slitherine.
 
