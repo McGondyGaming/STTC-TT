@@ -32,7 +32,8 @@ A living document for tracking ideas, improvements, and future direction for the
 - [ ] Zoom / inspect specific tiles
     
 ### Generation
-- [ ] Random terrain generator for quick prototyping
+- [ ] Noise (Perlin/Simplex) generator for quick prototyping
+- [ ] Map orientaion controls (Flip, invert, rotate)
 
 ---
 
