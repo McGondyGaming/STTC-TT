@@ -41,6 +41,12 @@ This tool allows you to:
 
 ## Usage
 
+### 0. Download
+- Select `STTCTT.html`
+- Cick the `...` button on the top right
+- Select Download
+- Open in your favourite browser (tested in Chrome)
+
 ### 1. Load a Source
 - Drop or load a heightmap image or an existing `map.json`.
 - Optionally load a `scenario.json` to sync the `LandscapeId`.
@@ -92,6 +98,7 @@ This tool allows you to:
  - Fixed map resolution: 128×128 only
  - No in-engine validation: Load your map to clean it up
  - Browser-based: no file system integration beyond downloads
+ - Tested in Chrome, stavle builds will be tested in a few browsers (e.g. Firefox, Edge)
 
 ## Known Issues:
  - Modifying elevations in a map with more than one elevation will remove all edges
