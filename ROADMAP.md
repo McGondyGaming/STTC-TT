@@ -22,7 +22,7 @@ A living document for tracking ideas, improvements, and future direction for the
 
 ### Exports
 - [ ] Export greyscale heightmap
-- [ ] Add “export directly to game folder” option
+- [ ] Add "export directly to game folder" option
 - [ ] Allow selecting export directory
 - [ ] Add confirmation or diff view before export if overwiting
 
@@ -30,6 +30,8 @@ A living document for tracking ideas, improvements, and future direction for the
 - [ ] Manual toggle between height and terrain views
 - [ ] Show tile coordinates on hover
 - [ ] Zoom / inspect specific tiles
+- [ ] Colourblind accessibility options
+- [ ] Level -1 render as water in preview (with terrain underlay)
     
 ### Generation
 - [ ] Noise (Perlin/Simplex) generator for quick prototyping
@@ -62,5 +64,5 @@ Completed items
 ## Notes
 
 - Keep scope aligned with actual usage (map creation + tweaking)
-- Avoid overbuilding features that don’t translate to in-game value
+- Avoid overbuilding features that don't translate to in-game value
 - Prioritise anything that reduces iteration time

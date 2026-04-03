@@ -42,10 +42,8 @@ This tool allows you to:
 ## Usage
 
 ### 0. Download
-- Select `STTCTT.html`
-- Cick the `...` button on the top right
-- Select Download
-- Open in your favourite browser (tested in Chrome)
+- Download the source code in your preferred format
+- Open `STTCTT.html` in your favourite browser (tested in Chrome)
 
 ### 1. Load a Source
 - Drop or load a heightmap image or an existing `map.json`.
@@ -90,20 +88,20 @@ This tool allows you to:
 ```
 
 ### Notes:
- - Internal level range is 0–14 (mapped to editor levels -1 to 13)
+ - Internal level range is 0-14 (mapped to editor levels -1 to 13)
  - Terrain edge styles are derived from TerrainTypeId
  - Some terrain blends may not have exact equivalents when remapping edges
 
 ### Limitations:
- - Fixed map resolution: 128×128 only
+ - Fixed map resolution: 128x128 only
  - No in-engine validation: Load your map to clean it up
  - Browser-based: no file system integration beyond downloads
  - Tested in Chrome, stavle builds will be tested in a few browsers (e.g. Firefox, Edge)
 
 ## Known Issues:
 - Outside corner edges may not be generated
-- Edges are presented as linked to terrains, not the case
-- All maps default to desert biome
+- Edges are presented as linked to terrains, this not the case
+- All image imported maps default to desert biome
 
 ## Change Notes:
  - Edge selection no longer modifies preview
