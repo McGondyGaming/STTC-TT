@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STTCTT</title>
+<title>Heightmap Importer</title>
 <style>
 :root{
   --bg:#f5f4f0;--bg2:#eceae4;--bg3:#fff;
@@ -95,8 +95,8 @@ button.sm{padding:5px 10px;font-size:12px;border-radius:5px;}
 .msg.err{color:var(--err);}
 
 /* Preview */
-.preview-canvas-wrap{position:relative;border-radius:6px;overflow:hidden;border:1px solid var(--border);background:var(--bg2);}
-.preview-canvas-wrap canvas{width:100%;height:auto;display:block;}
+.preview-canvas-wrap{border-radius:6px;border:1px solid var(--border);background:var(--bg2);line-height:0;}
+.preview-canvas-wrap canvas{width:100%;display:block;border-radius:6px;}
 #previewLabel{font-size:11px;color:var(--text3);text-align:center;margin-top:5px;}
 .legend{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px;}
 .li{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text2);}
@@ -133,8 +133,8 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 </head>
 <body>
 
-<h1>Starship Troopers Terran Commmand Terrain Tool</h1>
-<div class="subtitle">For use with custom map editing — not officially sanctioned. MIT licence.</div>
+<h1>STTC-TT</h1>
+<div class="subtitle">Starship Troopers Terran Command — Terrain Tool · <a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · Not officially sanctioned · MIT licence</div>
 
 <div class="layout">
 <!-- ════════════════ LEFT COLUMN ════════════════ -->
@@ -182,13 +182,14 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <label class="fl">Landscape</label>
         <select id="landscapeSelect">
           <option value="0">0 — Desert</option>
-          <option value="1">1 — Underground</option>
+          <option value="1">1 — Chemical / Underground</option>
           <option value="2">2 — Desert City</option>
           <option value="3">3 — Lava</option>
           <option value="4">4 — Lava Underground</option>
           <option value="5">5 — Space Station</option>
-          <option value="6">6 — Metro</option>
+          <option value="6">6 — Metropolis</option>
           <option value="7">7 — Metro Underground</option>
+          <option value="8">8 — Jungle</option>
         </select>
       </div>
     </div>
@@ -246,21 +247,64 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
-      <div class="note">Edge style (cliff walls) is encoded in <code>TerrainTypeId</code>. Remapping replaces all terrain IDs with equivalents in the target edge family.</div>
+      <div class="note">Edge style (cliff walls) is encoded in <code>TerrainTypeId</code> via each terrain's edge family. Selecting an edge family remaps all terrain IDs to equivalents that use that cliff asset set. Terrain and edge are independent — both apply to the final export regardless of source.</div>
       <div class="field"><label class="ck-row"><input type="checkbox" id="lockEdgeLandscape" checked>Restrict to legal landscape terrains only</label></div>
-      <div class="field">
-        <label class="fl">Remap all terrain to edge style</label>
-        <select id="edgeRemap">
-          <option value="">— no change —</option>
-          <option value="desert">Desert — Cliffs_A</option>
-          <option value="underground">Underground — Cliffs_Purple</option>
-          <option value="lava">Lava — Cliffs_Lava</option>
-          <option value="storm">Metro / Storm — Cliffs_Storm</option>
-          <option value="spacestation">Space Station — Spacestation_A</option>
-        </select>
+
+      <div class="tab-bar" id="eBar">
+        <div class="tab active" data-tab="ea-simple">No change / all</div>
+        <div class="tab" data-tab="ea-overrides">Low / high</div>
+        <div class="tab" data-tab="ea-bylevel">Per-level</div>
       </div>
-      <div class="note" id="edgeNote" style="margin-bottom:4px;"></div>
-      <div class="warn-box" id="edgeWarn" style="display:none;">Remapping replaces <em>all</em> TerrainTypeIds. Specialised blend tiles without a direct equivalent fall back to the base type for that family.</div>
+
+      <div class="tp active" id="tab-ea-simple">
+        <div class="field">
+          <label class="fl">Remap all terrain to edge family</label>
+          <select id="edgeRemap">
+            <option value="">— no change —</option>
+            <option value="desert">Desert — Cliffs_A</option>
+            <option value="underground">Underground — Cliffs_Purple</option>
+            <option value="lava">Lava — Cliffs_Lava</option>
+            <option value="storm">Metro / Storm — Cliffs_Storm</option>
+            <option value="spacestation">Space Station — Spacestation_A</option>
+          </select>
+        </div>
+        <div class="warn-box" id="edgeWarn" style="display:none;">Remapping replaces <em>all</em> TerrainTypeIds. Blend tiles without a direct equivalent fall back to the base type for that family.</div>
+      </div>
+
+      <div class="tp" id="tab-ea-overrides">
+        <div class="note">Override edge family at the extremes — mid levels (editor 3–9) keep the global remap or no change.</div>
+        <div class="tc">
+          <div class="field">
+            <label class="fl">Low (−1 to 2) → edge family</label>
+            <select id="edgeRemapLow">
+              <option value="">— no change —</option>
+              <option value="desert">Desert — Cliffs_A</option>
+              <option value="underground">Underground — Cliffs_Purple</option>
+              <option value="lava">Lava — Cliffs_Lava</option>
+              <option value="storm">Metro / Storm — Cliffs_Storm</option>
+              <option value="spacestation">Space Station — Spacestation_A</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="fl">High (10 to 13) → edge family</label>
+            <select id="edgeRemapHigh">
+              <option value="">— no change —</option>
+              <option value="desert">Desert — Cliffs_A</option>
+              <option value="underground">Underground — Cliffs_Purple</option>
+              <option value="lava">Lava — Cliffs_Lava</option>
+              <option value="storm">Metro / Storm — Cliffs_Storm</option>
+              <option value="spacestation">Space Station — Spacestation_A</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="tp" id="tab-ea-bylevel">
+        <div class="note">Assign an edge family per level. "No change" keeps the original terrain or global remap.</div>
+        <div class="pl-grid" id="edgePLGrid">
+          <div class="hdr">Level</div><div class="hdr">Edge family</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -318,7 +362,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 <!-- ════════════════ RIGHT COLUMN (sticky preview) ════════════════ -->
 <div class="right-col">
   <div class="section always-open">
-    <div class="sh"><span class="st">Preview</span><span class="sb" id="previewModeBadge"></span></div>
+    <div class="sh"><span class="st">Preview</span><span class="sb" id="previewModeBadge"></span><button class="sm" id="btnTogglePreviewMode" style="margin-left:auto;font-size:11px;padding:3px 8px;">Switch to height</button></div>
     <div class="section-body" style="padding-top:10px;">
       <div class="preview-canvas-wrap">
         <canvas id="cvPreview" width="128" height="128"></canvas>
@@ -326,7 +370,8 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div id="previewLabel">No source loaded</div>
       <div style="margin-top:10px;">
         <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px;">Level distribution</div>
-        <canvas id="cvHist" width="280" height="52" style="width:100%;border:none;border-radius:3px;display:block;"></canvas>
+        <canvas id="cvHist" width="280" height="40" style="width:100%;border:none;border-radius:3px;display:block;"></canvas>
+        <div id="histLabels" style="display:flex;margin-top:2px;"></div>
         <div class="legend" id="legend"></div>
       </div>
       <div class="g3" style="margin-top:10px;">
@@ -382,52 +427,37 @@ const TERRAINS=[
   {id:9,  name:'Rubble',           color:[129,129,129],edge:'Building_A',   group:'Humid'},
   {id:10, name:'Beach',            color:[197,158,102],edge:'Cliffs_A',     group:'Humid'},
   {id:20, name:'Black',            color:[20,20,20],   edge:'Cliffs_A',     group:'Special'},
-  {id:28, name:'Sand2',            color:[201,163,108],edge:'Cliffs_Purple',group:'Purple'},
-  {id:29, name:'Pebbles2',         color:[165,136,88], edge:'Cliffs_Purple',group:'Purple'},
-  {id:30, name:'Dunes2',           color:[201,163,108],edge:'Cliffs_Purple',group:'Purple'},
-  {id:31, name:'Cracks2',          color:[197,158,102],edge:'Cliffs_Purple',group:'Purple'},
-  {id:32, name:'Pavement2',        color:[131,131,131],edge:'Outpost',      group:'Purple'},
-  {id:33, name:'Rocks2',           color:[84,65,44],   edge:'Cliffs_Purple',group:'Purple'},
-  {id:34, name:'Tiles2',           color:[132,132,132],edge:'Building_A',   group:'Purple'},
-  {id:35, name:'Platform2',        color:[132,132,132],edge:'Outpost',      group:'Purple'},
-  {id:36, name:'Sandy_Dunes2',     color:[197,158,102],edge:'Cliffs_Purple',group:'Purple Blends'},
-  {id:37, name:'Sandy_Pebbles2',   color:[197,158,102],edge:'Cliffs_Purple',group:'Purple Blends'},
-  {id:38, name:'Pebble_Dunes2',    color:[197,158,102],edge:'Cliffs_Purple',group:'Purple Blends'},
-  {id:39, name:'Flat_Sand2',       color:[204,168,117],edge:'Cliffs_Purple',group:'Purple Blends'},
-  {id:40, name:'Flat_Rocks2',      color:[84,65,44],   edge:'Cliffs_Purple',group:'Purple Blends'},
-  {id:41, name:'Rocky_Sand2',      color:[197,158,102],edge:'Cliffs_Purple',group:'Purple Blends'},
-  {id:42, name:'Rocky_Pebbles2',   color:[165,136,88], edge:'Cliffs_Purple',group:'Purple Blends'},
-  {id:43, name:'Sandy_Concrete2',  color:[131,131,131],edge:'Outpost',      group:'Purple Blends'},
-  {id:44, name:'Sandy_Tiles2',     color:[92,65,36],   edge:'Outpost',      group:'Purple Blends'},
-  {id:45, name:'Cracked_Rocks2',   color:[84,65,44],   edge:'Cliffs_Purple',group:'Purple Blends'},
-  {id:46, name:'Cracked_Sand2',    color:[165,136,88], edge:'Cliffs_Purple',group:'Purple Blends'},
-  {id:47, name:'Sand3',            color:[30,30,30],   edge:'Cliffs_Storm', group:'Storm'},
-  {id:48, name:'Pebbles3',         color:[165,136,88], edge:'Cliffs_Storm', group:'Storm'},
-  {id:49, name:'Dunes3',           color:[201,163,108],edge:'Cliffs_Storm', group:'Storm'},
-  {id:50, name:'Cracks3',          color:[197,158,102],edge:'Cliffs_Storm', group:'Storm'},
-  {id:51, name:'Pavement3',        color:[131,131,131],edge:'Outpost',      group:'Storm'},
-  {id:52, name:'Rocks3',           color:[84,65,44],   edge:'Cliffs_Storm', group:'Storm'},
-  {id:53, name:'Tiles3',           color:[132,132,132],edge:'Building_A',   group:'Storm'},
-  {id:54, name:'Platform3',        color:[132,132,132],edge:'Outpost',      group:'Storm'},
-  {id:62, name:'Sand_Dunes_ST',    color:[197,158,102],edge:'Cliffs_Storm', group:'Storm Blends'},
-  {id:63, name:'Sand_Pebbles_ST',  color:[197,158,102],edge:'Cliffs_Storm', group:'Storm Blends'},
-  {id:64, name:'Sand_Rocks_ST',    color:[197,158,102],edge:'Cliffs_Storm', group:'Storm Blends'},
-  {id:65, name:'Sand_Cracks_ST',   color:[197,158,102],edge:'Cliffs_Storm', group:'Storm Blends'},
-  {id:66, name:'Pebbles_Cracks_ST',color:[197,158,102],edge:'Cliffs_Storm', group:'Storm Blends'},
-  {id:67, name:'Pebbles_Rocks_ST', color:[197,158,102],edge:'Cliffs_Storm', group:'Storm Blends'},
+  {id:47, name:'Chemical_Pebbles',    color:[165,136,88], edge:'Cliffs_Storm', group:'Chemical'},
+  {id:49, name:'Chemical_Dunes',      color:[201,163,108],edge:'Cliffs_Storm', group:'Chemical'},
+  {id:48, name:'Chemical_Sand',       color:[30,30,30],   edge:'Cliffs_Storm', group:'Chemical'},
+  {id:52, name:'Chemical_Cliffs',     color:[84,65,44],   edge:'Cliffs_Storm', group:'Chemical'},
+  {id:54, name:'Chemical_Platform',   color:[132,132,132],edge:'Outpost',      group:'Chemical'},
+  {id:51, name:'Chemical_Concrete',   color:[131,131,131],edge:'Outpost',      group:'Chemical'},
+  {id:53, name:'Chemical_Tiles',      color:[132,132,132],edge:'Building_A',   group:'Chemical'},
+  {id:50, name:'Chemical_Dry_Sand',   color:[197,158,102],edge:'Cliffs_Storm', group:'Chemical'},
+  {id:62, name:'Chemical_Dunes_Pebbles',   color:[197,158,102],edge:'Cliffs_Storm', group:'Chemical Blends'},
+  {id:63, name:'Chemical_Sandy_Concrete',  color:[131,131,131],edge:'Outpost',      group:'Chemical Blends'},
+  {id:64, name:'Chemical_Cliffs_Dunes',    color:[197,158,102],edge:'Cliffs_Storm', group:'Chemical Blends'},
+  {id:65, name:'Chemical_Cliffs_Pebbles',  color:[197,158,102],edge:'Cliffs_Storm', group:'Chemical Blends'},
+  {id:66, name:'Chemical_Sandy_Dunes',     color:[197,158,102],edge:'Cliffs_Storm', group:'Chemical Blends'},
+  {id:67, name:'Chemical_Sandy_Platform',  color:[197,158,102],edge:'Outpost',      group:'Chemical Blends'},
+  // Lava
   {id:80, name:'Ash_Flat',         color:[201,163,108],edge:'Cliffs_Lava',  group:'Lava'},
-  {id:82, name:'Ash_Bumps',        color:[165,136,88], edge:'Cliffs_Lava',  group:'Lava'},
+  {id:94, name:'Ash_Bumps',        color:[190,155,100],edge:'Cliffs_Lava',  group:'Lava'},
+  {id:82, name:'Ash_Soft_Bumps',   color:[165,136,88], edge:'Cliffs_Lava',  group:'Lava'},
   {id:81, name:'Dry_Lava',         color:[131,131,131],edge:'Cliffs_Lava',  group:'Lava'},
   {id:85, name:'Lava_Rocks',       color:[84,65,44],   edge:'Cliffs_Lava',  group:'Lava'},
   {id:83, name:'Lava_Veins',       color:[180,80,20],  edge:'Cliffs_Lava',  group:'Lava'},
   {id:84, name:'Lava_Pool',        color:[220,60,10],  edge:'Cliffs_Lava',  group:'Lava'},
   {id:86, name:'Lava_Blobs',       color:[100,60,40],  edge:'Cliffs_Lava',  group:'Lava'},
   {id:87, name:'Lava_Platform',    color:[132,132,132],edge:'Cliffs_Lava',  group:'Lava'},
+  {id:88, name:'Lava_Metal_Grid',  color:[100,100,110],edge:'Cliffs_Lava',  group:'Lava'},
   {id:89, name:'Ashy_Platform',    color:[160,140,110],edge:'Cliffs_Lava',  group:'Lava'},
   {id:90, name:'Veined_Platform',  color:[150,130,100],edge:'Cliffs_Lava',  group:'Lava'},
   {id:91, name:'Dry_Lava_Platform',color:[140,120,90], edge:'Cliffs_Lava',  group:'Lava'},
   {id:92, name:'Veined_Rocks',     color:[110,80,50],  edge:'Cliffs_Lava',  group:'Lava'},
   {id:93, name:'Ashy_Rocks',       color:[120,100,70], edge:'Cliffs_Lava',  group:'Lava'},
+  // Space Station
   {id:100,name:'Station_Platform', color:[20,20,30],   edge:'Spacestation_A',group:'Space Station'},
   {id:101,name:'Station1',         color:[165,136,88], edge:'Spacestation_A',group:'Space Station'},
   {id:102,name:'Station2',         color:[201,163,108],edge:'Spacestation_A',group:'Space Station'},
@@ -436,41 +466,157 @@ const TERRAINS=[
   {id:105,name:'Station5',         color:[84,65,44],   edge:'Spacestation_A',group:'Space Station'},
   {id:106,name:'Station6',         color:[132,132,132],edge:'Spacestation_A',group:'Space Station'},
   {id:107,name:'Station_Sand',     color:[197,158,102],edge:'Spacestation_A',group:'Space Station'},
+  // Metropolis
+  {id:120,name:'Metropolis_Pavement',   color:[110,110,118],edge:'Cliffs_Storm', group:'Metropolis'},
+  {id:121,name:'Metropolis_Sidewalk',   color:[130,128,135],edge:'Cliffs_Storm', group:'Metropolis'},
+  {id:122,name:'Metropolis_2',          color:[118,115,122],edge:'Cliffs_Storm', group:'Metropolis'},
+  {id:123,name:'Metropolis_3',          color:[105,102,110],edge:'Cliffs_Storm', group:'Metropolis'},
+  {id:124,name:'Metropolis_4',          color:[95,92,100],  edge:'Cliffs_Storm', group:'Metropolis'},
+  {id:125,name:'Metropolis_Sand',       color:[185,155,105],edge:'Cliffs_Storm', group:'Metropolis'},
+  {id:126,name:'Metropolis_Pebbles',    color:[155,135,100],edge:'Cliffs_Storm', group:'Metropolis'},
+  {id:127,name:'Metropolis_Grass',      color:[80,100,50],  edge:'Cliffs_Storm', group:'Metropolis'},
+  {id:128,name:'Metropolis_Sidewalk_Sandy',color:[150,140,110],edge:'Cliffs_Storm',group:'Metropolis Blends'},
+  {id:129,name:'Metropolis_Pavement_Sandy',color:[145,135,108],edge:'Cliffs_Storm',group:'Metropolis Blends'},
+  {id:130,name:'Metropolis_Sidewalk_Pavement',color:[120,118,125],edge:'Cliffs_Storm',group:'Metropolis Blends'},
+  {id:131,name:'Metropolis_Rocks',      color:[90,75,60],   edge:'Cliffs_Storm', group:'Metropolis Blends'},
+  {id:132,name:'Metropolis_Rocks_Sandy',color:[130,110,85], edge:'Cliffs_Storm', group:'Metropolis Blends'},
+  {id:133,name:'Metropolis_Rock_Slopes',color:[115,100,80], edge:'Cliffs_Storm', group:'Metropolis Blends'},
+  {id:134,name:'Metropolis_Grid_Rocks', color:[85,80,75],   edge:'Cliffs_Storm', group:'Metropolis Blends'},
+  {id:135,name:'Metropolis_Grid_Sand',  color:[160,140,100],edge:'Cliffs_Storm', group:'Metropolis Blends'},
+  {id:136,name:'Metropolis_Tiles_Rocks',color:[100,95,90],  edge:'Cliffs_Storm', group:'Metropolis Blends'},
+  // Jungle
+  {id:170,name:'Jungle_Grass',          color:[75,100,40],  edge:'Jungle_Cliff',  group:'Jungle'},
+  {id:171,name:'Jungle_Grassy_Sand',    color:[130,130,70], edge:'Jungle_Cliff',  group:'Jungle'},
+  {id:172,name:'Jungle_Ground',         color:[110,85,55],  edge:'Jungle_Cliff',  group:'Jungle'},
+  {id:173,name:'Jungle_Ground_Cracks',  color:[100,78,50],  edge:'Jungle_Cliff',  group:'Jungle'},
+  {id:174,name:'Jungle_Pavement3',      color:[120,118,125],edge:'Jungle_Cliff',  group:'Jungle'},
+  {id:175,name:'Jungle_Rocks',          color:[84,70,50],   edge:'Jungle_Cliff',  group:'Jungle'},
+  {id:176,name:'Jungle_Platform',       color:[130,130,135],edge:'Jungle_Cliff',  group:'Jungle'},
+  {id:177,name:'Jungle_TODO',           color:[90,90,90],   edge:'Jungle_Cliff',  group:'Jungle'},
+  {id:178,name:'Jungle_Grass_Ground',   color:[95,110,50],  edge:'Jungle_Cliff',  group:'Jungle Blends'},
+  {id:179,name:'Jungle_Soil_Grass',     color:[100,100,55], edge:'Jungle_Cliff',  group:'Jungle Blends'},
+  {id:180,name:'Jungle_Tiles_Soil',     color:[115,105,85], edge:'Jungle_Cliff',  group:'Jungle Blends'},
+  {id:181,name:'Jungle_Rocks_Grass',    color:[88,90,55],   edge:'Jungle_Cliff',  group:'Jungle Blends'},
+  {id:182,name:'Jungle_Pebbles_Cracks', color:[105,95,70],  edge:'Jungle_Cliff',  group:'Jungle Blends'},
+  {id:183,name:'Jungle_Pebbles_Rocks',  color:[95,85,60],   edge:'Jungle_Cliff',  group:'Jungle Blends'},
+  {id:184,name:'Jungle_Grass_Flat',     color:[80,105,42],  edge:'Jungle_Cliff',  group:'Jungle Blends'},
+  {id:185,name:'Jungle_Rockier_Grass',  color:[88,95,48],   edge:'Jungle_Cliff',  group:'Jungle Blends'},
+  {id:186,name:'Jungle_Pavement_Grass', color:[105,108,70], edge:'Jungle_Cliff',  group:'Jungle Blends'},
+  {id:187,name:'Jungle_Grass_Red_Ground',color:[100,85,60], edge:'Jungle_Cliff',  group:'Jungle Blends'},
+  {id:188,name:'Jungle_Underground_Soil',color:[90,75,55],  edge:'Jungle_Underground',group:'Jungle Blends'},
+  {id:189,name:'Jungle_Metal_Grid',     color:[90,95,100],  edge:'Jungle_Cliff',  group:'Jungle Blends'},
+  {id:190,name:'Jungle_Shallow_Water',  color:[80,130,160], edge:'Jungle_Cliff',  group:'Jungle Blends'},
+  // Legacy Purple (older game version — kept for backwards compatibility)
+  {id:28, name:'Sand2 (Legacy)',        color:[201,163,108],edge:'Cliffs_A',      group:'Legacy'},
+  {id:29, name:'Pebbles2 (Legacy)',     color:[165,136,88], edge:'Cliffs_A',      group:'Legacy'},
+  {id:30, name:'Dunes2 (Legacy)',       color:[201,163,108],edge:'Cliffs_A',      group:'Legacy'},
+  {id:31, name:'Cracks2 (Legacy)',      color:[197,158,102],edge:'Cliffs_A',      group:'Legacy'},
+  {id:32, name:'Pavement2 (Legacy)',    color:[131,131,131],edge:'Outpost',       group:'Legacy'},
+  {id:33, name:'Rocks2 (Legacy)',       color:[84,65,44],   edge:'Cliffs_A',      group:'Legacy'},
+  {id:34, name:'Tiles2 (Legacy)',       color:[132,132,132],edge:'Building_A',    group:'Legacy'},
+  {id:35, name:'Platform2 (Legacy)',    color:[132,132,132],edge:'Outpost',       group:'Legacy'},
+  {id:36, name:'Sandy_Dunes2 (Legacy)', color:[197,158,102],edge:'Cliffs_A',      group:'Legacy'},
+  {id:37, name:'Sandy_Pebbles2 (Legacy)',color:[197,158,102],edge:'Cliffs_A',     group:'Legacy'},
+  {id:38, name:'Pebble_Dunes2 (Legacy)',color:[197,158,102],edge:'Cliffs_A',      group:'Legacy'},
+  {id:39, name:'Flat_Sand2 (Legacy)',   color:[204,168,117],edge:'Cliffs_A',      group:'Legacy'},
+  {id:40, name:'Flat_Rocks2 (Legacy)',  color:[84,65,44],   edge:'Cliffs_A',      group:'Legacy'},
+  {id:41, name:'Rocky_Sand2 (Legacy)',  color:[197,158,102],edge:'Cliffs_A',      group:'Legacy'},
+  {id:42, name:'Rocky_Pebbles2 (Legacy)',color:[165,136,88],edge:'Cliffs_A',      group:'Legacy'},
+  {id:43, name:'Sandy_Concrete2 (Legacy)',color:[131,131,131],edge:'Outpost',     group:'Legacy'},
+  {id:44, name:'Sandy_Tiles2 (Legacy)', color:[92,65,36],   edge:'Outpost',       group:'Legacy'},
+  {id:45, name:'Cracked_Rocks2 (Legacy)',color:[84,65,44],  edge:'Cliffs_A',      group:'Legacy'},
+  {id:46, name:'Cracked_Sand2 (Legacy)',color:[165,136,88], edge:'Cliffs_A',      group:'Legacy'},
 ];
 
 const LS_GROUPS={
   0:['Desert','Desert Blends'],
-  1:['Purple','Purple Blends'],
+  1:['Chemical','Chemical Blends'],
   2:['Desert','Desert Blends','Humid'],
-  3:['Lava'],4:['Lava','Special'],
+  3:['Lava'],
+  4:['Lava','Special'],
   5:['Space Station'],
-  6:['Storm','Storm Blends','Humid'],
-  7:['Storm','Storm Blends','Special'],
+  6:['Metropolis','Metropolis Blends'],
+  7:['Metropolis','Metropolis Blends','Special'],
+  8:['Jungle','Jungle Blends'],
 };
-const LS_NAMES={0:'Desert',1:'Underground',2:'Desert City',3:'Lava',4:'Lava Underground',5:'Space Station',6:'Metro',7:'Metro Underground'};
+const LS_NAMES={0:'Desert',1:'Chemical/Underground',2:'Desert City',3:'Lava',4:'Lava Underground',5:'Space Station',6:'Metropolis',7:'Metro Underground',8:'Jungle'};
 const T_BY_ID=Object.fromEntries(TERRAINS.map(t=>[t.id,t]));
 
-// Edge remap tables
-const EDGE_FAM={
-  desert:     {base:2, rubble:12,flat:0, rocks:4, cracks:8, pave:3, tiles:7, platform:11},
-  underground:{base:28,rubble:29,flat:30,rocks:33,cracks:31,pave:32,tiles:34,platform:35},
-  lava:       {base:80,rubble:82,flat:81,rocks:85,cracks:83,pave:87,tiles:87,platform:87},
-  storm:      {base:49,rubble:48,flat:47,rocks:52,cracks:50,pave:51,tiles:53,platform:54},
-  spacestation:{base:102,rubble:101,flat:100,rocks:105,cracks:103,pave:104,tiles:106,platform:107},
-};
+// ── Edge data (from edges.csv) ────────────────────────────────────────────────
+// Each entry: key used in dropdowns, edge name, dlc group, noEditor flag,
+// and a terrain remap table (cat->terrainId) for that edge family.
+// 'default' = fallback terrain when no category match exists.
+const EDGES=[
+  // BASE DLC
+  {id:0,    key:'cliffs_a',       name:'Cliffs_A',              dlc:'Base',   noEditor:false, remap:{base:2,  rubble:12, flat:0,  rocks:4,  cracks:8,  pave:3,  tiles:7,  platform:11, default:2  }},
+  {id:1,    key:'building_a',     name:'Building_A',            dlc:'Base',   noEditor:false, remap:{base:7,  rubble:9,  flat:7,  rocks:9,  cracks:7,  pave:7,  tiles:7,  platform:11, default:7  }},
+  {id:6,    key:'building_b',     name:'Building_B',            dlc:'Base',   noEditor:false, remap:{default:9  }},
+  {id:9,    key:'building_c',     name:'Building_C',            dlc:'Base',   noEditor:false, remap:{default:9  }},
+  {id:8,    key:'skyscraper_a',   name:'Skyscraper_A',          dlc:'Base',   noEditor:false, remap:{default:7  }},
+  {id:2,    key:'outpost',        name:'Outpost',               dlc:'Base',   noEditor:false, remap:{base:3,  rubble:3,  flat:3,  rocks:4,  cracks:3,  pave:3,  tiles:11, platform:11, default:3  }},
+  {id:3,    key:'damaged_outpost',name:'Damaged_Outpost',       dlc:'Base',   noEditor:true,  remap:{default:3  }},
+  {id:4,    key:'destroyed_wall', name:'Destroyed_Wall',        dlc:'Base',   noEditor:true,  remap:{default:4  }},
+  {id:7,    key:'trenches',       name:'Trenches',              dlc:'Base',   noEditor:false, remap:{default:5  }},
+  {id:5,    key:'quay',           name:'Quay',                  dlc:'Base',   noEditor:false, remap:{default:10 }},
+  {id:10,   key:'tunnel_cliffs',  name:'Tunnel_Cliffs',         dlc:'Base',   noEditor:false, remap:{base:4,  rubble:4,  flat:4,  rocks:4,  cracks:4,  pave:3,  tiles:7,  platform:11, default:4  }},
+  {id:1001, key:'canal_wall',     name:'Canal_Wall',            dlc:'Base',   noEditor:false, remap:{default:3  }},
+  {id:1002, key:'internal_wall',  name:'Internal_Wall',         dlc:'Base',   noEditor:false, remap:{default:7  }},
+  {id:400,  key:'skyscraper_b',   name:'Skyscraper_B',          dlc:'Base',   noEditor:false, remap:{default:7  }},
+  {id:404,  key:'destroyed',      name:'Destroyed',             dlc:'Base',   noEditor:false, remap:{default:9  }},
+  {id:405,  key:'settler_house',  name:'Settler_House',         dlc:'Base',   noEditor:false, remap:{default:1  }},
+  // LAVA DLC
+  {id:11,   key:'industrial_b',   name:'Industrial_B',          dlc:'Lava',   noEditor:false, remap:{default:87 }},
+  {id:12,   key:'spacestation_a', name:'Spacestation_A',        dlc:'Lava',   noEditor:false, remap:{base:102,rubble:101,flat:100,rocks:105,cracks:103,pave:104,tiles:106,platform:107,default:102}},
+  {id:300,  key:'cliffs_lava',    name:'Cliffs_Lava',           dlc:'Lava',   noEditor:false, remap:{base:80, rubble:82, flat:81, rocks:85, cracks:83, pave:87, tiles:87, platform:87, default:80 }},
+  {id:301,  key:'cliffs_lava_veins',name:'Cliffs_Lava_Veins',  dlc:'Lava',   noEditor:false, remap:{base:83, rubble:86, flat:81, rocks:92, cracks:83, pave:87, tiles:87, platform:87, default:83 }},
+  {id:302,  key:'cliffs_lava_tunnel',name:'Cliffs_Lava_Tunnel',dlc:'Lava',   noEditor:false, remap:{base:81, rubble:82, flat:81, rocks:85, cracks:83, pave:87, tiles:87, platform:87, default:81 }},
+  // CHEM DLC
+  {id:200,  key:'cliffs_storm',   name:'Cliffs_Storm',          dlc:'Chem',   noEditor:false, remap:{base:49, rubble:48, flat:47, rocks:52, cracks:64, pave:51, tiles:53, platform:54, default:49 }},
+  {id:201,  key:'bug_prison',     name:'Bug_Prison',            dlc:'Chem',   noEditor:false, remap:{default:51 }},
+  {id:502,  key:'frost_building', name:'Frost_Building',        dlc:'Chem',   noEditor:false, remap:{default:51 }},
+  // METRO DLC
+  {id:401,  key:'under_construction',name:'UnderConstruction',  dlc:'Metro',  noEditor:false, remap:{base:120,rubble:126,flat:125,rocks:131,cracks:123,pave:120,tiles:121,platform:124,default:120}},
+  {id:402,  key:'office_walls',   name:'Office_Walls',          dlc:'Metro',  noEditor:false, remap:{base:120,rubble:126,flat:125,rocks:131,cracks:123,pave:120,tiles:121,platform:124,default:120}},
+  {id:406,  key:'warehouse',      name:'Warehouse',             dlc:'Metro',  noEditor:false, remap:{default:124}},
+  // JUNGLE DLC
+  {id:407,  key:'jungle_cliff',   name:'Jungle_Cliff',          dlc:'Jungle', noEditor:false, remap:{base:170,rubble:175,flat:172,rocks:175,cracks:173,pave:174,tiles:176,platform:176,default:170}},
+  {id:408,  key:'jungle_cliff_climbable',name:'Jungle_Cliff_Climbable',dlc:'Jungle',noEditor:false,remap:{base:170,rubble:175,flat:172,rocks:175,cracks:173,pave:174,tiles:176,platform:176,default:170}},
+  {id:409,  key:'jungle_underground',name:'Jungle_Underground', dlc:'Jungle', noEditor:false, remap:{base:188,rubble:175,flat:172,rocks:175,cracks:173,pave:174,tiles:189,platform:176,default:188}},
+  {id:410,  key:'settler_house_jungle',name:'Settler_House_Jungle',dlc:'Jungle',noEditor:false,remap:{default:170}},
+];
+const EDGE_BY_KEY=Object.fromEntries(EDGES.map(e=>[e.key,e]));
+
+// Underground biome uses Cliffs_Purple in terrain.csv (legacy name = Cliffs_A visual for Purple terrain)
+// Map it to the desert remap table since Purple terrain IS the underground cliff family
 const T_CAT={
+  // Desert
   2:'base',12:'rubble',0:'flat',4:'rocks',8:'cracks',3:'pave',7:'tiles',11:'platform',
   13:'base',26:'rubble',25:'flat',27:'rocks',18:'cracks',16:'pave',23:'tiles',14:'flat',15:'rocks',17:'rocks',22:'pave',21:'rubble',24:'pave',
-  1:'base',6:'flat',5:'flat',9:'rubble',10:'base',
+  1:'base',6:'flat',5:'flat',9:'rubble',10:'base',20:'flat',
+  // Legacy Purple (maps to desert categories)
   28:'base',29:'rubble',30:'flat',33:'rocks',31:'cracks',32:'pave',34:'tiles',35:'platform',
   36:'base',37:'rubble',38:'flat',40:'rocks',46:'cracks',43:'pave',44:'pave',39:'flat',41:'rocks',42:'rubble',45:'rocks',
-  80:'base',82:'rubble',81:'flat',85:'rocks',83:'cracks',84:'cracks',86:'rubble',87:'platform',89:'platform',90:'platform',91:'platform',92:'rocks',93:'rocks',
-  49:'base',48:'rubble',47:'flat',52:'rocks',50:'cracks',51:'pave',53:'tiles',54:'platform',
-  62:'base',63:'rubble',64:'rocks',65:'cracks',66:'cracks',67:'rocks',
+  // Chemical (Storm)
+  49:'base',48:'rubble',47:'flat',52:'rocks',50:'flat',51:'pave',53:'tiles',54:'platform',
+  62:'base',63:'pave',64:'base',65:'rubble',66:'base',67:'platform',
+  // Lava
+  80:'base',94:'rubble',82:'rubble',81:'flat',85:'rocks',83:'cracks',84:'cracks',86:'rubble',87:'platform',88:'tiles',89:'platform',90:'platform',91:'platform',92:'rocks',93:'rocks',
+  // Space Station
   100:'platform',101:'rubble',102:'base',103:'cracks',104:'pave',105:'rocks',106:'tiles',107:'base',
-  20:'flat',
+  // Metropolis
+  120:'pave',121:'tiles',122:'tiles',123:'tiles',124:'tiles',125:'base',126:'rubble',127:'base',
+  128:'pave',129:'pave',130:'tiles',131:'rocks',132:'rocks',133:'rocks',134:'rocks',135:'base',136:'tiles',
+  // Jungle
+  170:'base',171:'base',172:'flat',173:'rocks',174:'pave',175:'rocks',176:'platform',177:'flat',
+  178:'base',179:'flat',180:'tiles',181:'rocks',182:'cracks',183:'rubble',184:'base',185:'rocks',
+  186:'pave',187:'base',188:'flat',189:'tiles',190:'flat',
 };
-function remapTerrain(id,fam){if(!fam)return id;const f=EDGE_FAM[fam];if(!f)return id;return f[T_CAT[id]]??f.base;}
+function remapTerrain(tid,edgeKey){
+  if(!edgeKey)return tid;
+  const e=EDGE_BY_KEY[edgeKey];if(!e)return tid;
+  const cat=T_CAT[tid]||'base';
+  return e.remap[cat]??e.remap.default??tid;
+}
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let imgGray=null;
@@ -478,9 +624,11 @@ let tileData=null;          // Int16Array[16384], values 0..14 (map.json levels)
 let origTileData=null;      // snapshot at load time for reset
 let srcTiles=null;
 let srcByIndex={};          // Index -> original tile object
+let srcEdgeGroups=null;     // original EdgeGroups array from loaded map.json (null if none)
 let scenarioData=null;
 let activeSource='image';
 let activeLandscape=0;
+let previewMode='terrain';  // 'terrain' | 'height'
 
 // Undo/redo stacks (each entry is an Int16Array snapshot)
 const UNDO_MAX=10;
@@ -497,7 +645,7 @@ document.querySelectorAll('.sh[data-sec]').forEach(h=>{
 });
 
 // ── Tabs ───────────────────────────────────────────────────────────────────────
-function wireTabs(barId){
+function wireTabs(barId,onChange){
   const bar=document.getElementById(barId);if(!bar)return;
   bar.querySelectorAll('.tab').forEach(tab=>{
     tab.addEventListener('click',()=>{
@@ -505,10 +653,74 @@ function wireTabs(barId){
       tab.classList.add('active');
       bar.querySelectorAll('.tab').forEach(t=>{const p=document.getElementById('tab-'+t.dataset.tab);if(p)p.classList.remove('active');});
       const p=document.getElementById('tab-'+tab.dataset.tab);if(p)p.classList.add('active');
+      if(onChange)onChange();
     });
   });
 }
-wireTabs('srcBar');wireTabs('tBar');
+wireTabs('srcBar');
+wireTabs('tBar',updatePreview);
+wireTabs('eBar',updatePreview);
+
+// ── Edge select builder ────────────────────────────────────────────────────────
+// Landscape -> which DLC groups are "legal"
+const LS_EDGE_DLCS={
+  0:['Base'],
+  1:['Base','Chem'],
+  2:['Base'],
+  3:['Base','Lava'],
+  4:['Base','Lava'],
+  5:['Base','Lava'],
+  6:['Base','Metro'],
+  7:['Base','Metro'],
+  8:['Base','Jungle'],
+};
+
+function buildEdgeSelect(el){
+  const locked=document.getElementById('lockEdgeLandscape').checked;
+  const legalDlcs=locked?LS_EDGE_DLCS[activeLandscape]:null;
+  const showNoEditor=!locked; // noEditor visible only when restriction is off
+  const prev=el.value;
+  el.innerHTML='';
+  el.appendChild(new Option('— no change —',''));
+  // Group by DLC
+  const dlcs=[...new Set(EDGES.map(e=>e.dlc))];
+  dlcs.forEach(dlc=>{
+    if(legalDlcs&&!legalDlcs.includes(dlc))return;
+    const filtered=EDGES.filter(e=>e.dlc===dlc&&(showNoEditor||!e.noEditor));
+    if(!filtered.length)return;
+    const og=document.createElement('optgroup');og.label=dlc;
+    filtered.forEach(e=>og.appendChild(new Option(e.name,e.key)));
+    el.appendChild(og);
+  });
+  if(prev!==''&&el.querySelector(`option[value="${prev}"]`))el.value=prev;
+}
+
+function rebuildEdgeSelects(){
+  ['edgeRemap','edgeRemapLow','edgeRemapHigh'].forEach(id=>{
+    const el=document.getElementById(id);if(el)buildEdgeSelect(el);
+  });
+  for(let mv=0;mv<=MAX_LEVEL;mv++){
+    const s=document.getElementById(`edgePL_${mv}`);if(s)buildEdgeSelect(s);
+  }
+  // Update warn box
+  const anySet=['edgeRemap','edgeRemapLow','edgeRemapHigh'].some(id=>document.getElementById(id)?.value);
+  const w=document.getElementById('edgeWarn');if(w)w.style.display=anySet?'block':'none';
+}
+
+function buildEdgePLGrid(){
+  const g=document.getElementById('edgePLGrid');
+  while(g.children.length>2)g.removeChild(g.lastChild);
+  for(let mv=0;mv<=MAX_LEVEL;mv++){
+    const ev=toEditor(mv);
+    const b=document.createElement('div');b.className='lbadge';b.style.background=LV_COL[mv];
+    b.style.color=mv>=12?'#1a1a1a':'#fff';b.textContent=ev;
+    const s=document.createElement('select');s.id=`edgePL_${mv}`;s.style.fontSize='11px';
+    buildEdgeSelect(s);
+    s.addEventListener('change',updatePreview);
+    g.appendChild(b);g.appendChild(s);
+  }
+}
+buildEdgePLGrid();
 
 // ── Terrain selects ────────────────────────────────────────────────────────────
 function buildSelect(el,withNone,lockId){
@@ -574,6 +786,7 @@ function setActiveLandscape(id,source){
   badge.style.display='inline-block';badge.textContent=LS_NAMES[id];
   document.getElementById('lsBadgeNote').textContent={auto:'Auto-detected',scenario:'From scenario.json',manual:''}[source]||'';
   rebuildTerrainSelects();
+  rebuildEdgeSelects();
   // Pick first legal terrain if current isn't legal
   const legal=LS_GROUPS[id];
   const cur=parseInt(document.getElementById('terrainSelect').value);
@@ -587,22 +800,41 @@ function setActiveLandscape(id,source){
 
 document.getElementById('landscapeSelect').addEventListener('change',()=>setActiveLandscape(parseInt(document.getElementById('landscapeSelect').value),'manual'));
 document.getElementById('lockLandscape').addEventListener('change',rebuildTerrainSelects);
-document.getElementById('lockEdgeLandscape').addEventListener('change',()=>{}); // no rebuild needed, used at export
+document.getElementById('lockEdgeLandscape').addEventListener('change',updatePreview);
 
-// ── Edge remap ─────────────────────────────────────────────────────────────────
-document.getElementById('edgeRemap').addEventListener('change',()=>{
-  const v=document.getElementById('edgeRemap').value;
-  const notes={
-    '':'',
-    desert:'Remaps all terrain to Desert equivalents (Cliffs_A).',
-    underground:'Remaps all terrain to Underground equivalents (Cliffs_Purple).',
-    lava:'Remaps all terrain to Lava equivalents (Cliffs_Lava).',
-    storm:'Remaps all terrain to Metro/Storm equivalents (Cliffs_Storm).',
-    spacestation:'Remaps all terrain to Space Station equivalents (Spacestation_A).',
-  };
-  document.getElementById('edgeNote').textContent=notes[v]||'';
-  document.getElementById('edgeWarn').style.display=v?'block':'none';
-  updatePreview();
+// ── Edge remap helpers ─────────────────────────────────────────────────────────
+function activeEdgeTab(){const a=document.querySelector('#eBar .tab.active');return a?a.dataset.tab:'ea-simple';}
+
+function edgeFamilyForMapLevel(mv){
+  const tab=activeEdgeTab();
+  const ev=toEditor(mv);
+  if(tab==='ea-bylevel'){const s=document.getElementById(`edgePL_${mv}`);if(s&&s.value!=='')return s.value;}
+  if(tab==='ea-overrides'){
+    const lo=document.getElementById('edgeRemapLow').value;
+    const hi=document.getElementById('edgeRemapHigh').value;
+    if(lo!==''&&ev<=2)return lo;
+    if(hi!==''&&ev>=10)return hi;
+  }
+  if(tab==='ea-simple'||tab==='ea-overrides'){
+    // fall back to global remap if set
+    const g=document.getElementById('edgeRemap').value;
+    return g||'';
+  }
+  return '';
+}
+
+// Show/hide warn box when global remap changes
+['edgeRemap','edgeRemapLow','edgeRemapHigh'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el)el.addEventListener('change',()=>{
+    const anySet=[
+      document.getElementById('edgeRemap').value,
+      document.getElementById('edgeRemapLow').value,
+      document.getElementById('edgeRemapHigh').value,
+    ].some(v=>v!=='');
+    document.getElementById('edgeWarn').style.display=anySet?'block':'none';
+    updatePreview();
+  });
 });
 
 // ── Sliders ────────────────────────────────────────────────────────────────────
@@ -645,12 +877,21 @@ makeDrop('dzImg','fiImg',file=>{
     tmp.getContext('2d').drawImage(img,0,0,W,H);
     const px=tmp.getContext('2d').getImageData(0,0,W,H).data;
     imgGray=new Float32Array(W*H);
-    for(let i=0;i<W*H;i++)imgGray[i]=(0.299*px[i*4]+0.587*px[i*4+1]+0.114*px[i*4+2])/255;
+    for(let i=0;i<W*H;i++){
+      // Flip rows at read time: image row 0 (top) → game row H-1 (bottom).
+      // This way tileData[Index] is already in game coordinate order,
+      // and the preview renders without any additional transform —
+      // the map will match the image as drawn.
+      const imgRow=Math.floor(i/W), col=i%W;
+      const flippedRow=H-1-imgRow;
+      const pi=(flippedRow*W+col)*4;
+      imgGray[i]=(0.299*px[pi]+0.587*px[pi+1]+0.114*px[pi+2])/255;
+    }
     URL.revokeObjectURL(url);
     msg.textContent=`${file.name} (${img.naturalWidth}×${img.naturalHeight} → 128×128)`;msg.className='msg ok';
     document.getElementById('dzImg').classList.add('loaded');
     document.getElementById('srcBadge').textContent='Image loaded';
-    activeSource='image';srcTiles=null;srcByIndex={};
+    activeSource='image';srcTiles=null;srcByIndex={};srcEdgeGroups=null;
     recompute();enableTools();
   };
   img.onerror=()=>{msg.textContent='Could not read image.';msg.className='msg err';};
@@ -666,13 +907,16 @@ makeDrop('dzMap','fiMap',file=>{
       const data=JSON.parse(e.target.result);
       if(!Array.isArray(data.Tiles))throw new Error('No Tiles array');
       srcTiles=data.Tiles;
+      srcEdgeGroups=Array.isArray(data.EdgeGroups)?data.EdgeGroups:null;
       srcByIndex={};
       srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)srcByIndex[t.Index]=t;});
       tileData=new Int16Array(W*H);
       srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)tileData[t.Index]=Math.max(0,Math.min(MAX_LEVEL,t.Level));});
       origTileData=tileData.slice();
       undoStack=[];redoStack=[];updateUndoButtons();
-      msg.textContent=`${file.name} — ${data.Tiles.length} tiles`;msg.className='msg ok';
+      // file.name is always just the filename in browsers, never a path
+      const fname=(file.name||'map.json').replace(/^.*[\\/]/,'');
+      msg.textContent=`${fname} — ${data.Tiles.length.toLocaleString()} tiles`;msg.className='msg ok';
       document.getElementById('dzMap').classList.add('loaded');
       document.getElementById('srcBadge').textContent=`${data.Tiles.length.toLocaleString()} tiles`;
       activeSource='map';
@@ -738,6 +982,14 @@ function terrainForMapLevel(mv){
   return parseInt(document.getElementById('terrainSelect').value)||0;
 }
 
+// ── Preview mode toggle ────────────────────────────────────────────────────────
+document.getElementById('btnTogglePreviewMode').addEventListener('click',()=>{
+  previewMode=(previewMode==='terrain')?'height':'terrain';
+  document.getElementById('btnTogglePreviewMode').textContent=
+    previewMode==='terrain'?'Switch to height':'Switch to terrain';
+  updatePreview();
+});
+
 // ── Preview ────────────────────────────────────────────────────────────────────
 function updatePreview(){
   if(!tileData)return;
@@ -745,50 +997,83 @@ function updatePreview(){
   const ctx=canvas.getContext('2d');
   const imgData=ctx.createImageData(W,H);
   const dist=new Array(MAX_LEVEL+1).fill(0);
-  const useTC=(activeSource==='map'&&Object.keys(srcByIndex).length>0);
-  const edgeTarget=document.getElementById('edgeRemap').value;
+
+  // Cache all settings before the per-tile loop (avoids 16k× DOM reads)
+  const showTerrainColours=previewMode==='terrain';
+  const terrainTab=activeTerrainTab();
+  const isPreserve=(activeSource==='map'&&Object.keys(srcByIndex).length>0
+                    &&terrainTab==='ta-simple'
+                    &&document.getElementById('chkPreserve').checked);
+  // Pre-resolve terrain ID for non-preserve modes (same for every level in simple tab,
+  // but terrainForMapLevel is cheap so we call it per tile only for overrides)
+  const edgeKey=edgeFamilyForMapLevel(0); // edge key is level-independent for simple tab
+  // For per-level edge and terrain, we must call per tile — but cache the tab values
+  const edgeTabActive=activeEdgeTab();
 
   for(let i=0;i<W*H;i++){
     const mv=Math.max(0,Math.min(MAX_LEVEL,tileData[i]));
     dist[mv]++;
     let r,g,b;
-    if(useTC){
-      const tile=srcByIndex[i];
-      let tid=tile?tile.TerrainTypeId:-1;
-      if(edgeTarget&&tid>=0)tid=remapTerrain(tid,edgeTarget);
+    if(showTerrainColours){
+      let tid;
+      if(isPreserve){
+        const tile=srcByIndex[i];
+        tid=tile?tile.TerrainTypeId:-1;
+      }else{
+        tid=terrainForMapLevel(mv);
+      }
+      // Edge remap for preview — only applies if edge tab is active (not 'no change')
+      // Use per-level lookup only when needed
+      const ef=(edgeTabActive==='ea-bylevel'||edgeTabActive==='ea-overrides')
+        ? edgeFamilyForMapLevel(mv)
+        : edgeKey;
+      if(ef&&tid>=0)tid=remapTerrain(tid,ef);
       const t=tid>=0?T_BY_ID[tid]:null;
       if(t){[r,g,b]=t.color;}
       else{const h=LV_COL[mv];r=parseInt(h.slice(1,3),16);g=parseInt(h.slice(3,5),16);b=parseInt(h.slice(5,7),16);}
     }else{
       const h=LV_COL[mv];r=parseInt(h.slice(1,3),16);g=parseInt(h.slice(3,5),16);b=parseInt(h.slice(5,7),16);
     }
-    imgData.data[i*4]=r;imgData.data[i*4+1]=g;imgData.data[i*4+2]=b;imgData.data[i*4+3]=255;
+    // Display flip: preview row 0 shows the bottom of the tile grid (matching game orientation).
+    // tileData and exports are NOT affected — only the canvas pixel placement is flipped.
+    const row=Math.floor(i/W), col=i%W;
+    const ci=(H-1-row)*W+col;
+    imgData.data[ci*4]=r;imgData.data[ci*4+1]=g;imgData.data[ci*4+2]=b;imgData.data[ci*4+3]=255;
   }
   ctx.putImageData(imgData,0,0);
 
   const used=dist.map((c,i)=>c>0?toEditor(i):null).filter(x=>x!==null);
   const lo=used.length?Math.min(...used):0,hi=used.length?Math.max(...used):0;
   document.getElementById('previewLabel').textContent=
-    `Editor levels ${lo} to ${hi} · ${useTC?'terrain colours':'dark=low, bright=high'}`;
-  document.getElementById('previewModeBadge').textContent=useTC?'terrain colours':'height colours';
+    `Editor levels ${lo}–${hi} · ${showTerrainColours?'terrain colours':'height colours (dark=low)'}`;
+  document.getElementById('previewModeBadge').textContent=previewMode;
   document.getElementById('sTiles').textContent=(W*H).toLocaleString();
   document.getElementById('sRange').textContent=used.length?`${lo}–${hi}`:'—';
   document.getElementById('sNonZero').textContent=dist.slice(1).reduce((a,b)=>a+b,0).toLocaleString();
   drawHist(dist);drawLegend(dist);
 }
 
+function buildHistLabels(){
+  const el=document.getElementById('histLabels');
+  el.innerHTML='';
+  for(let mv=0;mv<=MAX_LEVEL;mv++){
+    const d=document.createElement('div');
+    d.style.cssText=`flex:1;text-align:center;font-size:9px;color:var(--text3);font-family:monospace;min-width:0;overflow:hidden;`;
+    d.textContent=toEditor(mv);
+    el.appendChild(d);
+  }
+}
+buildHistLabels();
+
 function drawHist(dist){
   const c=document.getElementById('cvHist');
-  // Use attribute width (280) not offset width to avoid racing with CSS
   const cw=c.width,ch=c.height;
   const ctx=c.getContext('2d');
   ctx.clearRect(0,0,cw,ch);
   const max=Math.max(...dist,1),bw=cw/(MAX_LEVEL+1);
   for(let mv=0;mv<=MAX_LEVEL;mv++){
-    const bh=Math.round((dist[mv]/max)*(ch-14));
-    ctx.fillStyle=LV_COL[mv];ctx.fillRect(mv*bw+1,ch-14-bh,bw-2,bh);
-    ctx.fillStyle=mv>=12?'#ccc':'#888';ctx.font='8px monospace';ctx.textAlign='center';
-    ctx.fillText(toEditor(mv),mv*bw+bw/2,ch-2);
+    const bh=Math.round((dist[mv]/max)*ch);
+    if(bh>0){ctx.fillStyle=LV_COL[mv];ctx.fillRect(mv*bw+1,ch-bh,bw-2,bh);}
   }
 }
 
@@ -892,40 +1177,110 @@ document.getElementById('btnReset').addEventListener('click',()=>{
 });
 
 // ── Build export tiles ─────────────────────────────────────────────────────────
+
+// Type=2 = cliff BASE: tile that has at least one orthogonal neighbour at a HIGHER level.
+// The engine renders cliff walls upward from these tiles.
+// Type=0 = flat ground, or cliff top (no wall rendered from this tile upward).
+function computeTypesForExport(levels){
+  const types=new Uint8Array(W*H);
+  for(let i=0;i<W*H;i++){
+    const lv=levels[i];
+    const row=Math.floor(i/W),col=i%W;
+    const nbrs=[
+      row>0   ?levels[i-W]:lv, row<H-1?levels[i+W]:lv,
+      col>0   ?levels[i-1]:lv, col<W-1?levels[i+1]:lv,
+    ];
+    if(nbrs.some(n=>n>lv))types[i]=2;
+  }
+  return types;
+}
+
 function buildTiles(){
   if(!tileData)return null;
   const tab=activeTerrainTab();
   const preserve=document.getElementById('chkPreserve').checked;
-  const edgeTarget=document.getElementById('edgeRemap').value;
   const lockEdge=document.getElementById('lockEdgeLandscape').checked;
+  const isPreserveMap=activeSource==='map'&&preserve&&tab==='ta-simple';
+
+  // Resolve the EdgeTypeId to write for each tile.
+  // Edges are stored in EdgeGroups[].EdgeTypeId (from edges.csv id column),
+  // completely separate from TerrainTypeId (surface texture).
+  // edgeFamilyForMapLevel() returns an EDGES key (e.g. 'building_a').
+  // We look up the numeric id from EDGES to write into EdgeGroups.
+  // If no edge is selected, we preserve the original EdgeGroup if available,
+  // or default to Cliffs_A (id=0).
+
+  // Build a lookup: TileIndex -> original EdgeTypeId (from loaded map)
+  const origEdgeById={};
+  if(srcEdgeGroups){
+    srcEdgeGroups.forEach(eg=>{origEdgeById[eg.TileIndex]=eg.EdgeTypeId;});
+  }
+
+  // Pre-compute cliff-base Types
+  const computedTypes=computeTypesForExport(tileData);
+
   const tiles=[];
+  const edgeGroups=[];
 
   for(let i=0;i<W*H;i++){
     const mv=clampMap(tileData[i]);
     let terrain,type;
+    const origTile=srcByIndex[i];
 
-    if(activeSource==='map'&&preserve&&tab==='ta-simple'){
-      const orig=srcByIndex[i];
-      terrain=orig?orig.TerrainTypeId:terrainForMapLevel(mv);
-      type=orig?orig.Type:0; // preserve original Type (not recomputed)
+    // ── Terrain (surface texture) ────────────────────────────────────────────
+    if(isPreserveMap){
+      terrain=origTile?origTile.TerrainTypeId:terrainForMapLevel(mv);
+      type=origTile?origTile.Type:computedTypes[i];
     }else{
       terrain=terrainForMapLevel(mv);
-      type=0; // Type=0 for image imports; engine handles cliffs from level differences
-    }
-
-    // Apply edge remap (optionally filtered to legal landscape terrains)
-    if(edgeTarget){
-      const remapped=remapTerrain(terrain,edgeTarget);
-      if(!lockEdge){terrain=remapped;}
-      else{
-        const rt=T_BY_ID[remapped];
-        if(rt&&LS_GROUPS[activeLandscape].includes(rt.group))terrain=remapped;
-      }
+      if(origTile?.Type===1){ type=1; }
+      else{ type=computedTypes[i]; }
     }
 
     tiles.push({Index:i,Level:mv,Type:type,TerrainTypeId:terrain});
+
+    // ── EdgeGroups (cliff wall style) ────────────────────────────────────────
+    // Only Type=2 tiles get EdgeGroup entries (confirmed from editor-saved maps)
+    if(type===2){
+      // Determine which edge family the user selected for this level
+      const edgeKey=edgeFamilyForMapLevel(mv);
+      let edgeTypeId;
+
+      if(!edgeKey){
+        // No edge selected — preserve original if available, else Cliffs_A
+        edgeTypeId=origEdgeById.hasOwnProperty(i)?origEdgeById[i]:0;
+      }else{
+        // Look up numeric EdgeTypeId from EDGES array
+        const edgeDef=EDGE_BY_KEY[edgeKey];
+        if(!edgeDef){
+          edgeTypeId=origEdgeById.hasOwnProperty(i)?origEdgeById[i]:0;
+        }else if(lockEdge){
+          // Only apply if within legal landscape DLCs
+          const legalDlcs=LS_EDGE_DLCS[activeLandscape]||[];
+          edgeTypeId=legalDlcs.includes(edgeDef.dlc)?edgeDef.id
+            :(origEdgeById.hasOwnProperty(i)?origEdgeById[i]:0);
+        }else{
+          edgeTypeId=edgeDef.id;
+        }
+      }
+
+      edgeGroups.push({
+        TileIndex:i,
+        EdgeTypeId:edgeTypeId||0,
+        EdgeVariationsIncludeFootAndRoof:true,
+        EdgeVariations:[-1,-1,i%3],  // third value matches editor pattern (0/1/2 variation seed)
+      });
+    }
   }
-  return{Width:W,Height:H,Tiles:tiles};
+
+  // Include Decorations from source if present (pass-through, don't modify)
+  const result={Width:W,Height:H,Tiles:tiles,EdgeGroups:edgeGroups};
+  if(srcEdgeGroups===null&&edgeGroups.length===0){
+    // Image import with no edge selection — omit EdgeGroups entirely
+    // so the game uses its defaults (same as original image-only export)
+    delete result.EdgeGroups;
+  }
+  return result;
 }
 
 // ── Export ─────────────────────────────────────────────────────────────────────

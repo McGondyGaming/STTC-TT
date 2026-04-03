@@ -101,8 +101,12 @@ This tool allows you to:
  - Tested in Chrome, stavle builds will be tested in a few browsers (e.g. Firefox, Edge)
 
 ## Known Issues:
- - Modifying elevations in a map with more than one elevation will remove all edges
- - Image imports may generate Type = 0 (read: sheer cliffs, no edges)
- - Image imports may generate edges, but only the default type
- - Preview for existing `map.json` files presents an inverted terrain map as opposed to a heightmap
- - Image import results in vertically flipped map
+- Outside corner edges may not be generated
+- Edges are presented as linked to terrains, not the case
+- All maps default to desert biome
+
+## Change Notes:
+ - Edge selection no longer modifies preview
+ - Imported image, preview and generated map have same orientation
+ - Edges applied to elevations
+ - Switch between terrain colours and heightmap preview 
