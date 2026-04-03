@@ -31,12 +31,16 @@ A living document for tracking ideas, improvements, and future direction for the
 - [ ] Show tile coordinates on hover
 - [ ] Zoom / inspect specific tiles
 - [ ] Colourblind accessibility options
-- [ ] Level -1 render as water in preview (with terrain underlay)
+- [ ] Level -1 render as water in preview (with terrain underlay) - toggleable?
+- [ ] Terrain traversability overlay
+- [ ] Terrain traversability (including blocking decors) overlay
     
 ### Generation
 - [ ] Noise (Perlin/Simplex) generator for quick prototyping
-- [ ] Map orientaion controls (Flip, invert, rotate)
+- [ ] Map orientaion controls (flip, invert, rotate)
 
+### Scenario integration 
+- [ ] Map-wide decor orientation controls (flip, rotate)
 ---
 
 ## Technical Improvements
