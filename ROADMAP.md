@@ -1,4 +1,4 @@
-# STTCTT Roadmap
+# STTC-TT Roadmap
 
 A living document for tracking ideas, improvements, and future direction for the terrain tool.
 
