@@ -108,3 +108,8 @@ This tool allows you to:
  - Imported image, preview and generated map have same orientation
  - Edges applied to elevations
  - Switch between terrain colours and heightmap preview 
+ - Icon created
+ - Option to include debug STTC-TT information embedded in map.json
+ - Improve preview performance
+ - Decouple edges from terrain selection
+ - Default TerrainTypeId set to --no change--

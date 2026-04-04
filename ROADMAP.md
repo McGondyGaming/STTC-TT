@@ -6,16 +6,6 @@ A living document for tracking ideas, improvements, and future direction for the
 
 ## Current Focus
 
-### Testing
-
-- [ ] Improve testing workflow (test packs + repeatable process)
-
-### Bugfixes
-
-- [ ] Validate edge remapping behaviour across all landscapes
-- [ ] Fix any inconsistencies in terrain assignment logic
-- [ ] Map vertical flip (in tool and game)
-
 ---
 
 ## Ideas
@@ -41,6 +31,7 @@ A living document for tracking ideas, improvements, and future direction for the
 
 ### Scenario integration 
 - [ ] Map-wide decor orientation controls (flip, rotate)
+
 ---
 
 ## Technical Improvements
@@ -62,7 +53,10 @@ Completed items
 - [x] Edge remapping system
 - [x] Undo / redo system
 - [x] Live preview + histogram
-
+- [x] Improve testing workflow (test packs + repeatable process)
+- [x] Validate edge remapping behaviour across all landscapes
+- [x] Fix any inconsistencies in terrain assignment logic
+- [x] Map vertical flip (in tool and game)
 ---
 
 ## Notes

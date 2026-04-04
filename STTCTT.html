@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Heightmap Importer</title>
+<title>STTC-TT</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cmask id='m'%3E%3Crect width='100' height='100' fill='white'/%3E%3Ccircle cx='50' cy='50' r='18' fill='black'/%3E%3C/mask%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='48' stroke='white' stroke-width='4' fill='none'/%3E%3Cpath mask='url(%23m)' d='M50,2 L59.2,33.5 L83.9,16.1 L66.5,40.8 L98,50 L66.5,59.2 L83.9,83.9 L59.2,66.5 L50,98 L40.8,66.5 L16.1,83.9 L33.5,59.2 L2,50 L33.5,40.8 L16.1,16.1 L40.8,33.5 Z' fill='%23e65100' stroke='white' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='18' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
 <style>
 :root{
   --bg:#f5f4f0;--bg2:#eceae4;--bg3:#fff;
@@ -133,8 +134,16 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 </head>
 <body>
 
-<h1>STTC-TT</h1>
-<div class="subtitle">Starship Troopers Terran Command — Terrain Tool · <a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · Not officially sanctioned · MIT licence</div>
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:3px;">
+  <svg width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+    <defs><mask id="hm"><rect width="100" height="100" fill="white"/><circle cx="50" cy="50" r="18" fill="black"/></mask></defs>
+    <circle cx="50" cy="50" r="48" stroke="currentColor" stroke-width="4" fill="none" opacity="0.5"/>
+    <path mask="url(#hm)" d="M50,2 L59.2,33.5 L83.9,16.1 L66.5,40.8 L98,50 L66.5,59.2 L83.9,83.9 L59.2,66.5 L50,98 L40.8,66.5 L16.1,83.9 L33.5,59.2 L2,50 L33.5,40.8 L16.1,16.1 L40.8,33.5 Z" fill="#e65100" stroke="currentColor" stroke-width="2"/>
+    <circle cx="50" cy="50" r="18" stroke="currentColor" stroke-width="3" fill="none"/>
+  </svg>
+  <h1>Starship Troopers Terran Command Terrain Tool</h1>
+</div>
+<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
 
 <div class="layout">
 <!-- ════════════════ LEFT COLUMN ════════════════ -->
@@ -152,7 +161,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <div class="tab" data-tab="src-map">Load map.json</div>
       </div>
       <div class="tp active" id="tab-src-image">
-        <div class="dz" id="dzImg"><div class="dl"><strong>Drop heightmap image here</strong></div><div class="dl">PNG / BMP / JPEG — resampled to 128×128</div><input type="file" id="fiImg" accept="image/*" style="display:none"></div>
+        <div class="dz" id="dzImg"><div class="dl"><strong>Drop heightmap image here</strong></div><div class="dl">PNG / BMP / JPEG - resampled to 128×128</div><input type="file" id="fiImg" accept="image/*" style="display:none"></div>
         <div class="msg" id="msgImg"></div>
         <div style="margin-top:11px;">
           <div class="field"><label class="fl">Quantization steps</label><div class="rr"><input type="range" id="levels" min="2" max="15" value="15" step="1"><span class="rv" id="levelsOut">15</span></div></div>
@@ -161,7 +170,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         </div>
       </div>
       <div class="tp" id="tab-src-map">
-        <div class="dz" id="dzMap"><div class="dl"><strong>Drop map.json here</strong></div><div class="dl">Loads levels and terrain — auto-detects landscape</div><input type="file" id="fiMap" accept=".json,application/json" style="display:none"></div>
+        <div class="dz" id="dzMap"><div class="dl"><strong>Drop map.json here</strong></div><div class="dl">Loads levels and terrain - auto-detects landscape</div><input type="file" id="fiMap" accept=".json,application/json" style="display:none"></div>
         <div class="msg" id="msgMap"></div>
       </div>
     </div>
@@ -175,21 +184,21 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
-      <div class="note">Controls <code>LandscapeId</code> in scenario.json — sets which cliff and terrain assets the engine uses.</div>
+      <div class="note">Controls <code>LandscapeId</code> in scenario.json - sets which cliff and terrain assets the engine uses.</div>
       <div class="dz" id="dzScenario" style="padding:11px 10px;"><div class="dl"><strong>Drop scenario.json here</strong></div><div class="dl">Reads LandscapeId, included in export</div><input type="file" id="fiScenario" accept=".json,application/json" style="display:none"></div>
       <div class="msg" id="msgScenario"></div>
       <div class="field" style="margin-top:10px;">
         <label class="fl">Landscape</label>
         <select id="landscapeSelect">
-          <option value="0">0 — Desert</option>
-          <option value="1">1 — Chemical / Underground</option>
-          <option value="2">2 — Desert City</option>
-          <option value="3">3 — Lava</option>
-          <option value="4">4 — Lava Underground</option>
-          <option value="5">5 — Space Station</option>
-          <option value="6">6 — Metropolis</option>
-          <option value="7">7 — Metro Underground</option>
-          <option value="8">8 — Jungle</option>
+          <option value="0">0 - Desert</option>
+          <option value="1">1 - Chemical / Underground</option>
+          <option value="2">2 - Desert City</option>
+          <option value="3">3 - Lava</option>
+          <option value="4">4 - Lava Underground</option>
+          <option value="5">5 - Space Station</option>
+          <option value="6">6 - Metropolis</option>
+          <option value="7">7 - Metro Underground</option>
+          <option value="8">8 - Jungle</option>
         </select>
       </div>
     </div>
@@ -215,7 +224,6 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
           <div class="field">
             <label class="fl">Default TerrainTypeId</label>
             <select id="terrainSelect"></select>
-            <div class="ch"><div class="tsw" id="tSwatch"></div><span id="tHint"></span></div>
           </div>
           <div class="field">
             <label class="ck-row" style="margin-top:2px;"><input type="checkbox" id="chkPreserve" checked>Preserve existing terrain (map.json)</label>
@@ -224,10 +232,10 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         </div>
       </div>
       <div class="tp" id="tab-ta-overrides">
-        <div class="note">Mid levels (editor 3–9) use the default above.</div>
+        <div class="note">Mid levels (editor 3-9) use the default above.</div>
         <div class="tc">
-          <div class="field"><label class="fl">Low (−1 to 2)</label><select id="lowTerrain"><option value="">— no change —</option></select></div>
-          <div class="field"><label class="fl">High (10 to 13)</label><select id="highTerrain"><option value="">— no change —</option></select></div>
+          <div class="field"><label class="fl">Low (−1 to 2)</label><select id="lowTerrain"><option value="">- no change -</option></select></div>
+          <div class="field"><label class="fl">High (10 to 13)</label><select id="highTerrain"><option value="">- no change -</option></select></div>
         </div>
       </div>
       <div class="tp" id="tab-ta-bylevel">
@@ -247,8 +255,9 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
-      <div class="note">Edge style (cliff walls) is encoded in <code>TerrainTypeId</code> via each terrain's edge family. Selecting an edge family remaps all terrain IDs to equivalents that use that cliff asset set. Terrain and edge are independent — both apply to the final export regardless of source.</div>
-      <div class="field"><label class="ck-row"><input type="checkbox" id="lockEdgeLandscape" checked>Restrict to legal landscape terrains only</label></div>
+      <div class="note">Cliff walls are written as <code>EdgeGroups</code> entries in the exported <code>map.json</code></div>
+      <div class="field"><label class="ck-row"><input type="checkbox" id="lockEdgeLandscape" checked>Restrict to legal landscape edges only</label></div>
+      <div class="ch" style="margin-bottom:10px;"><div class="tsw" id="tSwatch"></div><span id="tHint" style="font-size:11px;color:var(--text3);"></span></div>
 
       <div class="tab-bar" id="eBar">
         <div class="tab active" data-tab="ea-simple">No change / all</div>
@@ -260,40 +269,40 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <div class="field">
           <label class="fl">Remap all terrain to edge family</label>
           <select id="edgeRemap">
-            <option value="">— no change —</option>
-            <option value="desert">Desert — Cliffs_A</option>
-            <option value="underground">Underground — Cliffs_Purple</option>
-            <option value="lava">Lava — Cliffs_Lava</option>
-            <option value="storm">Metro / Storm — Cliffs_Storm</option>
-            <option value="spacestation">Space Station — Spacestation_A</option>
+            <option value="">- no change -</option>
+            <option value="desert">Desert - Cliffs_A</option>
+            <option value="underground">Underground - Cliffs_Purple</option>
+            <option value="lava">Lava - Cliffs_Lava</option>
+            <option value="storm">Metro / Storm - Cliffs_Storm</option>
+            <option value="spacestation">Space Station - Spacestation_A</option>
           </select>
         </div>
         <div class="warn-box" id="edgeWarn" style="display:none;">Remapping replaces <em>all</em> TerrainTypeIds. Blend tiles without a direct equivalent fall back to the base type for that family.</div>
       </div>
 
       <div class="tp" id="tab-ea-overrides">
-        <div class="note">Override edge family at the extremes — mid levels (editor 3–9) keep the global remap or no change.</div>
+        <div class="note">Override edge family at the extremes - mid levels (editor 3-9) keep the global remap or no change.</div>
         <div class="tc">
           <div class="field">
             <label class="fl">Low (−1 to 2) → edge family</label>
             <select id="edgeRemapLow">
-              <option value="">— no change —</option>
-              <option value="desert">Desert — Cliffs_A</option>
-              <option value="underground">Underground — Cliffs_Purple</option>
-              <option value="lava">Lava — Cliffs_Lava</option>
-              <option value="storm">Metro / Storm — Cliffs_Storm</option>
-              <option value="spacestation">Space Station — Spacestation_A</option>
+              <option value="">- no change -</option>
+              <option value="desert">Desert - Cliffs_A</option>
+              <option value="underground">Underground - Cliffs_Purple</option>
+              <option value="lava">Lava - Cliffs_Lava</option>
+              <option value="storm">Metro / Storm - Cliffs_Storm</option>
+              <option value="spacestation">Space Station - Spacestation_A</option>
             </select>
           </div>
           <div class="field">
             <label class="fl">High (10 to 13) → edge family</label>
             <select id="edgeRemapHigh">
-              <option value="">— no change —</option>
-              <option value="desert">Desert — Cliffs_A</option>
-              <option value="underground">Underground — Cliffs_Purple</option>
-              <option value="lava">Lava — Cliffs_Lava</option>
-              <option value="storm">Metro / Storm — Cliffs_Storm</option>
-              <option value="spacestation">Space Station — Spacestation_A</option>
+              <option value="">- no change -</option>
+              <option value="desert">Desert - Cliffs_A</option>
+              <option value="underground">Underground - Cliffs_Purple</option>
+              <option value="lava">Lava - Cliffs_Lava</option>
+              <option value="storm">Metro / Storm - Cliffs_Storm</option>
+              <option value="spacestation">Space Station - Spacestation_A</option>
             </select>
           </div>
         </div>
@@ -320,7 +329,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <div class="lt-box">
           <div class="lt-title">Shift entire map</div>
           <div class="lt-row"><input type="range" id="shiftSlider" min="-14" max="14" value="0" step="1"><span class="shift-val" id="shiftVal">0</span></div>
-          <div class="lt-row" style="justify-content:space-between;"><span class="note" style="margin:0;">Clamped to −1–13</span><button class="sm" id="btnShiftAll" disabled>Apply</button></div>
+          <div class="lt-row" style="justify-content:space-between;"><span class="note" style="margin:0;">Clamped to −1-13</span><button class="sm" id="btnShiftAll" disabled>Apply</button></div>
         </div>
         <div class="lt-box">
           <div class="lt-title">Clamp extremes</div>
@@ -352,6 +361,9 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <button id="btnRedo" disabled>↪ Redo</button>
       <button id="btnReset" disabled>⟳ Reset</button>
     </div>
+    <div class="field" style="margin-top:8px;">
+      <label class="ck-row"><input type="checkbox" id="chkEmbedDebug"> Embed STTC-TT debug info in map.json <span style="color:var(--text3);font-size:10px;">(unknown fields are ignored by the game)</span></label>
+    </div>
     <div class="msg" id="msgExport"></div>
     <div class="path-note" id="pathNote"></div>
     <pre id="jsonPre"></pre>
@@ -375,9 +387,9 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <div class="legend" id="legend"></div>
       </div>
       <div class="g3" style="margin-top:10px;">
-        <div class="stat"><div class="stat-l">Total tiles</div><div class="stat-v" id="sTiles">—</div></div>
-        <div class="stat"><div class="stat-l">Level range</div><div class="stat-v" id="sRange">—</div></div>
-        <div class="stat"><div class="stat-l">Non-zero</div><div class="stat-v" id="sNonZero">—</div></div>
+        <div class="stat"><div class="stat-l">Total tiles</div><div class="stat-v" id="sTiles">-</div></div>
+        <div class="stat"><div class="stat-l">Level range</div><div class="stat-v" id="sRange">-</div></div>
+        <div class="stat"><div class="stat-l">Non-zero</div><div class="stat-v" id="sNonZero">-</div></div>
       </div>
     </div>
   </div>
@@ -506,7 +518,7 @@ const TERRAINS=[
   {id:188,name:'Jungle_Underground_Soil',color:[90,75,55],  edge:'Jungle_Underground',group:'Jungle Blends'},
   {id:189,name:'Jungle_Metal_Grid',     color:[90,95,100],  edge:'Jungle_Cliff',  group:'Jungle Blends'},
   {id:190,name:'Jungle_Shallow_Water',  color:[80,130,160], edge:'Jungle_Cliff',  group:'Jungle Blends'},
-  // Legacy Purple (older game version — kept for backwards compatibility)
+  // Legacy Purple (older game version - kept for backwards compatibility)
   {id:28, name:'Sand2 (Legacy)',        color:[201,163,108],edge:'Cliffs_A',      group:'Legacy'},
   {id:29, name:'Pebbles2 (Legacy)',     color:[165,136,88], edge:'Cliffs_A',      group:'Legacy'},
   {id:30, name:'Dunes2 (Legacy)',       color:[201,163,108],edge:'Cliffs_A',      group:'Legacy'},
@@ -681,7 +693,7 @@ function buildEdgeSelect(el){
   const showNoEditor=!locked; // noEditor visible only when restriction is off
   const prev=el.value;
   el.innerHTML='';
-  el.appendChild(new Option('— no change —',''));
+  el.appendChild(new Option('- no change -',''));
   // Group by DLC
   const dlcs=[...new Set(EDGES.map(e=>e.dlc))];
   dlcs.forEach(dlc=>{
@@ -728,19 +740,19 @@ function buildSelect(el,withNone,lockId){
   const legal=locked?LS_GROUPS[activeLandscape]:null;
   const prev=el.value;
   el.innerHTML='';
-  if(withNone)el.appendChild(new Option('— no change —',''));
+  if(withNone)el.appendChild(new Option('- no change -',''));
   const groups=[...new Set(TERRAINS.map(t=>t.group))];
   groups.forEach(g=>{
     if(legal&&!legal.includes(g))return;
     const og=document.createElement('optgroup');og.label=g;
-    TERRAINS.filter(t=>t.group===g).forEach(t=>og.appendChild(new Option(`${t.id} — ${t.name} [${t.edge}]`,t.id)));
+    TERRAINS.filter(t=>t.group===g).forEach(t=>og.appendChild(new Option(`${t.id} - ${t.name}`,t.id)));
     el.appendChild(og);
   });
   if(prev!==''&&el.querySelector(`option[value="${prev}"]`))el.value=prev;
 }
 
 function rebuildTerrainSelects(){
-  buildSelect(document.getElementById('terrainSelect'),false,'lockLandscape');
+  buildSelect(document.getElementById('terrainSelect'),true,'lockLandscape');
   buildSelect(document.getElementById('lowTerrain'),true,'lockLandscape');
   buildSelect(document.getElementById('highTerrain'),true,'lockLandscape');
   for(let lv=0;lv<=MAX_LEVEL;lv++){const s=document.getElementById(`plT_${lv}`);if(s)buildSelect(s,true,'lockLandscape');}
@@ -748,9 +760,18 @@ function rebuildTerrainSelects(){
 }
 
 function updateTHint(){
-  const id=parseInt(document.getElementById('terrainSelect').value);
-  const t=T_BY_ID[id];
-  if(t){document.getElementById('tSwatch').style.background=`rgb(${t.color.join(',')})`;document.getElementById('tHint').textContent=`Edge: ${t.edge}`;}
+  // Show info about the currently selected edge family
+  const edgeKey=document.getElementById('edgeRemap')?.value||'';
+  const edgeDef=EDGE_BY_KEY[edgeKey];
+  if(edgeDef){
+    // Show a colour swatch from the first terrain that uses this edge (for visual reference)
+    const sampleTerrain=TERRAINS.find(t=>t.edge===edgeDef.name);
+    document.getElementById('tSwatch').style.background=sampleTerrain?`rgb(${sampleTerrain.color.join(',')})`:''
+    document.getElementById('tHint').textContent=`${edgeDef.name} · id ${edgeDef.id} · ${edgeDef.dlc}`;
+  }else{
+    document.getElementById('tSwatch').style.background='';
+    document.getElementById('tHint').textContent='No edge selected - original edges preserved';
+  }
 }
 
 // ── Per-level grid ─────────────────────────────────────────────────────────────
@@ -880,7 +901,7 @@ makeDrop('dzImg','fiImg',file=>{
     for(let i=0;i<W*H;i++){
       // Flip rows at read time: image row 0 (top) → game row H-1 (bottom).
       // This way tileData[Index] is already in game coordinate order,
-      // and the preview renders without any additional transform —
+      // and the preview renders without any additional transform -
       // the map will match the image as drawn.
       const imgRow=Math.floor(i/W), col=i%W;
       const flippedRow=H-1-imgRow;
@@ -916,7 +937,7 @@ makeDrop('dzMap','fiMap',file=>{
       undoStack=[];redoStack=[];updateUndoButtons();
       // file.name is always just the filename in browsers, never a path
       const fname=(file.name||'map.json').replace(/^.*[\\/]/,'');
-      msg.textContent=`${fname} — ${data.Tiles.length.toLocaleString()} tiles`;msg.className='msg ok';
+      msg.textContent=`${fname} - ${data.Tiles.length.toLocaleString()} tiles`;msg.className='msg ok';
       document.getElementById('dzMap').classList.add('loaded');
       document.getElementById('srcBadge').textContent=`${data.Tiles.length.toLocaleString()} tiles`;
       activeSource='map';
@@ -935,7 +956,7 @@ makeDrop('dzScenario','fiScenario',file=>{
     try{
       scenarioData=JSON.parse(e.target.result);
       const lid=scenarioData.LandscapeId??0;
-      msg.textContent=`${file.name} — LandscapeId ${lid} (${LS_NAMES[lid]??'unknown'})`;msg.className='msg ok';
+      msg.textContent=`${file.name} - LandscapeId ${lid} (${LS_NAMES[lid]??'unknown'})`;msg.className='msg ok';
       document.getElementById('dzScenario').classList.add('loaded');
       setActiveLandscape(lid,'scenario');
       document.getElementById('btnExportScenario').disabled=false;
@@ -979,7 +1000,9 @@ function terrainForMapLevel(mv){
     if(lt!==''&&ev<=2)return parseInt(lt);
     if(ht!==''&&ev>=10)return parseInt(ht);
   }
-  return parseInt(document.getElementById('terrainSelect').value)||0;
+  const v=document.getElementById('terrainSelect').value;
+  // '' means no change - caller should use preserved original; return null as sentinel
+  return v===''?null:parseInt(v);
 }
 
 // ── Preview mode toggle ────────────────────────────────────────────────────────
@@ -1004,11 +1027,6 @@ function updatePreview(){
   const isPreserve=(activeSource==='map'&&Object.keys(srcByIndex).length>0
                     &&terrainTab==='ta-simple'
                     &&document.getElementById('chkPreserve').checked);
-  // Pre-resolve terrain ID for non-preserve modes (same for every level in simple tab,
-  // but terrainForMapLevel is cheap so we call it per tile only for overrides)
-  const edgeKey=edgeFamilyForMapLevel(0); // edge key is level-independent for simple tab
-  // For per-level edge and terrain, we must call per tile — but cache the tab values
-  const edgeTabActive=activeEdgeTab();
 
   for(let i=0;i<W*H;i++){
     const mv=Math.max(0,Math.min(MAX_LEVEL,tileData[i]));
@@ -1020,14 +1038,12 @@ function updatePreview(){
         const tile=srcByIndex[i];
         tid=tile?tile.TerrainTypeId:-1;
       }else{
-        tid=terrainForMapLevel(mv);
+        const chosen=terrainForMapLevel(mv);
+        // null = no change; use original tile terrain or fall back to level colour
+        tid=chosen!==null?chosen:(srcByIndex[i]?srcByIndex[i].TerrainTypeId:-1);
       }
-      // Edge remap for preview — only applies if edge tab is active (not 'no change')
-      // Use per-level lookup only when needed
-      const ef=(edgeTabActive==='ea-bylevel'||edgeTabActive==='ea-overrides')
-        ? edgeFamilyForMapLevel(mv)
-        : edgeKey;
-      if(ef&&tid>=0)tid=remapTerrain(tid,ef);
+      // Note: edges are stored in EdgeGroups (not TerrainTypeId) so no edge remap here.
+      // The terrain colour preview shows surface texture only, independent of edge choice.
       const t=tid>=0?T_BY_ID[tid]:null;
       if(t){[r,g,b]=t.color;}
       else{const h=LV_COL[mv];r=parseInt(h.slice(1,3),16);g=parseInt(h.slice(3,5),16);b=parseInt(h.slice(5,7),16);}
@@ -1035,7 +1051,7 @@ function updatePreview(){
       const h=LV_COL[mv];r=parseInt(h.slice(1,3),16);g=parseInt(h.slice(3,5),16);b=parseInt(h.slice(5,7),16);
     }
     // Display flip: preview row 0 shows the bottom of the tile grid (matching game orientation).
-    // tileData and exports are NOT affected — only the canvas pixel placement is flipped.
+    // tileData and exports are NOT affected - only the canvas pixel placement is flipped.
     const row=Math.floor(i/W), col=i%W;
     const ci=(H-1-row)*W+col;
     imgData.data[ci*4]=r;imgData.data[ci*4+1]=g;imgData.data[ci*4+2]=b;imgData.data[ci*4+3]=255;
@@ -1045,10 +1061,10 @@ function updatePreview(){
   const used=dist.map((c,i)=>c>0?toEditor(i):null).filter(x=>x!==null);
   const lo=used.length?Math.min(...used):0,hi=used.length?Math.max(...used):0;
   document.getElementById('previewLabel').textContent=
-    `Editor levels ${lo}–${hi} · ${showTerrainColours?'terrain colours':'height colours (dark=low)'}`;
+    `Editor levels ${lo}-${hi} · ${showTerrainColours?'terrain colours':'height colours (dark=low)'}`;
   document.getElementById('previewModeBadge').textContent=previewMode;
   document.getElementById('sTiles').textContent=(W*H).toLocaleString();
-  document.getElementById('sRange').textContent=used.length?`${lo}–${hi}`:'—';
+  document.getElementById('sRange').textContent=used.length?`${lo}-${hi}`:'-';
   document.getElementById('sNonZero').textContent=dist.slice(1).reduce((a,b)=>a+b,0).toLocaleString();
   drawHist(dist);drawLegend(dist);
 }
@@ -1116,7 +1132,7 @@ function clampMap(v){return Math.max(0,Math.min(MAX_LEVEL,Math.round(v)));}
 document.getElementById('btnShiftAll').addEventListener('click',()=>{
   if(!tileData)return;
   const sh=parseInt(shiftSlider.value);
-  if(sh===0){toolMsg('Shift is 0 — nothing to do.');return;}
+  if(sh===0){toolMsg('Shift is 0 - nothing to do.');return;}
   pushUndo();
   for(let i=0;i<tileData.length;i++)tileData[i]=clampMap(tileData[i]+sh);
   syncSrc();updatePreview();
@@ -1229,10 +1245,12 @@ function buildTiles(){
 
     // ── Terrain (surface texture) ────────────────────────────────────────────
     if(isPreserveMap){
-      terrain=origTile?origTile.TerrainTypeId:terrainForMapLevel(mv);
+      terrain=origTile?origTile.TerrainTypeId:(terrainForMapLevel(mv)??2);
       type=origTile?origTile.Type:computedTypes[i];
     }else{
-      terrain=terrainForMapLevel(mv);
+      const chosen=terrainForMapLevel(mv);
+      // null = no change selected; fall back to original tile or Sand (2)
+      terrain=chosen!==null?chosen:(origTile?origTile.TerrainTypeId:2);
       if(origTile?.Type===1){ type=1; }
       else{ type=computedTypes[i]; }
     }
@@ -1247,7 +1265,7 @@ function buildTiles(){
       let edgeTypeId;
 
       if(!edgeKey){
-        // No edge selected — preserve original if available, else Cliffs_A
+        // No edge selected - preserve original if available, else Cliffs_A
         edgeTypeId=origEdgeById.hasOwnProperty(i)?origEdgeById[i]:0;
       }else{
         // Look up numeric EdgeTypeId from EDGES array
@@ -1276,7 +1294,7 @@ function buildTiles(){
   // Include Decorations from source if present (pass-through, don't modify)
   const result={Width:W,Height:H,Tiles:tiles,EdgeGroups:edgeGroups};
   if(srcEdgeGroups===null&&edgeGroups.length===0){
-    // Image import with no edge selection — omit EdgeGroups entirely
+    // Image import with no edge selection - omit EdgeGroups entirely
     // so the game uses its defaults (same as original image-only export)
     delete result.EdgeGroups;
   }
@@ -1305,16 +1323,52 @@ document.getElementById('btnPreview').addEventListener('click',()=>{
 
 document.getElementById('btnExportMap').addEventListener('click',()=>{
   const data=buildTiles();if(!data)return;
+
+  // Optionally embed STTC-TT debug info in map.json under _STTCTT key.
+  // Unknown fields are ignored by the game's JSON parser.
+  const embedDebug=document.getElementById('chkEmbedDebug').checked;
+  if(embedDebug){
+    data._STTCTT={
+      exportedAt:new Date().toISOString(),
+      toolVersion:'STTC-TT dev',
+      source:{type:activeSource,tiles:tileData?tileData.length:0},
+      landscape:{id:activeLandscape,name:LS_NAMES[activeLandscape]},
+      terrain:{
+        tab:activeTerrainTab(),
+        defaultValue:document.getElementById('terrainSelect').value,
+        preserve:document.getElementById('chkPreserve').checked,
+        lockToLandscape:document.getElementById('lockLandscape').checked,
+        lowOverride:document.getElementById('lowTerrain').value,
+        highOverride:document.getElementById('highTerrain').value,
+      },
+      edges:{
+        tab:activeEdgeTab(),
+        globalRemap:document.getElementById('edgeRemap').value,
+        lowRemap:document.getElementById('edgeRemapLow').value,
+        highRemap:document.getElementById('edgeRemapHigh').value,
+        lockToLandscape:document.getElementById('lockEdgeLandscape').checked,
+      },
+      output:{
+        totalTiles:data.Tiles.length,
+        edgeGroupCount:data.EdgeGroups?data.EdgeGroups.length:0,
+        levelRange:{min:Math.min(...data.Tiles.map(t=>t.Level)),max:Math.max(...data.Tiles.map(t=>t.Level))},
+      },
+      undoHistoryDepth:undoStack.length,
+    };
+  }
+
   dl('map.json',JSON.stringify(data));
+
   const m=document.getElementById('msgExport');
   if(scenarioData){
     scenarioData.LandscapeId=activeLandscape;
     dl('scenario.json',JSON.stringify(scenarioData,null,2));
-    m.textContent=`map.json + scenario.json exported (LandscapeId: ${activeLandscape} — ${LS_NAMES[activeLandscape]})`;
+    m.textContent=`map.json + scenario.json exported (LandscapeId: ${activeLandscape} - ${LS_NAMES[activeLandscape]})`;
   }else{
     m.textContent='map.json exported. (Drop a scenario.json to also update LandscapeId on export.)';
   }
   m.className='msg ok';
+
   undoStack=[];redoStack=[];updateUndoButtons();
   document.getElementById('undoBadge').textContent='';
 });
@@ -1324,16 +1378,16 @@ document.getElementById('btnExportScenario').addEventListener('click',()=>{
   scenarioData.LandscapeId=activeLandscape;
   dl('scenario.json',JSON.stringify(scenarioData,null,2));
   const m=document.getElementById('msgExport');
-  m.textContent=`scenario.json exported — LandscapeId: ${activeLandscape} (${LS_NAMES[activeLandscape]})`;m.className='msg ok';
+  m.textContent=`scenario.json exported - LandscapeId: ${activeLandscape} (${LS_NAMES[activeLandscape]})`;m.className='msg ok';
 });
 
 // ── Change listeners ───────────────────────────────────────────────────────────
-document.getElementById('terrainSelect').addEventListener('change',()=>{updateTHint();updatePreview();});
+document.getElementById('terrainSelect').addEventListener('change',updatePreview);
 ['lowTerrain','highTerrain','chkPreserve'].forEach(id=>document.getElementById(id).addEventListener('change',updatePreview));
+document.getElementById('edgeRemap').addEventListener('change',updateTHint);
 
 // ── Init ───────────────────────────────────────────────────────────────────────
 setActiveLandscape(0,'manual');
-document.getElementById('terrainSelect').value=2;
 updateTHint();
 </script>
 </body>
