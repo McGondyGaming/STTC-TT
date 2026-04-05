@@ -159,6 +159,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="tab-bar" id="srcBar">
         <div class="tab active" data-tab="src-image">From image</div>
         <div class="tab" data-tab="src-map">Load map.json</div>
+        <div class="tab" data-tab="src-gen">Generate</div>
       </div>
       <div class="tp active" id="tab-src-image">
         <div class="dz" id="dzImg"><div class="dl"><strong>Drop heightmap image here</strong></div><div class="dl">PNG / BMP / JPEG - resampled to 128×128</div><input type="file" id="fiImg" accept="image/*" style="display:none"></div>
@@ -172,6 +173,42 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="tp" id="tab-src-map">
         <div class="dz" id="dzMap"><div class="dl"><strong>Drop map.json here</strong></div><div class="dl">Loads levels and terrain - auto-detects landscape</div><input type="file" id="fiMap" accept=".json,application/json" style="display:none"></div>
         <div class="msg" id="msgMap"></div>
+      </div>
+      <div class="tp" id="tab-src-gen">
+        <div class="note" style="margin-bottom:8px;">Generates a procedural heightmap using fractal noise. Output is deterministic - same seed and settings always produce the same map.</div>
+        <!-- Noise type -->
+        <div class="field">
+          <label class="fl">Noise type</label>
+          <div style="display:flex;gap:8px;">
+            <label class="ck-row"><input type="radio" name="noiseType" id="noisePerlin" value="perlin" checked> Perlin</label>
+            <label class="ck-row"><input type="radio" name="noiseType" id="noiseSimplex" value="simplex"> OpenSimplex</label>
+          </div>
+        </div>
+        <!-- Seed -->
+        <div class="field">
+          <label class="fl">Seed</label>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <input type="text" id="genSeed" value="sttc-tt" maxlength="64" style="flex:1;min-width:0;">
+            <button class="sm" id="btnRandSeed">Randomize</button>
+          </div>
+        </div>
+        <!-- Scale -->
+        <div class="field"><label class="fl">Scale <span style="font-size:11px;color:var(--text3)">feature size</span></label><div class="rr"><input type="range" id="genScale" min="1" max="200" value="60" step="1"><span class="rv" id="genScaleOut">60</span></div></div>
+        <!-- Water level -->
+        <div class="field"><label class="fl">Water level <span style="font-size:11px;color:var(--text3)">noise below this → level −1</span></label><div class="rr"><input type="range" id="genWater" min="0" max="100" value="20" step="1"><span class="rv" id="genWaterOut">20%</span></div></div>
+        <!-- Advanced collapsible -->
+        <div style="margin-top:8px;">
+          <div id="genAdvToggle" style="cursor:pointer;font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;user-select:none;display:flex;align-items:center;gap:4px;">
+            <span id="genAdvChev">▶</span> Refine shape
+          </div>
+          <div id="genAdvBody" style="display:none;margin-top:8px;">
+            <div class="field"><label class="fl">Octaves <span style="font-size:11px;color:var(--text3)">layers of detail</span></label><div class="rr"><input type="range" id="genOctaves" min="1" max="8" value="4" step="1"><span class="rv" id="genOctavesOut">4</span></div></div>
+            <div class="field"><label class="fl">Persistence <span style="font-size:11px;color:var(--text3)">amplitude decay</span></label><div class="rr"><input type="range" id="genPersist" min="10" max="100" value="50" step="1"><span class="rv" id="genPersistOut">0.50</span></div></div>
+            <div class="field"><label class="fl">Lacunarity <span style="font-size:11px;color:var(--text3)">frequency growth</span></label><div class="rr"><input type="range" id="genLacun" min="100" max="400" value="200" step="10"><span class="rv" id="genLacunOut">2.00</span></div></div>
+            <div class="field"><label class="fl">Power <span style="font-size:11px;color:var(--text3)">redistribute slopes</span></label><div class="rr"><input type="range" id="genPower" min="10" max="400" value="100" step="10"><span class="rv" id="genPowerOut">1.00</span></div></div>
+          </div>
+        </div>
+        <div class="msg" id="msgGen" style="margin-top:6px;"></div>
       </div>
     </div>
   </div>
@@ -321,7 +358,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
-      <div class="note">Rotates and flips the level heightmap only. Units, decors, and triggers are <strong>not</strong> affected — re-place these after reorienting.</div>
+      <div class="note">Rotates and flips the level heightmap only. Units, decors, and triggers are <strong>not</strong> affected - re-place these after reorienting.</div>
       <div class="lt-grid" style="grid-template-columns:1fr 1fr;">
         <div class="lt-box">
           <div class="lt-title">Rotate</div>
@@ -679,7 +716,7 @@ let activeLandscape=0;
 let previewMode='terrain';  // 'terrain' | 'height'
 
 // Undo/redo stacks (each entry is an Int16Array snapshot)
-const UNDO_MAX=10;
+const UNDO_MAX=30;
 let undoStack=[];
 let redoStack=[];
 
@@ -705,7 +742,13 @@ function wireTabs(barId,onChange){
     });
   });
 }
-wireTabs('srcBar');
+wireTabs('srcBar',()=>{
+  const tab=document.querySelector('#srcBar .tab.active')?.dataset.tab;
+  if(tab==='src-gen'){
+    if(!tileData){activeSource='gen';srcTiles=null;srcByIndex={};srcEdgeGroups=null;recomputeGen();enableTools();resetCompass();}
+    else{activeSource='gen';}
+  }
+});
 wireTabs('tBar',updatePreview);
 wireTabs('eBar',updatePreview);
 
@@ -1023,7 +1066,167 @@ function recompute(){
   updatePreview();
 }
 
-// ── Terrain resolution ─────────────────────────────────────────────────────────
+// ── Heightmap Generator ────────────────────────────────────────────────────────
+// Seed hashing: FNV-1a 32-bit variant - produces consistent uint32 from any string
+function hashSeed(str){
+  let h=2166136261;
+  for(let i=0;i<str.length;i++){h=(h^str.charCodeAt(i))>>>0;h=(h*16777619)>>>0;}
+  return h;
+}
+
+// Sanitise seed input: printable ASCII only, max 64 chars
+function sanitiseSeed(s){return s.replace(/[^\x20-\x7E]/g,'').slice(0,64)||'sttc-tt';}
+
+// ── Improved Perlin Noise (Ken Perlin 2002, patent expired 2021) ──────────────
+function buildPerlin(seed32){
+  const p=new Uint8Array(512);
+  // Build permutation from seed using LCG shuffle
+  const perm=Array.from({length:256},(_,i)=>i);
+  let s=seed32>>>0;
+  for(let i=255;i>0;i--){s=(s*1664525+1013904223)>>>0;const j=s%(i+1);[perm[i],perm[j]]=[perm[j],perm[i]];}
+  for(let i=0;i<512;i++)p[i]=perm[i&255];
+  const fade=t=>t*t*t*(t*(t*6-15)+10);
+  const lerp=(a,b,t)=>a+(b-a)*t;
+  const grad=(h,x,y)=>{const u=h&1?-x:x,v=h&2?-y:y;return u+v;};
+  return (x,y)=>{
+    const X=Math.floor(x)&255,Y=Math.floor(y)&255;
+    x-=Math.floor(x);y-=Math.floor(y);
+    const u=fade(x),v=fade(y);
+    const a=p[X]+Y,b=p[X+1]+Y;
+    return lerp(lerp(grad(p[a],x,y),grad(p[b],x-1,y),u),
+                lerp(grad(p[a+1],x,y-1),grad(p[b+1],x-1,y-1),u),v);
+  };
+}
+
+// ── OpenSimplex2 2D (Kurt Spencer, public domain) ────────────────────────────
+// Compact faithful implementation of the 2D case using triangular grid skewing
+function buildSimplex(seed32){
+  const p=new Uint8Array(512);
+  const perm=Array.from({length:256},(_,i)=>i);
+  let s=seed32>>>0;
+  for(let i=255;i>0;i--){s=(s*1664525+1013904223)>>>0;const j=s%(i+1);[perm[i],perm[j]]=[perm[j],perm[i]];}
+  for(let i=0;i<512;i++)p[i]=perm[i&255];
+  const GRAD=[[ 1, 2],[-1, 2],[ 1,-2],[-1,-2],[2, 1],[-2, 1],[2,-1],[-2,-1]];
+  const F2=0.5*(Math.sqrt(3)-1), G2=(3-Math.sqrt(3))/6;
+  return (x,y)=>{
+    const s2=(x+y)*F2;
+    const i=Math.floor(x+s2),j=Math.floor(y+s2);
+    const t=(i+j)*G2;
+    const x0=x-(i-t),y0=y-(j-t);
+    const [i1,j1]=x0>y0?[1,0]:[0,1];
+    const x1=x0-i1+G2,y1=y0-j1+G2;
+    const x2=x0-1+2*G2,y2=y0-1+2*G2;
+    let n=0;
+    const contrib=(cx,cy,gi)=>{const t2=0.5-cx*cx-cy*cy;if(t2<0)return 0;const g=GRAD[gi&7];return t2*t2*t2*t2*(g[0]*cx+g[1]*cy);};
+    n+=contrib(x0,y0,p[(i+p[j&255])&255]);
+    n+=contrib(x1,y1,p[(i+i1+p[(j+j1)&255])&255]);
+    n+=contrib(x2,y2,p[(i+1+p[(j+1)&255])&255]);
+    return Math.max(-1,Math.min(1,n*70));
+  };
+}
+
+// ── Fractal Brownian Motion ───────────────────────────────────────────────────
+function fbm(noiseFn, x, y, octaves, persistence, lacunarity){
+  let val=0, amp=1, freq=1, maxAmp=0;
+  for(let o=0;o<octaves;o++){
+    val+=noiseFn(x*freq, y*freq)*amp;
+    maxAmp+=amp; amp*=persistence; freq*=lacunarity;
+  }
+  return val/maxAmp; // normalised to ~[-1,1]
+}
+
+function recomputeGen(){
+  // Read and sanitise all generator params
+  const rawSeed=sanitiseSeed(document.getElementById('genSeed').value);
+  document.getElementById('genSeed').value=rawSeed;
+  const seed32=hashSeed(rawSeed);
+  const type=document.querySelector('input[name="noiseType"]:checked')?.value||'perlin';
+  const scale=Math.max(1,parseInt(document.getElementById('genScale').value)||60);
+  const waterPct=parseInt(document.getElementById('genWater').value)||20;
+  const octaves=Math.max(1,Math.min(8,parseInt(document.getElementById('genOctaves').value)||4));
+  const persistence=(parseInt(document.getElementById('genPersist').value)||50)/100;
+  const lacunarity=(parseInt(document.getElementById('genLacun').value)||200)/100;
+  const power=Math.max(0.1,(parseInt(document.getElementById('genPower').value)||100)/100);
+
+  const noiseFn=type==='simplex'?buildSimplex(seed32):buildPerlin(seed32);
+  const waterThreshold=(waterPct/100)*2-1; // maps 0-100% to -1..1
+
+  tileData=new Int16Array(W*H);
+  // Sample noise for every tile and collect raw values for normalisation
+  const raw=new Float32Array(W*H);
+  for(let row=0;row<H;row++){
+    for(let col=0;col<W;col++){
+      const nx=col/scale, ny=row/scale;
+      raw[row*W+col]=fbm(noiseFn,nx,ny,octaves,persistence,lacunarity);
+    }
+  }
+  // Normalise raw to [0,1], apply power redistribution, then map to levels
+  let mn=raw[0],mx=raw[0];
+  for(let i=1;i<W*H;i++){if(raw[i]<mn)mn=raw[i];if(raw[i]>mx)mx=raw[i];}
+  const range=mx-mn||1;
+  for(let i=0;i<W*H;i++){
+    let v=(raw[i]-mn)/range; // 0..1
+    v=Math.pow(v,power);    // redistribute: >1 = more low, <1 = more high
+    // Water level: anything below the threshold becomes level -1 (map 0)
+    if(v<waterPct/100){ tileData[i]=0; } // map level 0 = editor -1
+    else{
+      // Remap the above-water portion to editor 0-13 (map 1-14)
+      const t=(v-waterPct/100)/(1-waterPct/100);
+      tileData[i]=Math.max(1,Math.min(14,Math.round(1+t*13)));
+    }
+  }
+  // Flip rows to match game coordinate order (same as image import)
+  const flipped=new Int16Array(W*H);
+  for(let row=0;row<H;row++)
+    for(let col=0;col<W;col++)
+      flipped[row*W+col]=tileData[(H-1-row)*W+col];
+  tileData=flipped;
+
+  origTileData=tileData.slice();
+  undoStack=[];redoStack=[];updateUndoButtons();
+  document.getElementById('srcBadge').textContent='Generated';
+  document.getElementById('msgGen').textContent=`Seed: ${rawSeed} · ${type}`;
+  document.getElementById('msgGen').className='msg ok';
+  activeSource='gen';
+  updatePreview();enableTools();resetCompass();
+}
+
+// ── Generator controls wiring ─────────────────────────────────────────────────
+function mkGenSlider(id,outId,displayFn){
+  const s=document.getElementById(id),o=document.getElementById(outId);
+  if(!s||!o)return;
+  o.textContent=displayFn(s.value);
+  s.addEventListener('input',()=>{o.textContent=displayFn(s.value);if(activeSource==='gen')recomputeGen();});
+}
+mkGenSlider('genScale',  'genScaleOut',  v=>v);
+mkGenSlider('genWater',  'genWaterOut',  v=>v+'%');
+mkGenSlider('genOctaves','genOctavesOut',v=>v);
+mkGenSlider('genPersist','genPersistOut',v=>(v/100).toFixed(2));
+mkGenSlider('genLacun',  'genLacunOut',  v=>(v/100).toFixed(2));
+mkGenSlider('genPower',  'genPowerOut',  v=>(v/100).toFixed(2));
+
+document.querySelectorAll('input[name="noiseType"]').forEach(r=>
+  r.addEventListener('change',()=>{if(activeSource==='gen')recomputeGen();}));
+
+document.getElementById('genSeed').addEventListener('change',()=>{
+  document.getElementById('genSeed').value=sanitiseSeed(document.getElementById('genSeed').value);
+  if(activeSource==='gen')recomputeGen();
+});
+
+document.getElementById('btnRandSeed').addEventListener('click',()=>{
+  const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const seed=Array.from({length:12},()=>chars[Math.floor(Math.random()*chars.length)]).join('');
+  document.getElementById('genSeed').value=seed;
+  if(activeSource==='gen')recomputeGen();
+});
+
+document.getElementById('genAdvToggle').addEventListener('click',()=>{
+  const body=document.getElementById('genAdvBody');
+  const chev=document.getElementById('genAdvChev');
+  const open=body.style.display==='none';
+  body.style.display=open?'block':'none';
+  chev.textContent=open?'▼':'▶';
+});
 function activeTerrainTab(){const a=document.querySelector('#tBar .tab.active');return a?a.dataset.tab:'ta-simple';}
 
 function terrainForMapLevel(mv){
@@ -1143,7 +1346,7 @@ function updateUndoButtons(){
   document.getElementById('btnRedo').disabled=redoStack.length===0;
   const top=undoStack[undoStack.length-1];
   document.getElementById('undoBadge').textContent=
-    undoStack.length>0?`${undoStack.length} — ${top.label}`:'';
+    undoStack.length>0?`${undoStack.length} - ${top.label}`:'';
 }
 
 function syncSrc(){if(srcTiles)srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)t.Level=tileData[t.Index];});}
@@ -1446,8 +1649,19 @@ document.getElementById('btnExportMap').addEventListener('click',()=>{
   if(embedDebug){
     data._STTCTT={
       exportedAt:new Date().toISOString(),
-      toolVersion:'STTC-TT dev',
-      source:{type:activeSource,tiles:tileData?tileData.length:0},
+      toolVersion:'Build15',
+      source:{type:activeSource,tiles:tileData?tileData.length:0,
+        ...(activeSource==='gen'?{
+          noiseType:document.querySelector('input[name="noiseType"]:checked')?.value,
+          seed:document.getElementById('genSeed').value,
+          scale:document.getElementById('genScale').value,
+          waterLevel:document.getElementById('genWater').value+'%',
+          octaves:document.getElementById('genOctaves').value,
+          persistence:(document.getElementById('genPersist').value/100).toFixed(2),
+          lacunarity:(document.getElementById('genLacun').value/100).toFixed(2),
+          power:(document.getElementById('genPower').value/100).toFixed(2),
+        }:{})
+      },
       landscape:{id:activeLandscape,name:LS_NAMES[activeLandscape]},
       terrain:{
         tab:activeTerrainTab(),
