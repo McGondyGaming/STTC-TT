@@ -5,7 +5,8 @@
 This tool allows you to:
 - Convert heightmap images into playable terrain
 - Load and modify existing `map.json` and `scenario.json` files
-- Adjust terrain types, elevation levels, and edge styles
+- Generate a starter landscape using Perlin or Simplex deterministic algorithms
+- Adjust terrain orientation, types, elevation levels, and edge styles
 - Preview results in real-time with histograms and tile-based visuals
 - Export ready-to-use `map.json` and updated `scenario.json` files
 
@@ -26,11 +27,15 @@ This tool allows you to:
 - Automatic `LandscapeId` syncing when `scenario.json` is loaded
 - Support for all in-game biomes including Desert, Lava, Space Station, and Metro (plus Underground variants)
 
+### Generator
+- Modify the seed to dramatically change the layout
+- Move sliders to finesse 
+
 ### Terrain and Level Control
 - **Modes:** Default single terrain, Low/High overrides, or per-level assignment
 - **Edge Remapping:** Batch-convert map edges to specific styles (e.g., Cliffs_Lava, Cliffs_Purple)
 - **Modifications:** Shift entire maps up/down, clamp extremes, or adjust specific level bands
-- **History:** 10-step Undo/Redo and state reset
+- **History:** 30-step Undo/Redo and state reset
 
 ### Export and Analysis
 - Visual tile preview and elevation distribution histogram
@@ -45,8 +50,8 @@ This tool allows you to:
 - Download the source code in your preferred format
 - Open `STTCTT.html` in your favourite browser (tested in Chrome)
 
-### 1. Load a Source
-- Drop or load a heightmap image or an existing `map.json`.
+### 1. Select a Source
+- Drop or load a heightmap image or an existing `map.json` *or* generate a new layout
 - Optionally load a `scenario.json` to sync the `LandscapeId`.
 
 ### 2. Adjust Terrain
@@ -64,6 +69,8 @@ This tool allows you to:
 ---
 
 ## Exported Data Format
+
+Option: Embed STTC-TT data in `map.json` for diagnositc purposes
 
 ### map.json
 ```json
@@ -104,6 +111,9 @@ This tool allows you to:
 - All image imported maps default to desert biome
 
 ## Change Notes:
+ - Perlin and OpenSimplex generator added
+ - Terrain orientation controls
+ - Undo buffer increased from 10 to 30 steps
  - Edge selection no longer modifies preview
  - Imported image, preview and generated map have same orientation
  - Edges applied to elevations
