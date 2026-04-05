@@ -313,6 +313,38 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
     </div>
   </div>
 
+  <!-- ORIENTATION -->
+  <div class="section" id="secOrientation">
+    <div class="sh" data-sec="secOrientation">
+      <div class="sh-left"><span class="st">Orientation</span></div>
+      <span class="sb" id="orientBadge">N↑</span>
+      <span class="sv-chev">▾</span>
+    </div>
+    <div class="section-body">
+      <div class="note">Rotates and flips the level heightmap only. Units, decors, and triggers are <strong>not</strong> affected — re-place these after reorienting.</div>
+      <div class="lt-grid" style="grid-template-columns:1fr 1fr;">
+        <div class="lt-box">
+          <div class="lt-title">Rotate</div>
+          <div class="lt-row" style="gap:6px;">
+            <button class="sm" id="btnRot90CCW" disabled>↺ 90° CCW</button>
+            <button class="sm" id="btnRot90CW"  disabled>↻ 90° CW</button>
+          </div>
+        </div>
+        <div class="lt-box">
+          <div class="lt-title">Flip</div>
+          <div class="lt-row" style="gap:6px;">
+            <button class="sm" id="btnFlipH" disabled>↔ Horizontal</button>
+            <button class="sm" id="btnFlipV" disabled>↕ Vertical</button>
+          </div>
+        </div>
+      </div>
+      <div class="msg" id="msgOrient" style="margin-top:8px;"></div>
+      <div class="field" style="margin-top:4px;">
+        <label class="ck-row"><input type="checkbox" id="chkCompass"> Show orientation indicator on preview</label>
+      </div>
+    </div>
+  </div>
+
   <!-- LEVEL TOOLS -->
   <div class="section" id="secLevelTools">
     <div class="sh" data-sec="secLevelTools">
@@ -372,8 +404,16 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <div class="section always-open">
     <div class="sh"><span class="st">Preview</span><span class="sb" id="previewModeBadge"></span><button class="sm" id="btnTogglePreviewMode" style="margin-left:auto;font-size:11px;padding:3px 8px;">Switch to height</button></div>
     <div class="section-body" style="padding-top:10px;">
-      <div class="preview-canvas-wrap">
+      <div class="preview-canvas-wrap" style="position:relative;">
         <canvas id="cvPreview" width="128" height="128"></canvas>
+        <!-- Orientation indicator: fixed N/E/S/W corners matching game-space isometric orientation.
+             Game north = top-left corner. Preview content moves relative to these fixed labels. -->
+        <div id="orientOverlay" style="display:none;position:absolute;inset:0;pointer-events:none;">
+          <div style="position:absolute;top:2px;left:2px;background:rgba(0,0,0,0.65);color:#e65100;font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">N</div>
+          <div style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">E</div>
+          <div style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">S</div>
+          <div style="position:absolute;bottom:2px;left:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">W</div>
+        </div>
       </div>
       <div id="previewLabel">No source loaded</div>
       <div style="margin-top:10px;">
@@ -909,7 +949,7 @@ makeDrop('dzImg','fiImg',file=>{
     document.getElementById('dzImg').classList.add('loaded');
     document.getElementById('srcBadge').textContent='Image loaded';
     activeSource='image';srcTiles=null;srcByIndex={};srcEdgeGroups=null;
-    recompute();enableTools();
+    recompute();enableTools();resetCompass();
   };
   img.onerror=()=>{msg.textContent='Could not read image.';msg.className='msg err';};
   img.src=url;
@@ -938,7 +978,7 @@ makeDrop('dzMap','fiMap',file=>{
       document.getElementById('srcBadge').textContent=`${data.Tiles.length.toLocaleString()} tiles`;
       activeSource='map';
       setActiveLandscape(detectLandscape(srcTiles),'auto');
-      updatePreview();enableTools();
+      updatePreview();enableTools();resetCompass();
     }catch(err){msg.textContent='Error: '+err.message;msg.className='msg err';}
   };
   reader.readAsText(file);
@@ -1051,7 +1091,7 @@ function updatePreview(){
   document.getElementById('sTiles').textContent=(W*H).toLocaleString();
   document.getElementById('sRange').textContent=used.length?`${lo}-${hi}`:'-';
   document.getElementById('sNonZero').textContent=dist.slice(1).reduce((a,b)=>a+b,0).toLocaleString();
-  drawHist(dist);drawLegend(dist);
+  drawHist(dist);drawLegend(dist);drawOrientIndicator();
 }
 
 function buildHistLabels(){
@@ -1091,8 +1131,8 @@ function drawLegend(dist){
 }
 
 // ── Undo/redo ──────────────────────────────────────────────────────────────────
-function pushUndo(){
-  undoStack.push(tileData.slice());
+function pushUndo(label='edit'){
+  undoStack.push({data:tileData.slice(),label});
   if(undoStack.length>UNDO_MAX)undoStack.shift();
   redoStack=[];
   updateUndoButtons();
@@ -1101,7 +1141,9 @@ function pushUndo(){
 function updateUndoButtons(){
   document.getElementById('btnUndo').disabled=undoStack.length===0;
   document.getElementById('btnRedo').disabled=redoStack.length===0;
-  document.getElementById('undoBadge').textContent=undoStack.length>0?`${undoStack.length} op${undoStack.length>1?'s':''}`:''
+  const top=undoStack[undoStack.length-1];
+  document.getElementById('undoBadge').textContent=
+    undoStack.length>0?`${undoStack.length} — ${top.label}`:'';
 }
 
 function syncSrc(){if(srcTiles)srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)t.Level=tileData[t.Index];});}
@@ -1118,7 +1160,7 @@ document.getElementById('btnShiftAll').addEventListener('click',()=>{
   if(!tileData)return;
   const sh=parseInt(shiftSlider.value);
   if(sh===0){toolMsg('Shift is 0 - nothing to do.');return;}
-  pushUndo();
+  pushUndo('shift all');
   for(let i=0;i<tileData.length;i++)tileData[i]=clampMap(tileData[i]+sh);
   syncSrc();updatePreview();
   toolMsg(`Shifted all by ${sh>0?'+':''}${sh} (editor levels)`);
@@ -1131,7 +1173,7 @@ document.getElementById('btnClamp').addEventListener('click',()=>{
   const loVE=parseInt(document.getElementById('clampLowVal').value);
   const hiE=parseInt(document.getElementById('clampHigh').value);
   const hiVE=parseInt(document.getElementById('clampHighVal').value);
-  pushUndo();
+  pushUndo('clamp');
   let n=0;
   for(let i=0;i<tileData.length;i++){
     const ev=toEditor(tileData[i]);
@@ -1146,7 +1188,7 @@ document.getElementById('btnBand').addEventListener('click',()=>{
   const op=document.getElementById('bandOp').value;
   const threshE=parseInt(document.getElementById('bandThresh').value);
   const sh=parseInt(document.getElementById('bandShift').value)||0;
-  pushUndo();
+  pushUndo('band shift');
   let n=0;
   for(let i=0;i<tileData.length;i++){
     const ev=toEditor(tileData[i]);
@@ -1158,24 +1200,119 @@ document.getElementById('btnBand').addEventListener('click',()=>{
 
 document.getElementById('btnUndo').addEventListener('click',()=>{
   if(!undoStack.length)return;
-  redoStack.push(tileData.slice());
-  tileData=undoStack.pop();
-  syncSrc();updatePreview();updateUndoButtons();toolMsg('Undone.');
+  redoStack.push({data:tileData.slice(),label:'(redo)'});
+  const entry=undoStack.pop();
+  tileData=entry.data;
+  syncSrc();updatePreview();updateUndoButtons();toolMsg(`Undone: ${entry.label}`);
 });
 
 document.getElementById('btnRedo').addEventListener('click',()=>{
   if(!redoStack.length)return;
-  undoStack.push(tileData.slice());
-  tileData=redoStack.pop();
-  syncSrc();updatePreview();updateUndoButtons();toolMsg('Redone.');
+  undoStack.push({data:tileData.slice(),label:'(redo)'});
+  const entry=redoStack.pop();
+  tileData=entry.data;
+  syncSrc();updatePreview();updateUndoButtons();toolMsg(`Redone: ${entry.label}`);
 });
 
 document.getElementById('btnReset').addEventListener('click',()=>{
   if(!origTileData)return;
-  pushUndo();
+  pushUndo('before reset');
   tileData=origTileData.slice();
+  resetCompass();
   syncSrc();updatePreview();toolMsg('Reset to loaded state.');
 });
+
+// ── Orientation (rotate / flip) ────────────────────────────────────────────────
+// orientAngle: cumulative CW rotation of the DATA in degrees (0/90/180/270).
+// orientFlippedH: whether data has been flipped horizontally.
+// The preview has a built-in display flip (row 0 at bottom), which inverts
+// the apparent rotation. CW and CCW button transforms are swapped to compensate,
+// so the user sees the expected visual result while the game data is also correct.
+let orientAngle=0;
+let orientFlippedH=false;
+// History of orientation operations for debug export
+let orientHistory=[];
+
+function orientMsg(txt){
+  const m=document.getElementById('msgOrient');m.textContent=txt;m.className='msg ok';
+  setTimeout(()=>{if(m.textContent===txt)m.textContent='';},4000);
+}
+
+// Corner indicators are fixed: N=top-right, E=bottom-right, S=bottom-left, W=top-left.
+// This matches the game's isometric presentation. Preview content rotates relative to them.
+// The section badge shows which data direction currently faces "up" in the preview.
+const ORIENT_BADGE_DIRS=['N↑','W←','S↓','E→']; // at 0°/90°/180°/270° CW rotation of data
+
+function drawOrientIndicator(){
+  const show=document.getElementById('chkCompass')?.checked;
+  const overlay=document.getElementById('orientOverlay');
+  if(overlay)overlay.style.display=show?'block':'none';
+  // Badge: which cardinal was originally "up" (north) is now facing preview-top
+  const idx=((orientAngle/90)%4+4)%4;
+  let badge=ORIENT_BADGE_DIRS[idx];
+  if(orientFlippedH)badge+=' ⟺';
+  const ob=document.getElementById('orientBadge');
+  if(ob)ob.textContent=badge;
+}
+
+function applyTransform(fn, label){
+  if(!tileData)return;
+  pushUndo(label);
+  const src=tileData.slice();
+  const dst=new Int16Array(W*H);
+  for(let row=0;row<H;row++){
+    for(let col=0;col<W;col++){
+      const {r:nr,c:nc}=fn(row,col);
+      dst[nr*W+nc]=src[row*W+col];
+    }
+  }
+  tileData=dst;
+  orientHistory.push(label);
+  syncSrc();updatePreview();
+  orientMsg(label);
+}
+
+// Transform functions: given source (row,col), return destination (r,c)
+// NOTE: CW and CCW are swapped vs naive maths to compensate for the
+// preview's vertical display flip (row 0 at bottom), so that:
+//   - the button labelled CW rotates CW both in preview AND in-game
+//   - the exported map.json is also correct
+function rot90CW (row,col){return {r:W-1-col, c:row      };}  // compensated for display flip
+function rot90CCW(row,col){return {r:col,      c:H-1-row  };}  // compensated for display flip
+function flipH   (row,col){return {r:row,      c:W-1-col  };}
+function flipV   (row,col){return {r:H-1-row,  c:col      };}
+
+document.getElementById('btnRot90CW').addEventListener('click',()=>{
+  applyTransform(rot90CW,'Rotate 90° CW');
+  orientAngle=(orientAngle+90)%360;
+  drawOrientIndicator();
+});
+
+document.getElementById('btnRot90CCW').addEventListener('click',()=>{
+  applyTransform(rot90CCW,'Rotate 90° CCW');
+  orientAngle=(orientAngle-90+360)%360;
+  drawOrientIndicator();
+});
+
+document.getElementById('btnFlipH').addEventListener('click',()=>{
+  applyTransform(flipH,'Flip horizontal');
+  orientFlippedH=!orientFlippedH;
+  drawOrientIndicator();
+});
+
+document.getElementById('btnFlipV').addEventListener('click',()=>{
+  applyTransform(flipV,'Flip vertical');
+  orientAngle=(orientAngle+180)%360;
+  orientFlippedH=!orientFlippedH;
+  drawOrientIndicator();
+});
+
+document.getElementById('chkCompass').addEventListener('change',drawOrientIndicator);
+
+function resetCompass(){
+  orientAngle=0;orientFlippedH=false;orientHistory=[];
+  drawOrientIndicator();
+}
 
 // ── Build export tiles ─────────────────────────────────────────────────────────
 
@@ -1281,7 +1418,8 @@ function buildTiles(){
 
 // ── Export ─────────────────────────────────────────────────────────────────────
 function enableTools(){
-  ['btnShiftAll','btnClamp','btnBand','btnPreview','btnExportMap','btnReset'].forEach(id=>document.getElementById(id).disabled=false);
+  ['btnShiftAll','btnClamp','btnBand','btnPreview','btnExportMap','btnReset',
+   'btnRot90CW','btnRot90CCW','btnFlipH','btnFlipV'].forEach(id=>document.getElementById(id).disabled=false);
   document.getElementById('secLevelTools').classList.add('open');
 }
 
@@ -1332,6 +1470,12 @@ document.getElementById('btnExportMap').addEventListener('click',()=>{
         levelRange:{min:Math.min(...data.Tiles.map(t=>t.Level)),max:Math.max(...data.Tiles.map(t=>t.Level))},
       },
       undoHistoryDepth:undoStack.length,
+      undoHistory:undoStack.map(e=>e.label),
+      orientation:{
+        angleCW:orientAngle,
+        flippedH:orientFlippedH,
+        history:orientHistory,
+      },
     };
   }
 
