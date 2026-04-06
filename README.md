@@ -106,14 +106,14 @@ Option: Embed STTC-TT data in `map.json` for diagnositc purposes
  - Tested in Chrome, stavle builds will be tested in a few browsers (e.g. Firefox, Edge)
 
 ## Known Issues:
-- Generator actions do not record in the undo buffer, so they are not undo-able
 - Outside corner edges may not be generated
 - Edges are presented as linked to terrains, this not the case
-- All image imported or generated maps default to desert biome - work around by creating the scenario in the offical editor, then load `map.json` into the editor.
+- All image imported maps default to desert biome 
+   - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
  - Perlin and OpenSimplex generator added
- - Terrain orientation controls
+ - Terrain orientation controls (Units, Decors and Triggers are unmoved)
  - Undo buffer increased from 10 to 30 steps
  - Edge selection no longer modifies preview
  - Imported image, preview and generated map have same orientation
