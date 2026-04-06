@@ -29,7 +29,7 @@ This tool allows you to:
 
 ### Generator
 - Modify the seed to dramatically change the layout
-- Move sliders to finesse 
+- Move sliders to finesse
 
 ### Terrain and Level Control
 - **Modes:** Default single terrain, Low/High overrides, or per-level assignment
@@ -47,7 +47,7 @@ This tool allows you to:
 ## Usage
 
 ### 0. Download
-- Download the source code in your preferred format
+- If downloading, choose the source code in your preferred format
 - Open `STTCTT.html` in your favourite browser (tested in Chrome)
 
 ### 1. Select a Source
