@@ -107,7 +107,6 @@ Option: Embed STTC-TT data in `map.json` for diagnositc purposes
 
 ## Known Issues:
 - Outside corner edges may not be generated
-- Edges are presented as linked to terrains, this not the case
 - All image imported maps default to desert biome 
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
