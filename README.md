@@ -111,6 +111,7 @@ Option: Embed STTC-TT data in `map.json` for diagnositc purposes
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
+ - Generator actions register in undo buffer
  - Perlin and OpenSimplex generator added
  - Terrain orientation controls (Units, Decors and Triggers are unmoved)
  - Undo buffer increased from 10 to 30 steps
