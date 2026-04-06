@@ -439,7 +439,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 <!-- ════════════════ RIGHT COLUMN (sticky preview) ════════════════ -->
 <div class="right-col">
   <div class="section always-open">
-    <div class="sh"><span class="st">Preview</span><span class="sb" id="previewModeBadge"></span><button class="sm" id="btnTogglePreviewMode" style="margin-left:auto;font-size:11px;padding:3px 8px;">Switch to height</button></div>
+    <div class="sh"><span class="st">Preview</span><span class="sb" id="previewModeBadge"></span><button class="sm" id="btnTogglePreviewMode" style="margin-left:auto;font-size:11px;padding:3px 8px;">Terrain</button></div>
     <div class="section-body" style="padding-top:10px;">
       <div class="preview-canvas-wrap" style="position:relative;">
         <canvas id="cvPreview" width="128" height="128"></canvas>
@@ -713,7 +713,7 @@ let srcEdgeGroups=null;     // original EdgeGroups array from loaded map.json (n
 let scenarioData=null;
 let activeSource='image';
 let activeLandscape=0;
-let previewMode='terrain';  // 'terrain' | 'height'
+let previewMode='height';  // 'terrain' | 'height'
 
 // Undo/redo stacks (each entry is an Int16Array snapshot)
 const UNDO_MAX=30;
@@ -1200,12 +1200,15 @@ function mkGenSlider(id,outId,displayFn){
   const s=document.getElementById(id),o=document.getElementById(outId);
   if(!s||!o)return;
   o.textContent=displayFn(s.value);
+  // 'input': live preview while dragging, no undo push
   s.addEventListener('input',()=>{
     o.textContent=displayFn(s.value);
     if(activeSource==='gen')recomputeGenPreview();
   });
+  // 'pointerup': one undo commit per drag gesture (fires after input stream ends)
+  // 'change' is intentionally NOT listened to here - it fires immediately after
+  // pointerup on mouse release, which would create a duplicate undo entry.
   s.addEventListener('pointerup',()=>{if(activeSource==='gen')recomputeGen(true);});
-  s.addEventListener('change',   ()=>{if(activeSource==='gen')recomputeGen(true);});
 }
 mkGenSlider('genScale',  'genScaleOut',  v=>v);
 mkGenSlider('genWater',  'genWaterOut',  v=>v+'%');
@@ -1214,14 +1217,20 @@ mkGenSlider('genPersist','genPersistOut',v=>(v/100).toFixed(2));
 mkGenSlider('genLacun',  'genLacunOut',  v=>(v/100).toFixed(1));
 mkGenSlider('genPower',  'genPowerOut',  v=>(v/100).toFixed(1));
 
-// Reset buttons: restore slider default and commit undo
+// Reset buttons: push undo of current state FIRST, then update slider and regenerate
 document.querySelectorAll('.gen-reset').forEach(btn=>{
   btn.addEventListener('click',()=>{
     const sl=document.getElementById(btn.dataset.id);
+    const out=document.getElementById(btn.dataset.id+'Out');
     if(!sl)return;
+    if(activeSource==='gen') pushUndo(`reset ${btn.dataset.id}`);
     sl.value=btn.dataset.def;
-    sl.dispatchEvent(new Event('input'));
-    if(activeSource==='gen')recomputeGen(true);
+    if(out){
+      // Re-derive display value from the slider's own mkGenSlider displayFn
+      // by reading back via input event (simpler than duplicating the fn)
+      sl.dispatchEvent(new Event('input'));
+    }
+    if(activeSource==='gen') recomputeGen(false); // undo already pushed above
   });
 });
 
@@ -1268,7 +1277,7 @@ function terrainForMapLevel(mv){
 document.getElementById('btnTogglePreviewMode').addEventListener('click',()=>{
   previewMode=(previewMode==='terrain')?'height':'terrain';
   document.getElementById('btnTogglePreviewMode').textContent=
-    previewMode==='terrain'?'Switch to height':'Switch to terrain';
+    previewMode==='terrain'?'Height':'Terrain';
   updatePreview();
 });
 
@@ -1310,7 +1319,7 @@ function updatePreview(){
   const lo=used.length?Math.min(...used):0,hi=used.length?Math.max(...used):0;
   document.getElementById('previewLabel').textContent=
     `Editor levels ${lo}-${hi} · ${showTerrainColours?'terrain colours':'height colours (dark=low)'}`;
-  document.getElementById('previewModeBadge').textContent=previewMode;
+  document.getElementById('previewModeBadge').textContent=previewMode==='terrain'?'Terrain':'Height';
   document.getElementById('sTiles').textContent=(W*H).toLocaleString();
   document.getElementById('sRange').textContent=used.length?`${lo}-${hi}`:'-';
   document.getElementById('sNonZero').textContent=dist.slice(1).reduce((a,b)=>a+b,0).toLocaleString();
@@ -1354,8 +1363,43 @@ function drawLegend(dist){
 }
 
 // ── Undo/redo ──────────────────────────────────────────────────────────────────
+// Capture all generator slider values for undo state storage
+function captureGenState(){
+  return activeSource!=='gen' ? null : {
+    seed:    document.getElementById('genSeed').value,
+    scale:   document.getElementById('genScale').value,
+    water:   document.getElementById('genWater').value,
+    octaves: document.getElementById('genOctaves').value,
+    persist: document.getElementById('genPersist').value,
+    lacun:   document.getElementById('genLacun').value,
+    power:   document.getElementById('genPower').value,
+    type:    document.querySelector('input[name="noiseType"]:checked')?.value||'perlin',
+  };
+}
+
+// Restore generator slider values from a captured state (without re-running noise)
+function restoreGenState(gs){
+  if(!gs)return;
+  document.getElementById('genSeed').value=gs.seed;
+  document.getElementById('genScale').value=gs.scale;
+  document.getElementById('genWater').value=gs.water;
+  document.getElementById('genOctaves').value=gs.octaves;
+  document.getElementById('genPersist').value=gs.persist;
+  document.getElementById('genLacun').value=gs.lacun;
+  document.getElementById('genPower').value=gs.power;
+  const radio=document.querySelector(`input[name="noiseType"][value="${gs.type}"]`);
+  if(radio)radio.checked=true;
+  // Update display labels
+  document.getElementById('genScaleOut').textContent=gs.scale;
+  document.getElementById('genWaterOut').textContent=gs.water+'%';
+  document.getElementById('genOctavesOut').textContent=gs.octaves;
+  document.getElementById('genPersistOut').textContent=(gs.persist/100).toFixed(2);
+  document.getElementById('genLacunOut').textContent=(gs.lacun/100).toFixed(1);
+  document.getElementById('genPowerOut').textContent=(gs.power/100).toFixed(1);
+}
+
 function pushUndo(label='edit'){
-  undoStack.push({data:tileData.slice(),label});
+  undoStack.push({data:tileData.slice(), label, genState:captureGenState()});
   if(undoStack.length>UNDO_MAX)undoStack.shift();
   redoStack=[];
   updateUndoButtons();
@@ -1423,17 +1467,19 @@ document.getElementById('btnBand').addEventListener('click',()=>{
 
 document.getElementById('btnUndo').addEventListener('click',()=>{
   if(!undoStack.length)return;
-  redoStack.push({data:tileData.slice(),label:'(redo)'});
+  redoStack.push({data:tileData.slice(), label:'(redo)', genState:captureGenState()});
   const entry=undoStack.pop();
   tileData=entry.data;
+  restoreGenState(entry.genState);
   syncSrc();updatePreview();updateUndoButtons();toolMsg(`Undone: ${entry.label}`);
 });
 
 document.getElementById('btnRedo').addEventListener('click',()=>{
   if(!redoStack.length)return;
-  undoStack.push({data:tileData.slice(),label:'(redo)'});
+  undoStack.push({data:tileData.slice(), label:'(redo)', genState:captureGenState()});
   const entry=redoStack.pop();
   tileData=entry.data;
+  restoreGenState(entry.genState);
   syncSrc();updatePreview();updateUndoButtons();toolMsg(`Redone: ${entry.label}`);
 });
 

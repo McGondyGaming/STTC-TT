@@ -38,8 +38,7 @@ A living document for tracking ideas, improvements, and future direction for the
 
 ## Technical Improvements
 
-Under-the-hood changes
-
+- [ ] Undo/redo action list
 - [ ] Improve undo/redo efficiency (diff-based instead of full copy)
 - [ ] Add basic automated tests for core functions
 
