@@ -143,7 +143,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   </svg>
   <h1>Starship Troopers Terran Command Terrain Tool</h1>
 </div>
-<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
+<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · v1.01-alpha01 · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
 
 <div class="layout">
 <!-- ════════════════ LEFT COLUMN ════════════════ -->
@@ -193,19 +193,19 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
           </div>
         </div>
         <!-- Scale -->
-        <div class="field"><label class="fl">Scale <span style="font-size:11px;color:var(--text3)">feature size</span></label><div class="rr"><input type="range" id="genScale" min="1" max="200" value="60" step="1"><span class="rv" id="genScaleOut">60</span></div></div>
+        <div class="field"><label class="fl">Scale <span style="font-size:11px;color:var(--text3)">feature size</span></label><div class="rr"><input type="range" id="genScale" min="1" max="200" value="60" step="1"><span class="rv" id="genScaleOut">60</span><button class="sm gen-reset" data-id="genScale" data-def="60" title="Reset to default">↺</button></div></div>
         <!-- Water level -->
-        <div class="field"><label class="fl">Water level <span style="font-size:11px;color:var(--text3)">noise below this → level −1</span></label><div class="rr"><input type="range" id="genWater" min="0" max="100" value="20" step="1"><span class="rv" id="genWaterOut">20%</span></div></div>
+        <div class="field"><label class="fl">Water level <span style="font-size:11px;color:var(--text3)">noise below this → level −1</span></label><div class="rr"><input type="range" id="genWater" min="0" max="100" value="20" step="1"><span class="rv" id="genWaterOut">20%</span><button class="sm gen-reset" data-id="genWater" data-def="20" title="Reset to default">↺</button></div></div>
         <!-- Advanced collapsible -->
         <div style="margin-top:8px;">
           <div id="genAdvToggle" style="cursor:pointer;font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;user-select:none;display:flex;align-items:center;gap:4px;">
             <span id="genAdvChev">▶</span> Refine shape
           </div>
           <div id="genAdvBody" style="display:none;margin-top:8px;">
-            <div class="field"><label class="fl">Octaves <span style="font-size:11px;color:var(--text3)">layers of detail</span></label><div class="rr"><input type="range" id="genOctaves" min="1" max="8" value="4" step="1"><span class="rv" id="genOctavesOut">4</span></div></div>
-            <div class="field"><label class="fl">Persistence <span style="font-size:11px;color:var(--text3)">amplitude decay</span></label><div class="rr"><input type="range" id="genPersist" min="10" max="100" value="50" step="1"><span class="rv" id="genPersistOut">0.50</span></div></div>
-            <div class="field"><label class="fl">Lacunarity <span style="font-size:11px;color:var(--text3)">frequency growth</span></label><div class="rr"><input type="range" id="genLacun" min="100" max="400" value="200" step="10"><span class="rv" id="genLacunOut">2.00</span></div></div>
-            <div class="field"><label class="fl">Power <span style="font-size:11px;color:var(--text3)">redistribute slopes</span></label><div class="rr"><input type="range" id="genPower" min="10" max="400" value="100" step="10"><span class="rv" id="genPowerOut">1.00</span></div></div>
+            <div class="field"><label class="fl">Octaves <span style="font-size:11px;color:var(--text3)">layers of detail</span></label><div class="rr"><input type="range" id="genOctaves" min="1" max="8" value="4" step="1"><span class="rv" id="genOctavesOut">4</span><button class="sm gen-reset" data-id="genOctaves" data-def="4" title="Reset to default">↺</button></div></div>
+            <div class="field"><label class="fl">Persistence <span style="font-size:11px;color:var(--text3)">amplitude decay</span></label><div class="rr"><input type="range" id="genPersist" min="10" max="100" value="50" step="1"><span class="rv" id="genPersistOut">0.50</span><button class="sm gen-reset" data-id="genPersist" data-def="50" title="Reset to default">↺</button></div></div>
+            <div class="field"><label class="fl">Lacunarity <span style="font-size:11px;color:var(--text3)">frequency growth</span></label><div class="rr"><input type="range" id="genLacun" min="100" max="400" value="200" step="10"><span class="rv" id="genLacunOut">2.0</span><button class="sm gen-reset" data-id="genLacun" data-def="200" title="Reset to default">↺</button></div></div>
+            <div class="field"><label class="fl">Power <span style="font-size:11px;color:var(--text3)">redistribute slopes</span></label><div class="rr"><input type="range" id="genPower" min="10" max="400" value="100" step="10"><span class="rv" id="genPowerOut">1.0</span><button class="sm gen-reset" data-id="genPower" data-def="100" title="Reset to default">↺</button></div></div>
           </div>
         </div>
         <div class="msg" id="msgGen" style="margin-top:6px;"></div>
@@ -1135,8 +1135,8 @@ function fbm(noiseFn, x, y, octaves, persistence, lacunarity){
   return val/maxAmp; // normalised to ~[-1,1]
 }
 
-function recomputeGen(){
-  // Read and sanitise all generator params
+// Core noise generation - shared by preview and undo-committing paths
+function runNoiseGen(){
   const rawSeed=sanitiseSeed(document.getElementById('genSeed').value);
   document.getElementById('genSeed').value=rawSeed;
   const seed32=hashSeed(rawSeed);
@@ -1149,75 +1149,95 @@ function recomputeGen(){
   const power=Math.max(0.1,(parseInt(document.getElementById('genPower').value)||100)/100);
 
   const noiseFn=type==='simplex'?buildSimplex(seed32):buildPerlin(seed32);
-  const waterThreshold=(waterPct/100)*2-1; // maps 0-100% to -1..1
-
-  tileData=new Int16Array(W*H);
-  // Sample noise for every tile and collect raw values for normalisation
   const raw=new Float32Array(W*H);
-  for(let row=0;row<H;row++){
-    for(let col=0;col<W;col++){
-      const nx=col/scale, ny=row/scale;
-      raw[row*W+col]=fbm(noiseFn,nx,ny,octaves,persistence,lacunarity);
-    }
-  }
-  // Normalise raw to [0,1], apply power redistribution, then map to levels
+  for(let row=0;row<H;row++)
+    for(let col=0;col<W;col++)
+      raw[row*W+col]=fbm(noiseFn,col/scale,row/scale,octaves,persistence,lacunarity);
+
   let mn=raw[0],mx=raw[0];
   for(let i=1;i<W*H;i++){if(raw[i]<mn)mn=raw[i];if(raw[i]>mx)mx=raw[i];}
   const range=mx-mn||1;
+  const result=new Int16Array(W*H);
   for(let i=0;i<W*H;i++){
-    let v=(raw[i]-mn)/range; // 0..1
-    v=Math.pow(v,power);    // redistribute: >1 = more low, <1 = more high
-    // Water level: anything below the threshold becomes level -1 (map 0)
-    if(v<waterPct/100){ tileData[i]=0; } // map level 0 = editor -1
-    else{
-      // Remap the above-water portion to editor 0-13 (map 1-14)
-      const t=(v-waterPct/100)/(1-waterPct/100);
-      tileData[i]=Math.max(1,Math.min(14,Math.round(1+t*13)));
-    }
+    let v=Math.pow((raw[i]-mn)/range, power);
+    result[i]=v<waterPct/100 ? 0 : Math.max(1,Math.min(14,Math.round(1+(v-waterPct/100)/(1-waterPct/100)*13)));
   }
-  // Flip rows to match game coordinate order (same as image import)
+  // Flip rows to match game coordinate order
   const flipped=new Int16Array(W*H);
   for(let row=0;row<H;row++)
     for(let col=0;col<W;col++)
-      flipped[row*W+col]=tileData[(H-1-row)*W+col];
-  tileData=flipped;
+      flipped[row*W+col]=result[(H-1-row)*W+col];
+  return {data:flipped, seed:rawSeed, type};
+}
 
-  origTileData=tileData.slice();
-  undoStack=[];redoStack=[];updateUndoButtons();
+// Preview only - no undo push, no origTileData reset (called while dragging)
+function recomputeGenPreview(){
+  if(!tileData)return; // only preview if already initialised
+  const {data}=runNoiseGen();
+  tileData=data;
+  updatePreview();
+}
+
+// Full regenerate - pushes undo when commitUndo=true, resets origTileData on first load
+function recomputeGen(commitUndo=false){
+  const firstLoad=!tileData||activeSource!=='gen';
+  if(commitUndo&&!firstLoad) pushUndo('generate');
+  const {data,seed,type}=runNoiseGen();
+  tileData=data;
+  if(firstLoad){ origTileData=tileData.slice(); undoStack=[];redoStack=[];updateUndoButtons(); }
   document.getElementById('srcBadge').textContent='Generated';
-  document.getElementById('msgGen').textContent=`Seed: ${rawSeed} · ${type}`;
+  document.getElementById('msgGen').textContent=`Seed: ${seed} · ${type}`;
   document.getElementById('msgGen').className='msg ok';
   activeSource='gen';
   updatePreview();enableTools();resetCompass();
 }
 
 // ── Generator controls wiring ─────────────────────────────────────────────────
+// Undo strategy: 'input' (drag) -> live preview only, no undo push.
+// 'pointerup' (release) -> commit one undo state per drag gesture.
+// Discrete actions (noise type, seed, randomize, reset) -> commit immediately.
 function mkGenSlider(id,outId,displayFn){
   const s=document.getElementById(id),o=document.getElementById(outId);
   if(!s||!o)return;
   o.textContent=displayFn(s.value);
-  s.addEventListener('input',()=>{o.textContent=displayFn(s.value);if(activeSource==='gen')recomputeGen();});
+  s.addEventListener('input',()=>{
+    o.textContent=displayFn(s.value);
+    if(activeSource==='gen')recomputeGenPreview();
+  });
+  s.addEventListener('pointerup',()=>{if(activeSource==='gen')recomputeGen(true);});
+  s.addEventListener('change',   ()=>{if(activeSource==='gen')recomputeGen(true);});
 }
 mkGenSlider('genScale',  'genScaleOut',  v=>v);
 mkGenSlider('genWater',  'genWaterOut',  v=>v+'%');
 mkGenSlider('genOctaves','genOctavesOut',v=>v);
 mkGenSlider('genPersist','genPersistOut',v=>(v/100).toFixed(2));
-mkGenSlider('genLacun',  'genLacunOut',  v=>(v/100).toFixed(2));
-mkGenSlider('genPower',  'genPowerOut',  v=>(v/100).toFixed(2));
+mkGenSlider('genLacun',  'genLacunOut',  v=>(v/100).toFixed(1));
+mkGenSlider('genPower',  'genPowerOut',  v=>(v/100).toFixed(1));
+
+// Reset buttons: restore slider default and commit undo
+document.querySelectorAll('.gen-reset').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const sl=document.getElementById(btn.dataset.id);
+    if(!sl)return;
+    sl.value=btn.dataset.def;
+    sl.dispatchEvent(new Event('input'));
+    if(activeSource==='gen')recomputeGen(true);
+  });
+});
 
 document.querySelectorAll('input[name="noiseType"]').forEach(r=>
-  r.addEventListener('change',()=>{if(activeSource==='gen')recomputeGen();}));
+  r.addEventListener('change',()=>{if(activeSource==='gen')recomputeGen(true);}));
 
 document.getElementById('genSeed').addEventListener('change',()=>{
   document.getElementById('genSeed').value=sanitiseSeed(document.getElementById('genSeed').value);
-  if(activeSource==='gen')recomputeGen();
+  if(activeSource==='gen')recomputeGen(true);
 });
 
 document.getElementById('btnRandSeed').addEventListener('click',()=>{
   const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const seed=Array.from({length:12},()=>chars[Math.floor(Math.random()*chars.length)]).join('');
   document.getElementById('genSeed').value=seed;
-  if(activeSource==='gen')recomputeGen();
+  if(activeSource==='gen')recomputeGen(true);
 });
 
 document.getElementById('genAdvToggle').addEventListener('click',()=>{
@@ -1649,7 +1669,7 @@ document.getElementById('btnExportMap').addEventListener('click',()=>{
   if(embedDebug){
     data._STTCTT={
       exportedAt:new Date().toISOString(),
-      toolVersion:'Build15',
+      toolVersion:'1.01-alpha01',
       source:{type:activeSource,tiles:tileData?tileData.length:0,
         ...(activeSource==='gen'?{
           noiseType:document.querySelector('input[name="noiseType"]:checked')?.value,
@@ -1658,8 +1678,8 @@ document.getElementById('btnExportMap').addEventListener('click',()=>{
           waterLevel:document.getElementById('genWater').value+'%',
           octaves:document.getElementById('genOctaves').value,
           persistence:(document.getElementById('genPersist').value/100).toFixed(2),
-          lacunarity:(document.getElementById('genLacun').value/100).toFixed(2),
-          power:(document.getElementById('genPower').value/100).toFixed(2),
+          lacunarity:(document.getElementById('genLacun').value/100).toFixed(1),
+          power:(document.getElementById('genPower').value/100).toFixed(1),
         }:{})
       },
       landscape:{id:activeLandscape,name:LS_NAMES[activeLandscape]},
