@@ -214,7 +214,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   </div>
 
   <!-- LANDSCAPE -->
-  <div class="section open" id="secLandscape">
+  <div class="section" id="secLandscape">
     <div class="sh" data-sec="secLandscape">
       <div class="sh-left"><span class="st">Landscape</span><span id="lsBadge" class="landscape-badge" style="display:none"></span></div>
       <span class="sb" id="lsBadgeNote"></span>
@@ -386,7 +386,6 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <div class="section" id="secLevelTools">
     <div class="sh" data-sec="secLevelTools">
       <div class="sh-left"><span class="st">Level tools</span></div>
-      <span class="sb" id="undoBadge"></span>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
@@ -413,6 +412,18 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
     </div>
   </div>
 
+  <!-- HISTORY -->
+  <div class="section" id="secHistory">
+    <div class="sh" data-sec="secHistory">
+      <div class="sh-left"><span class="st">History</span></div>
+      <span class="sv-chev">▾</span>
+    </div>
+    <div class="section-body">
+      <div class="note" style="margin-bottom:6px;">Most recent action at top. Click an entry to undo/redo to that point.</div>
+      <div id="historyList" style="font-size:11px;font-family:monospace;max-height:160px;overflow-y:auto;border:1px solid var(--border);border-radius:3px;background:var(--bg2);"></div>
+    </div>
+  </div>
+
   <!-- EXPORT -->
   <div class="export-box">
     <div class="export-title">Export</div>
@@ -426,6 +437,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <button id="btnRedo" disabled>↪ Redo</button>
       <button id="btnReset" disabled>⟳ Reset</button>
     </div>
+    <div style="font-size:11px;color:var(--text3);margin-top:4px;" id="undoBadge"></div>
     <div class="field" style="margin-top:8px;">
       <label class="ck-row"><input type="checkbox" id="chkEmbedDebug"> Embed STTC-TT debug info in map.json <span style="color:var(--text3);font-size:10px;">(unknown fields are ignored by the game)</span></label>
     </div>
@@ -1170,9 +1182,9 @@ function runNoiseGen(){
   return {data:flipped, seed:rawSeed, type};
 }
 
-// Preview only - no undo push, no origTileData reset (called while dragging)
+// Preview only - no undo push (called while dragging)
 function recomputeGenPreview(){
-  if(!tileData)return; // only preview if already initialised
+  if(!tileData)return;
   const {data}=runNoiseGen();
   tileData=data;
   updatePreview();
@@ -1184,7 +1196,13 @@ function recomputeGen(commitUndo=false){
   if(commitUndo&&!firstLoad) pushUndo('generate');
   const {data,seed,type}=runNoiseGen();
   tileData=data;
-  if(firstLoad){ origTileData=tileData.slice(); undoStack=[];redoStack=[];updateUndoButtons(); }
+  if(firstLoad){
+    origTileData=tileData.slice();
+    undoStack=[];redoStack=[];
+    // Push the initial generated state so the very first action is undoable
+    undoStack.push({data:tileData.slice(),label:'initial generate',genState:captureGenState()});
+    updateUndoButtons();
+  }
   document.getElementById('srcBadge').textContent='Generated';
   document.getElementById('msgGen').textContent=`Seed: ${seed} · ${type}`;
   document.getElementById('msgGen').className='msg ok';
@@ -1193,22 +1211,60 @@ function recomputeGen(commitUndo=false){
 }
 
 // ── Generator controls wiring ─────────────────────────────────────────────────
-// Undo strategy: 'input' (drag) -> live preview only, no undo push.
-// 'pointerup' (release) -> commit one undo state per drag gesture.
-// Discrete actions (noise type, seed, randomize, reset) -> commit immediately.
+// Undo strategy:
+//   pointerdown -> snapshot tileData+genState BEFORE the drag starts
+//   input       -> live preview, no undo push
+//   pointerup   -> push the pre-drag snapshot as undo entry, then commit new state
+// Maps slider id -> {name, displayFn} for human-readable history labels
+const GEN_SLIDER_META={
+  genScale:   {name:'Scale',      fmt:v=>v},
+  genWater:   {name:'Water',      fmt:v=>v+'%'},
+  genOctaves: {name:'Octaves',    fmt:v=>v},
+  genPersist: {name:'Persist',    fmt:v=>(v/100).toFixed(2)},
+  genLacun:   {name:'Lacunarity', fmt:v=>(v/100).toFixed(1)},
+  genPower:   {name:'Power',      fmt:v=>(v/100).toFixed(1)},
+};
+
+// Build a label comparing pre-drag genState to current slider value for one slider
+function genDragLabel(sliderId,preState){
+  const meta=GEN_SLIDER_META[sliderId];
+  if(!meta||!preState)return'Generate';
+  const stateKey={genScale:'scale',genWater:'water',genOctaves:'octaves',
+                  genPersist:'persist',genLacun:'lacun',genPower:'power'}[sliderId];
+  const before=meta.fmt(preState[stateKey]??document.getElementById(sliderId).value);
+  const after=meta.fmt(document.getElementById(sliderId).value);
+  return before===after?`Generate - ${meta.name}`:`Generate - ${meta.name} (${before} -> ${after})`;
+}
+
+let genPreDragSnapshot=null;
+let genPreDragSliderId=null; // which slider started the drag
+
 function mkGenSlider(id,outId,displayFn){
   const s=document.getElementById(id),o=document.getElementById(outId);
   if(!s||!o)return;
   o.textContent=displayFn(s.value);
-  // 'input': live preview while dragging, no undo push
+  s.addEventListener('pointerdown',()=>{
+    if(activeSource==='gen'){
+      genPreDragSnapshot={data:tileData.slice(),genState:captureGenState()};
+      genPreDragSliderId=id;
+    }
+  });
   s.addEventListener('input',()=>{
     o.textContent=displayFn(s.value);
-    if(activeSource==='gen')recomputeGenPreview();
+    if(activeSource==='gen') recomputeGenPreview();
   });
-  // 'pointerup': one undo commit per drag gesture (fires after input stream ends)
-  // 'change' is intentionally NOT listened to here - it fires immediately after
-  // pointerup on mouse release, which would create a duplicate undo entry.
-  s.addEventListener('pointerup',()=>{if(activeSource==='gen')recomputeGen(true);});
+  s.addEventListener('pointerup',()=>{
+    if(activeSource==='gen'&&genPreDragSnapshot){
+      const label=genDragLabel(genPreDragSliderId,genPreDragSnapshot.genState);
+      undoStack.push({data:genPreDragSnapshot.data,label,genState:genPreDragSnapshot.genState});
+      if(undoStack.length>UNDO_MAX)undoStack.shift();
+      redoStack=[];
+      updateUndoButtons();
+      genPreDragSnapshot=null;
+      genPreDragSliderId=null;
+      recomputeGen(false);
+    }
+  });
 }
 mkGenSlider('genScale',  'genScaleOut',  v=>v);
 mkGenSlider('genWater',  'genWaterOut',  v=>v+'%');
@@ -1223,30 +1279,42 @@ document.querySelectorAll('.gen-reset').forEach(btn=>{
     const sl=document.getElementById(btn.dataset.id);
     const out=document.getElementById(btn.dataset.id+'Out');
     if(!sl)return;
-    if(activeSource==='gen') pushUndo(`reset ${btn.dataset.id}`);
-    sl.value=btn.dataset.def;
-    if(out){
-      // Re-derive display value from the slider's own mkGenSlider displayFn
-      // by reading back via input event (simpler than duplicating the fn)
-      sl.dispatchEvent(new Event('input'));
+    if(activeSource==='gen'){
+      const meta=GEN_SLIDER_META[btn.dataset.id];
+      const before=meta?meta.fmt(sl.value):sl.value;
+      const after=meta?meta.fmt(btn.dataset.def):btn.dataset.def;
+      pushUndo(`Reset ${meta?meta.name:btn.dataset.id} (${before} -> ${after})`);
     }
-    if(activeSource==='gen') recomputeGen(false); // undo already pushed above
+    sl.value=btn.dataset.def;
+    if(out) sl.dispatchEvent(new Event('input'));
+    if(activeSource==='gen') recomputeGen(false);
   });
 });
 
 document.querySelectorAll('input[name="noiseType"]').forEach(r=>
-  r.addEventListener('change',()=>{if(activeSource==='gen')recomputeGen(true);}));
+  r.addEventListener('change',()=>{
+    if(activeSource==='gen') recomputeGen(true); // pushUndo('generate') inside
+  }));
 
 document.getElementById('genSeed').addEventListener('change',()=>{
-  document.getElementById('genSeed').value=sanitiseSeed(document.getElementById('genSeed').value);
-  if(activeSource==='gen')recomputeGen(true);
+  const prev=document.getElementById('genSeed').value;
+  document.getElementById('genSeed').value=sanitiseSeed(prev);
+  if(activeSource==='gen') recomputeGen(true);
 });
 
 document.getElementById('btnRandSeed').addEventListener('click',()=>{
   const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const seed=Array.from({length:12},()=>chars[Math.floor(Math.random()*chars.length)]).join('');
+  const prev=document.getElementById('genSeed').value;
   document.getElementById('genSeed').value=seed;
-  if(activeSource==='gen')recomputeGen(true);
+  if(activeSource==='gen'){
+    // Build descriptive label before committing
+    undoStack.push({data:tileData.slice(),label:`Generate - Seed (${prev} -> ${seed})`,genState:captureGenState()});
+    if(undoStack.length>UNDO_MAX)undoStack.shift();
+    redoStack=[];
+    updateUndoButtons();
+    recomputeGen(false);
+  }
 });
 
 document.getElementById('genAdvToggle').addEventListener('click',()=>{
@@ -1409,8 +1477,69 @@ function updateUndoButtons(){
   document.getElementById('btnUndo').disabled=undoStack.length===0;
   document.getElementById('btnRedo').disabled=redoStack.length===0;
   const top=undoStack[undoStack.length-1];
-  document.getElementById('undoBadge').textContent=
-    undoStack.length>0?`${undoStack.length} - ${top.label}`:'';
+  const badge=document.getElementById('undoBadge');
+  if(badge) badge.textContent=undoStack.length>0?`${undoStack.length} undoable - last: ${top.label}`:'';
+
+  // Render history list - most recent at top, clickable to jump to any state
+  const list=document.getElementById('historyList');
+  if(!list)return;
+
+  // Build ordered list: redo entries (future), current marker, undo entries (past)
+  const items=[];
+  for(let i=redoStack.length-1;i>=0;i--)
+    items.push({label:redoStack[i].label, state:'redo', stackIdx:i});
+  items.push({label:'current', state:'current', stackIdx:-1});
+  for(let i=undoStack.length-1;i>=0;i--)
+    items.push({label:undoStack[i].label, state:'undo', stackIdx:i});
+
+  list.innerHTML='';
+  items.forEach(({label,state,stackIdx})=>{
+    const el=document.createElement('div');
+    const isCurrent=state==='current';
+    el.style.cssText=[
+      'padding:3px 8px',
+      `color:${isCurrent?'var(--ok)':state==='redo'?'var(--text3)':'var(--text)'}`,
+      `background:${isCurrent?'var(--bg3)':'transparent'}`,
+      'white-space:nowrap','overflow:hidden','text-overflow:ellipsis',
+      isCurrent?'':'cursor:pointer',
+    ].join(';');
+    el.textContent=(state==='redo'?'↪ ':'↩ ')+label;
+    if(!isCurrent){
+      el.title=`Click to jump to: ${label}`;
+      el.addEventListener('mouseenter',()=>el.style.background='var(--bg3)');
+      el.addEventListener('mouseleave',()=>el.style.background='transparent');
+      el.addEventListener('click',()=>{
+        // Jump to this state by running undo/redo steps
+        if(state==='undo'){
+          // Need to undo down to stackIdx (inclusive)
+          // undoStack has entries 0..n; top is n. We want to restore entry stackIdx.
+          // Steps needed = undoStack.length - 1 - stackIdx  (to get TO this entry)
+          // plus one more undo to restore it (undo restores the state FROM the entry)
+          const stepsNeeded=undoStack.length-stackIdx;
+          for(let s=0;s<stepsNeeded;s++){
+            if(!undoStack.length)break;
+            redoStack.push({data:tileData.slice(),label:'(redo)',genState:captureGenState()});
+            const entry=undoStack.pop();
+            tileData=entry.data;
+            restoreGenState(entry.genState);
+          }
+        }else{
+          // Need to redo up to stackIdx (in redoStack)
+          // redoStack[stackIdx] is the entry; we need to redo from bottom to stackIdx
+          const stepsNeeded=redoStack.length-stackIdx;
+          for(let s=0;s<stepsNeeded;s++){
+            if(!redoStack.length)break;
+            undoStack.push({data:tileData.slice(),label:'(redo)',genState:captureGenState()});
+            const entry=redoStack.pop();
+            tileData=entry.data;
+            restoreGenState(entry.genState);
+          }
+        }
+        syncSrc();updatePreview();updateUndoButtons();
+      });
+    }
+    list.appendChild(el);
+  });
 }
 
 function syncSrc(){if(srcTiles)srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)t.Level=tileData[t.Index];});}
@@ -1689,7 +1818,6 @@ function buildTiles(){
 function enableTools(){
   ['btnShiftAll','btnClamp','btnBand','btnPreview','btnExportMap','btnReset',
    'btnRot90CW','btnRot90CCW','btnFlipH','btnFlipV'].forEach(id=>document.getElementById(id).disabled=false);
-  document.getElementById('secLevelTools').classList.add('open');
 }
 
 function dl(name,text){
