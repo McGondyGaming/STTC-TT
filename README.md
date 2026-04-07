@@ -70,7 +70,14 @@ This tool allows you to:
 
 ## Exported Data Format
 
-Option: Embed STTC-TT data in `map.json` for diagnositc purposes
+Option: Embed STTC-TT data in `map.json` for diagnositc purposes. The following data is captured:
+ - STTC-TT version
+ - Source
+ - Generation data (if used)
+ - Tile and Edge selections and number
+ - Level ranges
+ - Undo depth and history
+ - Map orientation state and changes
 
 ### map.json
 ```json
