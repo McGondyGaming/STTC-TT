@@ -11,26 +11,28 @@ A living document for tracking ideas, improvements, and future direction for the
 ## Ideas
 
 ### Exports
+
 - [ ] Export greyscale heightmap
 - [ ] Add "export directly to game folder" option
 - [ ] Allow selecting export directory
 - [ ] Add confirmation or diff view before export if overwiting
 
 ### Preview
-- [ ] Manual toggle between height and terrain views
+
 - [ ] Show tile coordinates on hover
 - [ ] Zoom / inspect specific tiles
 - [ ] Colourblind accessibility options
-- [ ] Level -1 render as water in preview (with terrain underlay) - toggleable?
-- [ ] Terrain traversability overlay
-- [ ] Terrain traversability (including blocking decors) overlay
+- [ ] Terrain traversability preview overlay
+- [ ] Terrain traversability preview (including blocking decors) overlay
+- [ ] Level -1 render as water preview overlay
     
 ### Generation
-- [ ] Noise (Perlin/Simplex) generator for quick prototyping
-- [ ] Map orientaion controls (flip, invert, rotate)
 
 ### Scenario integration 
+
 - [ ] Map-wide decor orientation controls (flip, rotate)
+- [ ] Map-wide unit orientation controls (flip, rotate)
+- [ ] Map-wide trigger orientation controls (flip, rotate)
 
 ---
 
@@ -47,6 +49,9 @@ Under-the-hood changes
 
 Completed items
 
+- [x] Noise (Perlin/Simplex) generator for quick prototyping
+- [x] Map orientaion controls (flip, invert, rotate)
+- [x] Manual toggle between height and terrain views
 - [x] Image → heightmap conversion
 - [x] map.json import
 - [x] Terrain assignment modes

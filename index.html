@@ -159,6 +159,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="tab-bar" id="srcBar">
         <div class="tab active" data-tab="src-image">From image</div>
         <div class="tab" data-tab="src-map">Load map.json</div>
+        <div class="tab" data-tab="src-gen">Generate</div>
       </div>
       <div class="tp active" id="tab-src-image">
         <div class="dz" id="dzImg"><div class="dl"><strong>Drop heightmap image here</strong></div><div class="dl">PNG / BMP / JPEG - resampled to 128×128</div><input type="file" id="fiImg" accept="image/*" style="display:none"></div>
@@ -172,6 +173,42 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="tp" id="tab-src-map">
         <div class="dz" id="dzMap"><div class="dl"><strong>Drop map.json here</strong></div><div class="dl">Loads levels and terrain - auto-detects landscape</div><input type="file" id="fiMap" accept=".json,application/json" style="display:none"></div>
         <div class="msg" id="msgMap"></div>
+      </div>
+      <div class="tp" id="tab-src-gen">
+        <div class="note" style="margin-bottom:8px;">Generates a procedural heightmap using fractal noise. Output is deterministic - same seed and settings always produce the same map.</div>
+        <!-- Noise type -->
+        <div class="field">
+          <label class="fl">Noise type</label>
+          <div style="display:flex;gap:8px;">
+            <label class="ck-row"><input type="radio" name="noiseType" id="noisePerlin" value="perlin" checked> Perlin</label>
+            <label class="ck-row"><input type="radio" name="noiseType" id="noiseSimplex" value="simplex"> OpenSimplex</label>
+          </div>
+        </div>
+        <!-- Seed -->
+        <div class="field">
+          <label class="fl">Seed</label>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <input type="text" id="genSeed" value="sttc-tt" maxlength="64" style="flex:1;min-width:0;">
+            <button class="sm" id="btnRandSeed">Randomize</button>
+          </div>
+        </div>
+        <!-- Scale -->
+        <div class="field"><label class="fl">Scale <span style="font-size:11px;color:var(--text3)">feature size</span></label><div class="rr"><input type="range" id="genScale" min="1" max="200" value="60" step="1"><span class="rv" id="genScaleOut">60</span></div></div>
+        <!-- Water level -->
+        <div class="field"><label class="fl">Water level <span style="font-size:11px;color:var(--text3)">noise below this → level −1</span></label><div class="rr"><input type="range" id="genWater" min="0" max="100" value="20" step="1"><span class="rv" id="genWaterOut">20%</span></div></div>
+        <!-- Advanced collapsible -->
+        <div style="margin-top:8px;">
+          <div id="genAdvToggle" style="cursor:pointer;font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;user-select:none;display:flex;align-items:center;gap:4px;">
+            <span id="genAdvChev">▶</span> Refine shape
+          </div>
+          <div id="genAdvBody" style="display:none;margin-top:8px;">
+            <div class="field"><label class="fl">Octaves <span style="font-size:11px;color:var(--text3)">layers of detail</span></label><div class="rr"><input type="range" id="genOctaves" min="1" max="8" value="4" step="1"><span class="rv" id="genOctavesOut">4</span></div></div>
+            <div class="field"><label class="fl">Persistence <span style="font-size:11px;color:var(--text3)">amplitude decay</span></label><div class="rr"><input type="range" id="genPersist" min="10" max="100" value="50" step="1"><span class="rv" id="genPersistOut">0.50</span></div></div>
+            <div class="field"><label class="fl">Lacunarity <span style="font-size:11px;color:var(--text3)">frequency growth</span></label><div class="rr"><input type="range" id="genLacun" min="100" max="400" value="200" step="10"><span class="rv" id="genLacunOut">2.00</span></div></div>
+            <div class="field"><label class="fl">Power <span style="font-size:11px;color:var(--text3)">redistribute slopes</span></label><div class="rr"><input type="range" id="genPower" min="10" max="400" value="100" step="10"><span class="rv" id="genPowerOut">1.00</span></div></div>
+          </div>
+        </div>
+        <div class="msg" id="msgGen" style="margin-top:6px;"></div>
       </div>
     </div>
   </div>
@@ -224,10 +261,6 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
           <div class="field">
             <label class="fl">Default TerrainTypeId</label>
             <select id="terrainSelect"></select>
-          </div>
-          <div class="field">
-            <label class="ck-row" style="margin-top:2px;"><input type="checkbox" id="chkPreserve" checked>Preserve existing terrain (map.json)</label>
-            <div class="note" style="margin-top:4px;">Uncheck to apply the default to all tiles.</div>
           </div>
         </div>
       </div>
@@ -317,6 +350,38 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
     </div>
   </div>
 
+  <!-- ORIENTATION -->
+  <div class="section" id="secOrientation">
+    <div class="sh" data-sec="secOrientation">
+      <div class="sh-left"><span class="st">Orientation</span></div>
+      <span class="sb" id="orientBadge">N↑</span>
+      <span class="sv-chev">▾</span>
+    </div>
+    <div class="section-body">
+      <div class="note">Rotates and flips the level heightmap only. Units, decors, and triggers are <strong>not</strong> affected - re-place these after reorienting.</div>
+      <div class="lt-grid" style="grid-template-columns:1fr 1fr;">
+        <div class="lt-box">
+          <div class="lt-title">Rotate</div>
+          <div class="lt-row" style="gap:6px;">
+            <button class="sm" id="btnRot90CCW" disabled>↺ 90° CCW</button>
+            <button class="sm" id="btnRot90CW"  disabled>↻ 90° CW</button>
+          </div>
+        </div>
+        <div class="lt-box">
+          <div class="lt-title">Flip</div>
+          <div class="lt-row" style="gap:6px;">
+            <button class="sm" id="btnFlipH" disabled>↔ Horizontal</button>
+            <button class="sm" id="btnFlipV" disabled>↕ Vertical</button>
+          </div>
+        </div>
+      </div>
+      <div class="msg" id="msgOrient" style="margin-top:8px;"></div>
+      <div class="field" style="margin-top:4px;">
+        <label class="ck-row"><input type="checkbox" id="chkCompass"> Show orientation indicator on preview</label>
+      </div>
+    </div>
+  </div>
+
   <!-- LEVEL TOOLS -->
   <div class="section" id="secLevelTools">
     <div class="sh" data-sec="secLevelTools">
@@ -376,8 +441,16 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <div class="section always-open">
     <div class="sh"><span class="st">Preview</span><span class="sb" id="previewModeBadge"></span><button class="sm" id="btnTogglePreviewMode" style="margin-left:auto;font-size:11px;padding:3px 8px;">Switch to height</button></div>
     <div class="section-body" style="padding-top:10px;">
-      <div class="preview-canvas-wrap">
+      <div class="preview-canvas-wrap" style="position:relative;">
         <canvas id="cvPreview" width="128" height="128"></canvas>
+        <!-- Orientation indicator: fixed N/E/S/W corners matching game-space isometric orientation.
+             Game north = top-left corner. Preview content moves relative to these fixed labels. -->
+        <div id="orientOverlay" style="display:none;position:absolute;inset:0;pointer-events:none;">
+          <div style="position:absolute;top:2px;left:2px;background:rgba(0,0,0,0.65);color:#e65100;font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">N</div>
+          <div style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">E</div>
+          <div style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">S</div>
+          <div style="position:absolute;bottom:2px;left:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">W</div>
+        </div>
       </div>
       <div id="previewLabel">No source loaded</div>
       <div style="margin-top:10px;">
@@ -643,7 +716,7 @@ let activeLandscape=0;
 let previewMode='terrain';  // 'terrain' | 'height'
 
 // Undo/redo stacks (each entry is an Int16Array snapshot)
-const UNDO_MAX=10;
+const UNDO_MAX=30;
 let undoStack=[];
 let redoStack=[];
 
@@ -669,7 +742,13 @@ function wireTabs(barId,onChange){
     });
   });
 }
-wireTabs('srcBar');
+wireTabs('srcBar',()=>{
+  const tab=document.querySelector('#srcBar .tab.active')?.dataset.tab;
+  if(tab==='src-gen'){
+    if(!tileData){activeSource='gen';srcTiles=null;srcByIndex={};srcEdgeGroups=null;recomputeGen();enableTools();resetCompass();}
+    else{activeSource='gen';}
+  }
+});
 wireTabs('tBar',updatePreview);
 wireTabs('eBar',updatePreview);
 
@@ -913,7 +992,7 @@ makeDrop('dzImg','fiImg',file=>{
     document.getElementById('dzImg').classList.add('loaded');
     document.getElementById('srcBadge').textContent='Image loaded';
     activeSource='image';srcTiles=null;srcByIndex={};srcEdgeGroups=null;
-    recompute();enableTools();
+    recompute();enableTools();resetCompass();
   };
   img.onerror=()=>{msg.textContent='Could not read image.';msg.className='msg err';};
   img.src=url;
@@ -942,7 +1021,7 @@ makeDrop('dzMap','fiMap',file=>{
       document.getElementById('srcBadge').textContent=`${data.Tiles.length.toLocaleString()} tiles`;
       activeSource='map';
       setActiveLandscape(detectLandscape(srcTiles),'auto');
-      updatePreview();enableTools();
+      updatePreview();enableTools();resetCompass();
     }catch(err){msg.textContent='Error: '+err.message;msg.className='msg err';}
   };
   reader.readAsText(file);
@@ -987,7 +1066,167 @@ function recompute(){
   updatePreview();
 }
 
-// ── Terrain resolution ─────────────────────────────────────────────────────────
+// ── Heightmap Generator ────────────────────────────────────────────────────────
+// Seed hashing: FNV-1a 32-bit variant - produces consistent uint32 from any string
+function hashSeed(str){
+  let h=2166136261;
+  for(let i=0;i<str.length;i++){h=(h^str.charCodeAt(i))>>>0;h=(h*16777619)>>>0;}
+  return h;
+}
+
+// Sanitise seed input: printable ASCII only, max 64 chars
+function sanitiseSeed(s){return s.replace(/[^\x20-\x7E]/g,'').slice(0,64)||'sttc-tt';}
+
+// ── Improved Perlin Noise (Ken Perlin 2002, patent expired 2021) ──────────────
+function buildPerlin(seed32){
+  const p=new Uint8Array(512);
+  // Build permutation from seed using LCG shuffle
+  const perm=Array.from({length:256},(_,i)=>i);
+  let s=seed32>>>0;
+  for(let i=255;i>0;i--){s=(s*1664525+1013904223)>>>0;const j=s%(i+1);[perm[i],perm[j]]=[perm[j],perm[i]];}
+  for(let i=0;i<512;i++)p[i]=perm[i&255];
+  const fade=t=>t*t*t*(t*(t*6-15)+10);
+  const lerp=(a,b,t)=>a+(b-a)*t;
+  const grad=(h,x,y)=>{const u=h&1?-x:x,v=h&2?-y:y;return u+v;};
+  return (x,y)=>{
+    const X=Math.floor(x)&255,Y=Math.floor(y)&255;
+    x-=Math.floor(x);y-=Math.floor(y);
+    const u=fade(x),v=fade(y);
+    const a=p[X]+Y,b=p[X+1]+Y;
+    return lerp(lerp(grad(p[a],x,y),grad(p[b],x-1,y),u),
+                lerp(grad(p[a+1],x,y-1),grad(p[b+1],x-1,y-1),u),v);
+  };
+}
+
+// ── OpenSimplex2 2D (Kurt Spencer, public domain) ────────────────────────────
+// Compact faithful implementation of the 2D case using triangular grid skewing
+function buildSimplex(seed32){
+  const p=new Uint8Array(512);
+  const perm=Array.from({length:256},(_,i)=>i);
+  let s=seed32>>>0;
+  for(let i=255;i>0;i--){s=(s*1664525+1013904223)>>>0;const j=s%(i+1);[perm[i],perm[j]]=[perm[j],perm[i]];}
+  for(let i=0;i<512;i++)p[i]=perm[i&255];
+  const GRAD=[[ 1, 2],[-1, 2],[ 1,-2],[-1,-2],[2, 1],[-2, 1],[2,-1],[-2,-1]];
+  const F2=0.5*(Math.sqrt(3)-1), G2=(3-Math.sqrt(3))/6;
+  return (x,y)=>{
+    const s2=(x+y)*F2;
+    const i=Math.floor(x+s2),j=Math.floor(y+s2);
+    const t=(i+j)*G2;
+    const x0=x-(i-t),y0=y-(j-t);
+    const [i1,j1]=x0>y0?[1,0]:[0,1];
+    const x1=x0-i1+G2,y1=y0-j1+G2;
+    const x2=x0-1+2*G2,y2=y0-1+2*G2;
+    let n=0;
+    const contrib=(cx,cy,gi)=>{const t2=0.5-cx*cx-cy*cy;if(t2<0)return 0;const g=GRAD[gi&7];return t2*t2*t2*t2*(g[0]*cx+g[1]*cy);};
+    n+=contrib(x0,y0,p[(i+p[j&255])&255]);
+    n+=contrib(x1,y1,p[(i+i1+p[(j+j1)&255])&255]);
+    n+=contrib(x2,y2,p[(i+1+p[(j+1)&255])&255]);
+    return Math.max(-1,Math.min(1,n*70));
+  };
+}
+
+// ── Fractal Brownian Motion ───────────────────────────────────────────────────
+function fbm(noiseFn, x, y, octaves, persistence, lacunarity){
+  let val=0, amp=1, freq=1, maxAmp=0;
+  for(let o=0;o<octaves;o++){
+    val+=noiseFn(x*freq, y*freq)*amp;
+    maxAmp+=amp; amp*=persistence; freq*=lacunarity;
+  }
+  return val/maxAmp; // normalised to ~[-1,1]
+}
+
+function recomputeGen(){
+  // Read and sanitise all generator params
+  const rawSeed=sanitiseSeed(document.getElementById('genSeed').value);
+  document.getElementById('genSeed').value=rawSeed;
+  const seed32=hashSeed(rawSeed);
+  const type=document.querySelector('input[name="noiseType"]:checked')?.value||'perlin';
+  const scale=Math.max(1,parseInt(document.getElementById('genScale').value)||60);
+  const waterPct=parseInt(document.getElementById('genWater').value)||20;
+  const octaves=Math.max(1,Math.min(8,parseInt(document.getElementById('genOctaves').value)||4));
+  const persistence=(parseInt(document.getElementById('genPersist').value)||50)/100;
+  const lacunarity=(parseInt(document.getElementById('genLacun').value)||200)/100;
+  const power=Math.max(0.1,(parseInt(document.getElementById('genPower').value)||100)/100);
+
+  const noiseFn=type==='simplex'?buildSimplex(seed32):buildPerlin(seed32);
+  const waterThreshold=(waterPct/100)*2-1; // maps 0-100% to -1..1
+
+  tileData=new Int16Array(W*H);
+  // Sample noise for every tile and collect raw values for normalisation
+  const raw=new Float32Array(W*H);
+  for(let row=0;row<H;row++){
+    for(let col=0;col<W;col++){
+      const nx=col/scale, ny=row/scale;
+      raw[row*W+col]=fbm(noiseFn,nx,ny,octaves,persistence,lacunarity);
+    }
+  }
+  // Normalise raw to [0,1], apply power redistribution, then map to levels
+  let mn=raw[0],mx=raw[0];
+  for(let i=1;i<W*H;i++){if(raw[i]<mn)mn=raw[i];if(raw[i]>mx)mx=raw[i];}
+  const range=mx-mn||1;
+  for(let i=0;i<W*H;i++){
+    let v=(raw[i]-mn)/range; // 0..1
+    v=Math.pow(v,power);    // redistribute: >1 = more low, <1 = more high
+    // Water level: anything below the threshold becomes level -1 (map 0)
+    if(v<waterPct/100){ tileData[i]=0; } // map level 0 = editor -1
+    else{
+      // Remap the above-water portion to editor 0-13 (map 1-14)
+      const t=(v-waterPct/100)/(1-waterPct/100);
+      tileData[i]=Math.max(1,Math.min(14,Math.round(1+t*13)));
+    }
+  }
+  // Flip rows to match game coordinate order (same as image import)
+  const flipped=new Int16Array(W*H);
+  for(let row=0;row<H;row++)
+    for(let col=0;col<W;col++)
+      flipped[row*W+col]=tileData[(H-1-row)*W+col];
+  tileData=flipped;
+
+  origTileData=tileData.slice();
+  undoStack=[];redoStack=[];updateUndoButtons();
+  document.getElementById('srcBadge').textContent='Generated';
+  document.getElementById('msgGen').textContent=`Seed: ${rawSeed} · ${type}`;
+  document.getElementById('msgGen').className='msg ok';
+  activeSource='gen';
+  updatePreview();enableTools();resetCompass();
+}
+
+// ── Generator controls wiring ─────────────────────────────────────────────────
+function mkGenSlider(id,outId,displayFn){
+  const s=document.getElementById(id),o=document.getElementById(outId);
+  if(!s||!o)return;
+  o.textContent=displayFn(s.value);
+  s.addEventListener('input',()=>{o.textContent=displayFn(s.value);if(activeSource==='gen')recomputeGen();});
+}
+mkGenSlider('genScale',  'genScaleOut',  v=>v);
+mkGenSlider('genWater',  'genWaterOut',  v=>v+'%');
+mkGenSlider('genOctaves','genOctavesOut',v=>v);
+mkGenSlider('genPersist','genPersistOut',v=>(v/100).toFixed(2));
+mkGenSlider('genLacun',  'genLacunOut',  v=>(v/100).toFixed(2));
+mkGenSlider('genPower',  'genPowerOut',  v=>(v/100).toFixed(2));
+
+document.querySelectorAll('input[name="noiseType"]').forEach(r=>
+  r.addEventListener('change',()=>{if(activeSource==='gen')recomputeGen();}));
+
+document.getElementById('genSeed').addEventListener('change',()=>{
+  document.getElementById('genSeed').value=sanitiseSeed(document.getElementById('genSeed').value);
+  if(activeSource==='gen')recomputeGen();
+});
+
+document.getElementById('btnRandSeed').addEventListener('click',()=>{
+  const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const seed=Array.from({length:12},()=>chars[Math.floor(Math.random()*chars.length)]).join('');
+  document.getElementById('genSeed').value=seed;
+  if(activeSource==='gen')recomputeGen();
+});
+
+document.getElementById('genAdvToggle').addEventListener('click',()=>{
+  const body=document.getElementById('genAdvBody');
+  const chev=document.getElementById('genAdvChev');
+  const open=body.style.display==='none';
+  body.style.display=open?'block':'none';
+  chev.textContent=open?'▼':'▶';
+});
 function activeTerrainTab(){const a=document.querySelector('#tBar .tab.active');return a?a.dataset.tab:'ta-simple';}
 
 function terrainForMapLevel(mv){
@@ -1023,27 +1262,16 @@ function updatePreview(){
 
   // Cache all settings before the per-tile loop (avoids 16k× DOM reads)
   const showTerrainColours=previewMode==='terrain';
-  const terrainTab=activeTerrainTab();
-  const isPreserve=(activeSource==='map'&&Object.keys(srcByIndex).length>0
-                    &&terrainTab==='ta-simple'
-                    &&document.getElementById('chkPreserve').checked);
 
   for(let i=0;i<W*H;i++){
     const mv=Math.max(0,Math.min(MAX_LEVEL,tileData[i]));
     dist[mv]++;
     let r,g,b;
     if(showTerrainColours){
-      let tid;
-      if(isPreserve){
-        const tile=srcByIndex[i];
-        tid=tile?tile.TerrainTypeId:-1;
-      }else{
-        const chosen=terrainForMapLevel(mv);
-        // null = no change; use original tile terrain or fall back to level colour
-        tid=chosen!==null?chosen:(srcByIndex[i]?srcByIndex[i].TerrainTypeId:-1);
-      }
-      // Note: edges are stored in EdgeGroups (not TerrainTypeId) so no edge remap here.
-      // The terrain colour preview shows surface texture only, independent of edge choice.
+      // null from terrainForMapLevel = no change; fall back to original tile terrain
+      const chosen=terrainForMapLevel(mv);
+      const tid=chosen!==null?chosen:(srcByIndex[i]?srcByIndex[i].TerrainTypeId:-1);
+      // Edges are in EdgeGroups, not TerrainTypeId - no edge remap needed here.
       const t=tid>=0?T_BY_ID[tid]:null;
       if(t){[r,g,b]=t.color;}
       else{const h=LV_COL[mv];r=parseInt(h.slice(1,3),16);g=parseInt(h.slice(3,5),16);b=parseInt(h.slice(5,7),16);}
@@ -1066,7 +1294,7 @@ function updatePreview(){
   document.getElementById('sTiles').textContent=(W*H).toLocaleString();
   document.getElementById('sRange').textContent=used.length?`${lo}-${hi}`:'-';
   document.getElementById('sNonZero').textContent=dist.slice(1).reduce((a,b)=>a+b,0).toLocaleString();
-  drawHist(dist);drawLegend(dist);
+  drawHist(dist);drawLegend(dist);drawOrientIndicator();
 }
 
 function buildHistLabels(){
@@ -1106,8 +1334,8 @@ function drawLegend(dist){
 }
 
 // ── Undo/redo ──────────────────────────────────────────────────────────────────
-function pushUndo(){
-  undoStack.push(tileData.slice());
+function pushUndo(label='edit'){
+  undoStack.push({data:tileData.slice(),label});
   if(undoStack.length>UNDO_MAX)undoStack.shift();
   redoStack=[];
   updateUndoButtons();
@@ -1116,7 +1344,9 @@ function pushUndo(){
 function updateUndoButtons(){
   document.getElementById('btnUndo').disabled=undoStack.length===0;
   document.getElementById('btnRedo').disabled=redoStack.length===0;
-  document.getElementById('undoBadge').textContent=undoStack.length>0?`${undoStack.length} op${undoStack.length>1?'s':''}`:''
+  const top=undoStack[undoStack.length-1];
+  document.getElementById('undoBadge').textContent=
+    undoStack.length>0?`${undoStack.length} - ${top.label}`:'';
 }
 
 function syncSrc(){if(srcTiles)srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)t.Level=tileData[t.Index];});}
@@ -1133,7 +1363,7 @@ document.getElementById('btnShiftAll').addEventListener('click',()=>{
   if(!tileData)return;
   const sh=parseInt(shiftSlider.value);
   if(sh===0){toolMsg('Shift is 0 - nothing to do.');return;}
-  pushUndo();
+  pushUndo('shift all');
   for(let i=0;i<tileData.length;i++)tileData[i]=clampMap(tileData[i]+sh);
   syncSrc();updatePreview();
   toolMsg(`Shifted all by ${sh>0?'+':''}${sh} (editor levels)`);
@@ -1146,7 +1376,7 @@ document.getElementById('btnClamp').addEventListener('click',()=>{
   const loVE=parseInt(document.getElementById('clampLowVal').value);
   const hiE=parseInt(document.getElementById('clampHigh').value);
   const hiVE=parseInt(document.getElementById('clampHighVal').value);
-  pushUndo();
+  pushUndo('clamp');
   let n=0;
   for(let i=0;i<tileData.length;i++){
     const ev=toEditor(tileData[i]);
@@ -1161,7 +1391,7 @@ document.getElementById('btnBand').addEventListener('click',()=>{
   const op=document.getElementById('bandOp').value;
   const threshE=parseInt(document.getElementById('bandThresh').value);
   const sh=parseInt(document.getElementById('bandShift').value)||0;
-  pushUndo();
+  pushUndo('band shift');
   let n=0;
   for(let i=0;i<tileData.length;i++){
     const ev=toEditor(tileData[i]);
@@ -1173,24 +1403,119 @@ document.getElementById('btnBand').addEventListener('click',()=>{
 
 document.getElementById('btnUndo').addEventListener('click',()=>{
   if(!undoStack.length)return;
-  redoStack.push(tileData.slice());
-  tileData=undoStack.pop();
-  syncSrc();updatePreview();updateUndoButtons();toolMsg('Undone.');
+  redoStack.push({data:tileData.slice(),label:'(redo)'});
+  const entry=undoStack.pop();
+  tileData=entry.data;
+  syncSrc();updatePreview();updateUndoButtons();toolMsg(`Undone: ${entry.label}`);
 });
 
 document.getElementById('btnRedo').addEventListener('click',()=>{
   if(!redoStack.length)return;
-  undoStack.push(tileData.slice());
-  tileData=redoStack.pop();
-  syncSrc();updatePreview();updateUndoButtons();toolMsg('Redone.');
+  undoStack.push({data:tileData.slice(),label:'(redo)'});
+  const entry=redoStack.pop();
+  tileData=entry.data;
+  syncSrc();updatePreview();updateUndoButtons();toolMsg(`Redone: ${entry.label}`);
 });
 
 document.getElementById('btnReset').addEventListener('click',()=>{
   if(!origTileData)return;
-  pushUndo();
+  pushUndo('before reset');
   tileData=origTileData.slice();
+  resetCompass();
   syncSrc();updatePreview();toolMsg('Reset to loaded state.');
 });
+
+// ── Orientation (rotate / flip) ────────────────────────────────────────────────
+// orientAngle: cumulative CW rotation of the DATA in degrees (0/90/180/270).
+// orientFlippedH: whether data has been flipped horizontally.
+// The preview has a built-in display flip (row 0 at bottom), which inverts
+// the apparent rotation. CW and CCW button transforms are swapped to compensate,
+// so the user sees the expected visual result while the game data is also correct.
+let orientAngle=0;
+let orientFlippedH=false;
+// History of orientation operations for debug export
+let orientHistory=[];
+
+function orientMsg(txt){
+  const m=document.getElementById('msgOrient');m.textContent=txt;m.className='msg ok';
+  setTimeout(()=>{if(m.textContent===txt)m.textContent='';},4000);
+}
+
+// Corner indicators are fixed: N=top-right, E=bottom-right, S=bottom-left, W=top-left.
+// This matches the game's isometric presentation. Preview content rotates relative to them.
+// The section badge shows which data direction currently faces "up" in the preview.
+const ORIENT_BADGE_DIRS=['N↑','W←','S↓','E→']; // at 0°/90°/180°/270° CW rotation of data
+
+function drawOrientIndicator(){
+  const show=document.getElementById('chkCompass')?.checked;
+  const overlay=document.getElementById('orientOverlay');
+  if(overlay)overlay.style.display=show?'block':'none';
+  // Badge: which cardinal was originally "up" (north) is now facing preview-top
+  const idx=((orientAngle/90)%4+4)%4;
+  let badge=ORIENT_BADGE_DIRS[idx];
+  if(orientFlippedH)badge+=' ⟺';
+  const ob=document.getElementById('orientBadge');
+  if(ob)ob.textContent=badge;
+}
+
+function applyTransform(fn, label){
+  if(!tileData)return;
+  pushUndo(label);
+  const src=tileData.slice();
+  const dst=new Int16Array(W*H);
+  for(let row=0;row<H;row++){
+    for(let col=0;col<W;col++){
+      const {r:nr,c:nc}=fn(row,col);
+      dst[nr*W+nc]=src[row*W+col];
+    }
+  }
+  tileData=dst;
+  orientHistory.push(label);
+  syncSrc();updatePreview();
+  orientMsg(label);
+}
+
+// Transform functions: given source (row,col), return destination (r,c)
+// NOTE: CW and CCW are swapped vs naive maths to compensate for the
+// preview's vertical display flip (row 0 at bottom), so that:
+//   - the button labelled CW rotates CW both in preview AND in-game
+//   - the exported map.json is also correct
+function rot90CW (row,col){return {r:W-1-col, c:row      };}  // compensated for display flip
+function rot90CCW(row,col){return {r:col,      c:H-1-row  };}  // compensated for display flip
+function flipH   (row,col){return {r:row,      c:W-1-col  };}
+function flipV   (row,col){return {r:H-1-row,  c:col      };}
+
+document.getElementById('btnRot90CW').addEventListener('click',()=>{
+  applyTransform(rot90CW,'Rotate 90° CW');
+  orientAngle=(orientAngle+90)%360;
+  drawOrientIndicator();
+});
+
+document.getElementById('btnRot90CCW').addEventListener('click',()=>{
+  applyTransform(rot90CCW,'Rotate 90° CCW');
+  orientAngle=(orientAngle-90+360)%360;
+  drawOrientIndicator();
+});
+
+document.getElementById('btnFlipH').addEventListener('click',()=>{
+  applyTransform(flipH,'Flip horizontal');
+  orientFlippedH=!orientFlippedH;
+  drawOrientIndicator();
+});
+
+document.getElementById('btnFlipV').addEventListener('click',()=>{
+  applyTransform(flipV,'Flip vertical');
+  orientAngle=(orientAngle+180)%360;
+  orientFlippedH=!orientFlippedH;
+  drawOrientIndicator();
+});
+
+document.getElementById('chkCompass').addEventListener('change',drawOrientIndicator);
+
+function resetCompass(){
+  orientAngle=0;orientFlippedH=false;orientHistory=[];
+  drawOrientIndicator();
+}
 
 // ── Build export tiles ─────────────────────────────────────────────────────────
 
@@ -1214,9 +1539,7 @@ function computeTypesForExport(levels){
 function buildTiles(){
   if(!tileData)return null;
   const tab=activeTerrainTab();
-  const preserve=document.getElementById('chkPreserve').checked;
   const lockEdge=document.getElementById('lockEdgeLandscape').checked;
-  const isPreserveMap=activeSource==='map'&&preserve&&tab==='ta-simple';
 
   // Resolve the EdgeTypeId to write for each tile.
   // Edges are stored in EdgeGroups[].EdgeTypeId (from edges.csv id column),
@@ -1244,16 +1567,11 @@ function buildTiles(){
     const origTile=srcByIndex[i];
 
     // ── Terrain (surface texture) ────────────────────────────────────────────
-    if(isPreserveMap){
-      terrain=origTile?origTile.TerrainTypeId:(terrainForMapLevel(mv)??2);
-      type=origTile?origTile.Type:computedTypes[i];
-    }else{
-      const chosen=terrainForMapLevel(mv);
-      // null = no change selected; fall back to original tile or Sand (2)
-      terrain=chosen!==null?chosen:(origTile?origTile.TerrainTypeId:2);
-      if(origTile?.Type===1){ type=1; }
-      else{ type=computedTypes[i]; }
-    }
+    // null from terrainForMapLevel means "no change" - preserve original or fall back to Sand
+    const chosen=terrainForMapLevel(mv);
+    terrain=chosen!==null?chosen:(origTile?origTile.TerrainTypeId:2);
+    if(origTile?.Type===1){ type=1; }
+    else{ type=computedTypes[i]; }
 
     tiles.push({Index:i,Level:mv,Type:type,TerrainTypeId:terrain});
 
@@ -1303,7 +1621,8 @@ function buildTiles(){
 
 // ── Export ─────────────────────────────────────────────────────────────────────
 function enableTools(){
-  ['btnShiftAll','btnClamp','btnBand','btnPreview','btnExportMap','btnReset'].forEach(id=>document.getElementById(id).disabled=false);
+  ['btnShiftAll','btnClamp','btnBand','btnPreview','btnExportMap','btnReset',
+   'btnRot90CW','btnRot90CCW','btnFlipH','btnFlipV'].forEach(id=>document.getElementById(id).disabled=false);
   document.getElementById('secLevelTools').classList.add('open');
 }
 
@@ -1330,13 +1649,24 @@ document.getElementById('btnExportMap').addEventListener('click',()=>{
   if(embedDebug){
     data._STTCTT={
       exportedAt:new Date().toISOString(),
-      toolVersion:'STTC-TT dev',
-      source:{type:activeSource,tiles:tileData?tileData.length:0},
+      toolVersion:'Build15',
+      source:{type:activeSource,tiles:tileData?tileData.length:0,
+        ...(activeSource==='gen'?{
+          noiseType:document.querySelector('input[name="noiseType"]:checked')?.value,
+          seed:document.getElementById('genSeed').value,
+          scale:document.getElementById('genScale').value,
+          waterLevel:document.getElementById('genWater').value+'%',
+          octaves:document.getElementById('genOctaves').value,
+          persistence:(document.getElementById('genPersist').value/100).toFixed(2),
+          lacunarity:(document.getElementById('genLacun').value/100).toFixed(2),
+          power:(document.getElementById('genPower').value/100).toFixed(2),
+        }:{})
+      },
       landscape:{id:activeLandscape,name:LS_NAMES[activeLandscape]},
       terrain:{
         tab:activeTerrainTab(),
         defaultValue:document.getElementById('terrainSelect').value,
-        preserve:document.getElementById('chkPreserve').checked,
+        preserve:'n/a - no change dropdown preserves original',
         lockToLandscape:document.getElementById('lockLandscape').checked,
         lowOverride:document.getElementById('lowTerrain').value,
         highOverride:document.getElementById('highTerrain').value,
@@ -1354,6 +1684,12 @@ document.getElementById('btnExportMap').addEventListener('click',()=>{
         levelRange:{min:Math.min(...data.Tiles.map(t=>t.Level)),max:Math.max(...data.Tiles.map(t=>t.Level))},
       },
       undoHistoryDepth:undoStack.length,
+      undoHistory:undoStack.map(e=>e.label),
+      orientation:{
+        angleCW:orientAngle,
+        flippedH:orientFlippedH,
+        history:orientHistory,
+      },
     };
   }
 
@@ -1383,7 +1719,7 @@ document.getElementById('btnExportScenario').addEventListener('click',()=>{
 
 // ── Change listeners ───────────────────────────────────────────────────────────
 document.getElementById('terrainSelect').addEventListener('change',updatePreview);
-['lowTerrain','highTerrain','chkPreserve'].forEach(id=>document.getElementById(id).addEventListener('change',updatePreview));
+['lowTerrain','highTerrain'].forEach(id=>document.getElementById(id).addEventListener('change',updatePreview));
 document.getElementById('edgeRemap').addEventListener('change',updateTHint);
 
 // ── Init ───────────────────────────────────────────────────────────────────────
