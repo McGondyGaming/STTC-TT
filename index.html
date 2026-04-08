@@ -143,7 +143,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   </svg>
   <h1>Starship Troopers Terran Command Terrain Tool</h1>
 </div>
-<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · v1.01-beta01 · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
+<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · v1.01-beta02 · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
 
 <div class="layout">
 <!-- ════════════════ LEFT COLUMN ════════════════ -->
@@ -729,8 +729,19 @@ let previewMode='height';  // 'terrain' | 'height'
 
 // Undo/redo stacks (each entry is an Int16Array snapshot)
 const UNDO_MAX=30;
-let undoStack=[];
-let redoStack=[];
+// Single flat history array with cursor. history[0]=oldest, history[n]=newest.
+// historyCursor points to the currently active state (what tileData matches).
+// Entries before cursor = undoable, entries after cursor = redoable.
+// Each entry: {data, label, genState, readOnly}
+let history=[];
+let historyCursor=-1;  // -1 = no history yet
+
+// Compatibility shims so existing call-sites keep working
+function undoStackLength(){ return historyCursor+1; }
+function redoStackLength(){ return history.length-1-historyCursor; }
+// Legacy aliases used in debug embed
+Object.defineProperty(window,'undoStack',{get:()=>history.slice(0,historyCursor+1)});
+Object.defineProperty(window,'redoStack',{get:()=>history.slice(historyCursor+1)});
 
 // ── Collapsible sections ───────────────────────────────────────────────────────
 document.querySelectorAll('.sh[data-sec]').forEach(h=>{
@@ -1025,7 +1036,18 @@ makeDrop('dzMap','fiMap',file=>{
       tileData=new Int16Array(W*H);
       srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)tileData[t.Index]=Math.max(0,Math.min(MAX_LEVEL,t.Level));});
       origTileData=tileData.slice();
-      undoStack=[];redoStack=[];updateUndoButtons();
+      history=[];historyCursor=-1;
+      // Restore history from embedded _STTCTT debug block if present
+      if(data._STTCTT?.undoHistory?.length){
+        const hist=data._STTCTT.undoHistory;
+        // Show as display-only undo entries (no tileData snapshots - data not stored)
+        // They appear in the history list with a visual indicator that they are from a previous session
+        hist.forEach(label=>{
+          history.push({data:null, label:`[prev] ${label}`, genState:null, readOnly:true});
+        });
+        historyCursor=history.length-1;
+      }
+      updateUndoButtons();
       // file.name is always just the filename in browsers, never a path
       const fname=(file.name||'map.json').replace(/^.*[\\/]/,'');
       msg.textContent=`${fname} - ${data.Tiles.length.toLocaleString()} tiles`;msg.className='msg ok';
@@ -1074,7 +1096,7 @@ function recompute(){
   tileData=new Int16Array(W*H);
   for(let i=0;i<W*H;i++)tileData[i]=quantize(imgGray[i],q,lo2,hi2);
   origTileData=tileData.slice();
-  undoStack=[];redoStack=[];updateUndoButtons();
+  history=[];historyCursor=-1;updateUndoButtons();
   updatePreview();
 }
 
@@ -1198,9 +1220,10 @@ function recomputeGen(commitUndo=false){
   tileData=data;
   if(firstLoad){
     origTileData=tileData.slice();
-    undoStack=[];redoStack=[];
+    history=[];historyCursor=-1;
     // Push the initial generated state so the very first action is undoable
-    undoStack.push({data:tileData.slice(),label:'initial generate',genState:captureGenState()});
+    history.push({data:tileData.slice(),label:'initial generate',genState:captureGenState()});
+    historyCursor=0;
     updateUndoButtons();
   }
   document.getElementById('srcBadge').textContent='Generated';
@@ -1256,9 +1279,11 @@ function mkGenSlider(id,outId,displayFn){
   s.addEventListener('pointerup',()=>{
     if(activeSource==='gen'&&genPreDragSnapshot){
       const label=genDragLabel(genPreDragSliderId,genPreDragSnapshot.genState);
-      undoStack.push({data:genPreDragSnapshot.data,label,genState:genPreDragSnapshot.genState});
-      if(undoStack.length>UNDO_MAX)undoStack.shift();
-      redoStack=[];
+      // Truncate redo, push pre-drag snapshot, advance cursor
+      history.splice(historyCursor+1);
+      history.push({data:genPreDragSnapshot.data,label,genState:genPreDragSnapshot.genState});
+      if(history.length>UNDO_MAX+1)history.shift();
+      historyCursor=history.length-1;
       updateUndoButtons();
       genPreDragSnapshot=null;
       genPreDragSliderId=null;
@@ -1309,9 +1334,10 @@ document.getElementById('btnRandSeed').addEventListener('click',()=>{
   document.getElementById('genSeed').value=seed;
   if(activeSource==='gen'){
     // Build descriptive label before committing
-    undoStack.push({data:tileData.slice(),label:`Generate - Seed (${prev} -> ${seed})`,genState:captureGenState()});
-    if(undoStack.length>UNDO_MAX)undoStack.shift();
-    redoStack=[];
+    history.splice(historyCursor+1);
+    history.push({data:tileData.slice(),label:`Generate - Seed (${prev} -> ${seed})`,genState:captureGenState()});
+    if(history.length>UNDO_MAX+1)history.shift();
+    historyCursor=history.length-1;
     updateUndoButtons();
     recomputeGen(false);
   }
@@ -1467,80 +1493,72 @@ function restoreGenState(gs){
 }
 
 function pushUndo(label='edit'){
-  undoStack.push({data:tileData.slice(), label, genState:captureGenState()});
-  if(undoStack.length>UNDO_MAX)undoStack.shift();
-  redoStack=[];
+  // Truncate any redo entries after current cursor
+  history.splice(historyCursor+1);
+  history.push({data:tileData.slice(), label, genState:captureGenState()});
+  if(history.length>UNDO_MAX+1)history.shift();
+  historyCursor=history.length-1;
   updateUndoButtons();
 }
 
 function updateUndoButtons(){
-  document.getElementById('btnUndo').disabled=undoStack.length===0;
-  document.getElementById('btnRedo').disabled=redoStack.length===0;
-  const top=undoStack[undoStack.length-1];
-  const badge=document.getElementById('undoBadge');
-  if(badge) badge.textContent=undoStack.length>0?`${undoStack.length} undoable - last: ${top.label}`:'';
+  const canUndo=historyCursor>0;
+  const canRedo=historyCursor<history.length-1;
+  document.getElementById('btnUndo').disabled=!canUndo;
+  document.getElementById('btnRedo').disabled=!canRedo;
 
-  // Render history list - most recent at top, clickable to jump to any state
+  const badge=document.getElementById('undoBadge');
+  if(badge){
+    const cur=history[historyCursor];
+    badge.textContent=canUndo?(historyCursor+1)+' undoable - last: '+(cur?.label??''):'';
+  }
+
   const list=document.getElementById('historyList');
   if(!list)return;
-
-  // Build ordered list: redo entries (future), current marker, undo entries (past)
-  const items=[];
-  for(let i=redoStack.length-1;i>=0;i--)
-    items.push({label:redoStack[i].label, state:'redo', stackIdx:i});
-  items.push({label:'current', state:'current', stackIdx:-1});
-  for(let i=undoStack.length-1;i>=0;i--)
-    items.push({label:undoStack[i].label, state:'undo', stackIdx:i});
-
   list.innerHTML='';
-  items.forEach(({label,state,stackIdx})=>{
+
+  // Display history as a static list, newest at top.
+  // cursor position determines which entry is "current".
+  // Entries above cursor = redo (future), entry AT cursor = current, entries below = undo (past).
+  for(let i=history.length-1;i>=0;i--){
+    const entry=history[i];
+    const isCurrent=(i===historyCursor);
+    const isRedo=(i>historyCursor);
+    const isReadOnly=!!entry.readOnly;
+
     const el=document.createElement('div');
-    const isCurrent=state==='current';
     el.style.cssText=[
       'padding:3px 8px',
-      `color:${isCurrent?'var(--ok)':state==='redo'?'var(--text3)':'var(--text)'}`,
-      `background:${isCurrent?'var(--bg3)':'transparent'}`,
       'white-space:nowrap','overflow:hidden','text-overflow:ellipsis',
-      isCurrent?'':'cursor:pointer',
-    ].join(';');
-    el.textContent=(state==='redo'?'↪ ':'↩ ')+label;
-    if(!isCurrent){
-      el.title=`Click to jump to: ${label}`;
-      el.addEventListener('mouseenter',()=>el.style.background='var(--bg3)');
-      el.addEventListener('mouseleave',()=>el.style.background='transparent');
+      isReadOnly?'font-style:italic;opacity:0.55':'',
+      isCurrent?'background:var(--bg3)':'',
+      (!isCurrent&&!isReadOnly)?'cursor:pointer':'',
+    ].filter(Boolean).join(';');
+
+    // Colour: current=green, redo=dimmed, undo=normal
+    el.style.color=isCurrent?'var(--ok)':isRedo?'var(--text3)':'var(--text)';
+
+    // Label: current entry keeps its original label (just highlighted green)
+    el.textContent=(isRedo?'↪ ':'↩ ')+entry.label;
+
+    if(!isCurrent&&!isReadOnly){
+      el.title='Click to jump to: '+entry.label;
+      el.addEventListener('mouseenter',()=>{if(!isCurrent)el.style.background='var(--bg3)';});
+      el.addEventListener('mouseleave',()=>{if(!isCurrent)el.style.background='';});
       el.addEventListener('click',()=>{
-        // Jump to this state by running undo/redo steps
-        if(state==='undo'){
-          // Need to undo down to stackIdx (inclusive)
-          // undoStack has entries 0..n; top is n. We want to restore entry stackIdx.
-          // Steps needed = undoStack.length - 1 - stackIdx  (to get TO this entry)
-          // plus one more undo to restore it (undo restores the state FROM the entry)
-          const stepsNeeded=undoStack.length-stackIdx;
-          for(let s=0;s<stepsNeeded;s++){
-            if(!undoStack.length)break;
-            redoStack.push({data:tileData.slice(),label:'(redo)',genState:captureGenState()});
-            const entry=undoStack.pop();
-            tileData=entry.data;
-            restoreGenState(entry.genState);
-          }
-        }else{
-          // Need to redo up to stackIdx (in redoStack)
-          // redoStack[stackIdx] is the entry; we need to redo from bottom to stackIdx
-          const stepsNeeded=redoStack.length-stackIdx;
-          for(let s=0;s<stepsNeeded;s++){
-            if(!redoStack.length)break;
-            undoStack.push({data:tileData.slice(),label:'(redo)',genState:captureGenState()});
-            const entry=redoStack.pop();
-            tileData=entry.data;
-            restoreGenState(entry.genState);
-          }
-        }
+        // Move cursor to i by restoring that entry's data
+        // No stack mutation - just move cursor and restore state
+        const target=history[i];
+        tileData=target.data.slice();
+        restoreGenState(target.genState);
+        historyCursor=i;
         syncSrc();updatePreview();updateUndoButtons();
       });
     }
     list.appendChild(el);
-  });
+  }
 }
+
 
 function syncSrc(){if(srcTiles)srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)t.Level=tileData[t.Index];});}
 
@@ -1595,19 +1613,19 @@ document.getElementById('btnBand').addEventListener('click',()=>{
 });
 
 document.getElementById('btnUndo').addEventListener('click',()=>{
-  if(!undoStack.length)return;
-  redoStack.push({data:tileData.slice(), label:'(redo)', genState:captureGenState()});
-  const entry=undoStack.pop();
-  tileData=entry.data;
+  if(historyCursor<=0)return;
+  historyCursor--;
+  const entry=history[historyCursor];
+  tileData=entry.data.slice();
   restoreGenState(entry.genState);
-  syncSrc();updatePreview();updateUndoButtons();toolMsg(`Undone: ${entry.label}`);
+  syncSrc();updatePreview();updateUndoButtons();toolMsg(`Undone: ${history[historyCursor+1].label}`);
 });
 
 document.getElementById('btnRedo').addEventListener('click',()=>{
-  if(!redoStack.length)return;
-  undoStack.push({data:tileData.slice(), label:'(redo)', genState:captureGenState()});
-  const entry=redoStack.pop();
-  tileData=entry.data;
+  if(historyCursor>=history.length-1)return;
+  historyCursor++;
+  const entry=history[historyCursor];
+  tileData=entry.data.slice();
   restoreGenState(entry.genState);
   syncSrc();updatePreview();updateUndoButtons();toolMsg(`Redone: ${entry.label}`);
 });
@@ -1843,7 +1861,7 @@ document.getElementById('btnExportMap').addEventListener('click',()=>{
   if(embedDebug){
     data._STTCTT={
       exportedAt:new Date().toISOString(),
-      toolVersion:'1.01-beta01',
+      toolVersion:'1.01-beta02',
       source:{type:activeSource,tiles:tileData?tileData.length:0,
         ...(activeSource==='gen'?{
           noiseType:document.querySelector('input[name="noiseType"]:checked')?.value,
@@ -1877,8 +1895,8 @@ document.getElementById('btnExportMap').addEventListener('click',()=>{
         edgeGroupCount:data.EdgeGroups?data.EdgeGroups.length:0,
         levelRange:{min:Math.min(...data.Tiles.map(t=>t.Level)),max:Math.max(...data.Tiles.map(t=>t.Level))},
       },
-      undoHistoryDepth:undoStack.length,
-      undoHistory:undoStack.map(e=>e.label),
+      undoHistoryDepth:historyCursor+1,
+      undoHistory:history.slice(0,historyCursor+1).map(e=>e.label),
       orientation:{
         angleCW:orientAngle,
         flippedH:orientFlippedH,
@@ -1898,9 +1916,7 @@ document.getElementById('btnExportMap').addEventListener('click',()=>{
     m.textContent='map.json exported. (Drop a scenario.json to also update LandscapeId on export.)';
   }
   m.className='msg ok';
-
-  undoStack=[];redoStack=[];updateUndoButtons();
-  document.getElementById('undoBadge').textContent='';
+  // History is intentionally NOT cleared on export - continue working after saving
 });
 
 document.getElementById('btnExportScenario').addEventListener('click',()=>{
