@@ -38,8 +38,8 @@ A living document for tracking ideas, improvements, and future direction for the
 
 ## Technical Improvements
 
-- [ ] Option to load terrain/edge data from gamefiles or use embedded values
-- [ ] Undo/redo action list
+- [ ] Option to load terrain/edge data from gamefiles *or* use embedded values
+- [ ] Host multiple versions
 - [ ] Improve undo/redo efficiency (diff-based instead of full copy)
 - [ ] Add basic automated tests for core functions
 
@@ -49,6 +49,7 @@ A living document for tracking ideas, improvements, and future direction for the
 
 Completed items
 
+- [x] Undo/redo action list/History
 - [x] Noise (Perlin/Simplex) generator for quick prototyping
 - [x] Map orientaion controls (flip, invert, rotate)
 - [x] Manual toggle between height and terrain views
