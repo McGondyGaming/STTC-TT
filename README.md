@@ -29,7 +29,7 @@ This tool allows you to:
 
 ### Generator
 - Modify the seed to dramatically change the layout
-- Move sliders to finesse 
+- Move sliders to finesse
 
 ### Terrain and Level Control
 - **Modes:** Default single terrain, Low/High overrides, or per-level assignment
@@ -47,7 +47,7 @@ This tool allows you to:
 ## Usage
 
 ### 0. Download
-- Download the source code in your preferred format
+- If downloading, choose the source code in your preferred format
 - Open `STTCTT.html` in your favourite browser (tested in Chrome)
 
 ### 1. Select a Source
@@ -70,7 +70,14 @@ This tool allows you to:
 
 ## Exported Data Format
 
-Option: Embed STTC-TT data in `map.json` for diagnositc purposes
+Option: Embed STTC-TT data in `map.json` for diagnositc purposes. The following data is captured:
+ - STTC-TT version
+ - Source
+ - Generation data (if used)
+ - Tile and Edge selections and number
+ - Level ranges
+ - Undo depth and history
+ - Map orientation state and changes
 
 ### map.json
 ```json
@@ -106,13 +113,16 @@ Option: Embed STTC-TT data in `map.json` for diagnositc purposes
  - Tested in Chrome, stavle builds will be tested in a few browsers (e.g. Firefox, Edge)
 
 ## Known Issues:
- - Generator actions do not register in undo buffer
- - Outside corner edges may not be generated
- - Edges are presented as linked to terrains, this not the case
- - All image imported maps default to desert biome 
+- Outside corner edges may not be generated
+- All image imported maps default to desert biome 
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
+- History list entries change to (redo) after undoing to them
 
 ## Change Notes:
+ - All sections except `Source` are collpased on load
+ - `History` list implemented with meaningful entries
+ - `Preview` switch simplified text, and defaults to Height
+ - `Generator` actions register in undo buffer, and move slider to previous position
  - Perlin and OpenSimplex generator added
  - Terrain orientation controls (Units, Decors and Triggers are unmoved)
  - Undo buffer increased from 10 to 30 steps
