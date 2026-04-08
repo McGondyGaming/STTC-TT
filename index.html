@@ -143,7 +143,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   </svg>
   <h1>Starship Troopers Terran Command Terrain Tool</h1>
 </div>
-<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · v1.01-beta02 · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
+<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · v1.01 · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
 
 <div class="layout">
 <!-- ════════════════ LEFT COLUMN ════════════════ -->
@@ -1861,7 +1861,7 @@ document.getElementById('btnExportMap').addEventListener('click',()=>{
   if(embedDebug){
     data._STTCTT={
       exportedAt:new Date().toISOString(),
-      toolVersion:'1.01-beta02',
+      toolVersion:'1.01',
       source:{type:activeSource,tiles:tileData?tileData.length:0,
         ...(activeSource==='gen'?{
           noiseType:document.querySelector('input[name="noiseType"]:checked')?.value,
