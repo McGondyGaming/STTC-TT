@@ -116,7 +116,6 @@ Option: Embed STTC-TT data in `map.json` for diagnositc purposes. The following 
 - Outside corner edges may not be generated
 - All image imported maps default to desert biome 
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
-- History list entries change to (redo) after undoing to them
 
 ## Change Notes:
  - All sections except `Source` are collpased on load
