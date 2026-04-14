@@ -14,6 +14,9 @@ This tool allows you to:
 
 > Use this tool at your own risk. There is no guarantee it won't eat your map/scenario file. Definitely back your scenario up before using the tool on it.
 
+## Special Thanks
+- Thank-you to the dedicated STTC community for providing feedback, especially `Finding Pudge` and `Lionstein` 
+
 ## Features
 
 ### Image to Terrain Conversion
