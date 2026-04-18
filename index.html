@@ -934,13 +934,18 @@ function setActiveLandscape(id,source){
   document.getElementById('lsBadgeNote').textContent={auto:'Auto-detected',scenario:'From scenario.json',manual:''}[source]||'';
   rebuildTerrainSelects();
   rebuildEdgeSelects();
-  // Pick first legal terrain if current isn't legal
-  const legal=LS_GROUPS[id];
-  const cur=parseInt(document.getElementById('terrainSelect').value);
-  const curT=T_BY_ID[cur];
-  if(!curT||!legal.includes(curT.group)){
-    const first=TERRAINS.find(t=>legal.includes(t.group));
-    if(first)document.getElementById('terrainSelect').value=first.id;
+  // Only snap to a legal terrain if the user has explicitly picked one (not '- no change -').
+  // When loading a map.json the default should stay as '- no change -' so existing
+  // terrain values are preserved on export.
+  const curVal=document.getElementById('terrainSelect').value;
+  if(curVal!==''){
+    const legal=LS_GROUPS[id];
+    const cur=parseInt(curVal);
+    const curT=T_BY_ID[cur];
+    if(!curT||!legal.includes(curT.group)){
+      const first=TERRAINS.find(t=>legal.includes(t.group));
+      if(first)document.getElementById('terrainSelect').value=first.id;
+    }
   }
   updateTHint();
 }
@@ -1417,7 +1422,8 @@ document.getElementById('btnTogglePreviewMode').addEventListener('click',()=>{
 // A tile is blocked if it is water (editor -1) OR is a cliff base (has a
 // higher orthogonal neighbour). Used by both nav preview and heatmap.
 function _navBlocked(i,mv){
-  if(mv===0)return true; // editor -1 = water/floor
+  if(mv===0)return true;                 // editor -1 = water/floor
+  if(srcByIndex[i]?.Type===1)return false; // Type=1 = slope — navigable even if it has higher neighbours
   const row=Math.floor(i/W),col=i%W;
   const n0=row>0    ?tileData[i-W]:mv;
   const n1=row<H-1  ?tileData[i+W]:mv;
@@ -1426,77 +1432,90 @@ function _navBlocked(i,mv){
   return n0>mv||n1>mv||n2>mv||n3>mv;
 }
 
-// Compute navigability radius for every tile via a BFS-based distance transform.
-// Returns an Int16Array where:
-//   value = 0   → non-navigable (water / cliff base)
-//   value = N   → navigable, smallest open-space radius in any of 4 cardinal directions is N
-// "Radius" here is the Chebyshev (square) distance to the nearest blocked tile,
-// so a lone 1-tile island = 1, a 3-wide corridor = 1 (because blocked 1 step away on sides),
-// a large open plain = up to ~40+ at its centre.
+// Compute navigability radius via Dial's algorithm (integer bucket queue).
+// Costs scaled ×2 so slope=0.5 becomes integer 1, open=1.0 becomes 2.
+// Seed: hard barrier=0, slope=1, open=∞. Step cost into: hard=0, slope=1, open=2.
+// Output Float32Array: 0=blocked, 0.5=slope tile, N=clearance in tiles (unscaled).
 function computeNavRadius(){
   const n=W*H;
-  const radius=new Int16Array(n); // 0=blocked, else distance to nearest blocked
-
-  // First pass: mark blocked tiles
-  const blocked=new Uint8Array(n);
+  const HARD=1,SLOPE=2,OPEN=0;
+  const kind=new Uint8Array(n);
   for(let i=0;i<n;i++){
     const mv=Math.max(0,Math.min(MAX_LEVEL,tileData[i]));
-    blocked[i]=_navBlocked(i,mv)?1:0;
+    if(_navBlocked(i,mv))            kind[i]=HARD;
+    else if(srcByIndex[i]?.Type===1) kind[i]=SLOPE;
+    else                             kind[i]=OPEN;
   }
 
-  // Distance transform using 4-connected BFS from all blocked tiles simultaneously.
-  // This gives the L∞ / Chebyshev distance; we use 4-connected BFS which
-  // produces the Manhattan-like open-space radius — tight corridors score 1.
-  const dist=new Int16Array(n).fill(32767);
-  const queue=new Int32Array(n*2); // circular buffer of indices
-  let qHead=0,qTail=0;
+  const INF=0x7fff;
+  const dist=new Int16Array(n).fill(INF);
+
+  // Dial's algorithm: circular bucket array, width = max step cost + 1 = 3
+  const W3=3, buckets=Array.from({length:W3},()=>[]);
+  let minCost=0;
+
+  function push(d,i){ buckets[d%W3].push(i); }
 
   for(let i=0;i<n;i++){
-    if(blocked[i]){dist[i]=0;queue[qTail++]=i;}
+    if(kind[i]===HARD){   dist[i]=0; push(0,i); }
+    else if(kind[i]===SLOPE){ dist[i]=1; push(1,i); }
   }
 
-  const DR=[-1,1,0,0];
-  const DC=[0,0,-1,1];
+  const DR=[-1,1,0,0],DC=[0,0,-1,1];
+  let remaining=n;
 
-  while(qHead<qTail){
-    const i=queue[qHead++];
-    const r=Math.floor(i/W),c=i%W;
-    const d1=dist[i]+1;
-    for(let d=0;d<4;d++){
-      const nr=r+DR[d],nc=c+DC[d];
-      if(nr<0||nr>=H||nc<0||nc>=W)continue;
-      const ni=nr*W+nc;
-      if(d1<dist[ni]){dist[ni]=d1;queue[qTail++]=ni;}
+  outer: while(remaining>0){
+    // Advance to next non-empty bucket
+    while(buckets[minCost%W3].length===0){
+      minCost++;
+      if(minCost>=INF) break outer;
     }
+    const b=minCost%W3;
+    // Drain current bucket (copy to avoid mutation-while-iterating)
+    const batch=buckets[b].splice(0);
+    for(const i of batch){
+      if(dist[i]!==minCost) continue; // stale
+      remaining--;
+      const r=Math.floor(i/W),c=i%W;
+      for(let k=0;k<4;k++){
+        const nr=r+DR[k],nc=c+DC[k];
+        if(nr<0||nr>=H||nc<0||nc>=W) continue;
+        const ni=nr*W+nc;
+        const step=kind[ni]===HARD?0:kind[ni]===SLOPE?1:2;
+        const nd=minCost+step;
+        if(nd<dist[ni]){ dist[ni]=nd; push(nd,ni); }
+      }
+    }
+    minCost++;
   }
 
-  // Copy into radius (0 for blocked, dist value for navigable)
-  for(let i=0;i<n;i++) radius[i]=blocked[i]?0:dist[i];
+  const radius=new Float32Array(n);
+  for(let i=0;i<n;i++) radius[i]=kind[i]===HARD?0:dist[i]/2;
   return radius;
 }
 
-// Heatmap colour ramp: tight (radius 1) = red/amber → open = blue/white
-// Radius 0 = non-navigable = dark grey
+// Heatmap colour ramp: radius near 0 = tight/red → open = green → wide = blue
+// Slopes score ~0.5 and render in the red/amber band, slightly warmer than a 1-tile corridor
 function heatmapColour(r){
-  if(r===0) return [30,30,36];   // non-navigable: near-black
-  // Clamp and normalise radius 1..maxR → 0..1
-  const maxR=20; // radii above this are treated as fully open
-  const t=Math.min(r,maxR)/maxR;
-  // Colour stops: r=1 → red, r=2 → orange, r=4 → amber, r=8 → yellow-green, r=16+ → teal/blue
-  // Interpolate through: [220,40,20] → [220,130,0] → [180,210,0] → [30,180,100] → [20,120,220]
+  if(r===0)   return [25,25,30];      // hard non-navigable: near-black
+  if(r<1)     return [180,80,180];    // slope (r≈0.5): purple
+  // Normalise radius 1..maxR → 0..1 (saturates at maxR, all wider = full blue)
+  const maxR=12;
+  const t=Math.min(r-1,maxR-1)/(maxR-1); // r=1→t=0, r=maxR→t=1
+  // Ramp: 1-tile red → narrow amber → open green → wide blue
   const stops=[
-    [220, 40, 20],   // t=0  (radius 1) — tight corridor / cliff edge
-    [220,130,  0],   // t=0.15
-    [200,210,  0],   // t=0.35
-    [ 60,190, 80],   // t=0.60
-    [ 20,140,220],   // t=1.0 — open ground
+    [220, 40, 20],   // t=0    r=1   tight corridor
+    [220,130,  0],   // t=0.25 r≈4
+    [180,210,  0],   // t=0.50 r≈7
+    [ 50,190, 70],   // t=0.75 r≈10
+    [ 20,130,220],   // t=1.0  r=12+ wide open
   ];
   const si=stops.length-1;
   const pos=t*si;
   const lo=Math.floor(pos),hi=Math.min(si,lo+1);
   const f=pos-lo;
   const s0=stops[lo],s1=stops[hi];
-  return [
+  return[
     Math.round(s0[0]+(s1[0]-s0[0])*f),
     Math.round(s0[1]+(s1[1]-s0[1])*f),
     Math.round(s0[2]+(s1[2]-s0[2])*f),
@@ -1538,8 +1557,9 @@ function updatePreview(){
   // Nav colours
   const NAV_WATER =[180, 30, 30];
   const NAV_CLIFF =[200, 60, 10];
+  const NAV_SLOPE =[ 80,160,220];  // blue — slope (Type=1), navigable but distinct
   const NAV_HIGH  =[200,150, 30];
-  const NAV_NARROW=[ 80,130,  0]; // navigable but 1-tile wide — yellow-green
+  const NAV_NARROW=[ 80,130,  0];
   const NAV_OK    =[ 40,160, 70];
 
   for(let i=0;i<W*H;i++){
@@ -1561,9 +1581,11 @@ function updatePreview(){
         const n2=col2>0   ?tileData[i-1]:mv;
         const n3=col2<W-1 ?tileData[i+1]:mv;
         const isCliffBase=n0>mv||n1>mv||n2>mv||n3>mv;
-        const isCliffTop=srcByIndex[i]?.Type===1;
-        if(isCliffBase||isCliffTop){
+        const isSlope=srcByIndex[i]?.Type===1; // Type=1 = slope, navigable
+        if(isCliffBase && !isSlope){
           [r,g,b]=NAV_CLIFF;
+        } else if(isSlope){
+          [r,g,b]=NAV_SLOPE;
         } else if(ev>=10){
           [r,g,b]=NAV_HIGH;
         } else {
@@ -1605,9 +1627,9 @@ function updatePreview(){
   const used=dist.map((c,i)=>c>0?toEditor(i):null).filter(x=>x!==null);
   const lo=used.length?Math.min(...used):0,hi=used.length?Math.max(...used):0;
   const modeLabel=showHeat
-    ?'heatmap (red=1-tile tight, amber=narrow, green=open, blue=wide open)'
+    ?'heatmap (black=impassable, purple=slope, red=1-tile tight, amber=narrow, green=open, blue=wide)'
     :showNav
-    ?'navigability (green=ok, yellow-green=1-tile wide, red=water/cliff, amber=high)'
+    ?'navigability (green=ok, yellow-green=1-tile wide, blue=slope, red=water/cliff, amber=high)'
     :showTerrainColours?'terrain colours':'height colours (dark=low)';
   document.getElementById('previewLabel').textContent=`Editor levels ${lo}-${hi} · ${modeLabel}`;
   document.getElementById('previewModeBadge').textContent=showHeat?'Heatmap':showNav?'Navigability':showTerrainColours?'Terrain':'Height';
@@ -2169,7 +2191,7 @@ updateTHint();
     const ev = toEditor(mv);
     if(ev === -1) return {cls:'nav-no',  label:'Non-navigable (water)', hint:'Level -1 tiles are the non-navigable base floor. Infantry cannot traverse. Bugs can emerge from below adjacent floor tiles.'};
     if(type === 2) return {cls:'nav-no',  label:'Non-navigable (cliff base)', hint:'This tile has a higher neighbour, generating a cliff wall upward. Based on testing, 1-2 tile corridors cut into land (cliff base edges) block unit pathing. The raised surface itself may be passable, but the approach from below is not.'};
-    if(type === 1) return {cls:'nav-warn',label:'Cliff top (src flag)',  hint:'Flagged Type=1 in source map (cliff top). Generally passable; used for specific cliff-wall rendering edge cases.'};
+    if(type === 1) return {cls:'nav-yes',  label:'Navigable (slope)',       hint:'Type=1 is a slope — confirmed navigable by in-game testing. Units can traverse these tiles freely. The slope forms the sides of raised mounds and similar terrain features.'};
     if(ev >= 10)   return {cls:'nav-warn',label:'High ground',           hint:'Editor level 10+ can restrict some unit types and line-of-sight. Traversable for infantry but verify in-game.'};
     return           {cls:'nav-yes', label:'Navigable',                  hint:'Standard navigable tile. Infantry and most ground units can traverse freely.'};
   }
@@ -2232,7 +2254,7 @@ updateTHint();
     const lvcol = LV_COL[mv];
     const swatch = `<span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${lvcol};border:1px solid rgba(128,128,128,.3);vertical-align:middle;margin-right:3px;"></span>`;
 
-    const typeLabel = {0:'0 - flat',1:'1 - cliff top (src)',2:'2 - cliff base'}[type]??type;
+    const typeLabel = {0:'0 - flat',1:'1 - slope (navigable)',2:'2 - cliff base (non-navigable)'}[type]??type;
     const navBadge  = `<span class="nav-badge ${nav.cls}">${nav.label}</span>`;
 
     let html = '';

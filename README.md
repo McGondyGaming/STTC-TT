@@ -122,9 +122,11 @@ Option: Embed STTC-TT data in `map.json` for diagnositc purposes. The following 
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
+ - Slopes now differentiated from cliffs, painted separately in preview
+ - Heatmap calculated using Dail's algorithm to support multiple weights in future changes (cliffs vs slopes)
  - `Tile selector` available in preview
  - `Navigability` preview introduced (red = blocked, green = open)
- - BFS transform based `Heatmap`(red = narrow, green = open)
+ - BFS transform based `Heatmap`(red = narrow, green = open, blue = wide open)
  - All sections except `Source` are collpased on load
  - `History` list implemented with meaningful entries
  - `Preview` switch simplified text, and defaults to Height

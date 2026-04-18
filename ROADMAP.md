@@ -6,6 +6,10 @@ A living document for tracking ideas, improvements, and future direction for the
 
 ## Current Focus
 
+- [ ] Selectable colours (high, medium, low, intropolated levels)
+- [ ] Selections in preview
+- [ ] Rotate preview to match game (45° CW)
+
 ---
 
 ## Ideas
