@@ -41,9 +41,10 @@ This tool allows you to:
 - **History:** 30-step Undo/Redo and state reset
 
 ### Export and Analysis
-- Visual tile preview and elevation distribution histogram
+- Visual tile, heigh, navigability and heatmap previews
+- Elevation distribution histogram
 - Real-time stats for total tiles and level ranges
-- Export validated `map.json` and updated `scenario.json`
+- Export validated `map.json` and update existing `scenario.json`
 
 ---
 
@@ -121,6 +122,9 @@ Option: Embed STTC-TT data in `map.json` for diagnositc purposes. The following 
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
+ - `Tile selector` available in preview
+ - `Navigability` preview introduced (red = blocked, green = open)
+ - BFS transform based `Heatmap`(red = narrow, green = open)
  - All sections except `Source` are collpased on load
  - `History` list implemented with meaningful entries
  - `Preview` switch simplified text, and defaults to Height

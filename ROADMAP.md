@@ -13,16 +13,12 @@ A living document for tracking ideas, improvements, and future direction for the
 ### Exports
 
 - [ ] Export greyscale heightmap
-- [ ] Add "export directly to game folder" option
 - [ ] Allow selecting export directory
 - [ ] Add confirmation or diff view before export if overwiting
 
 ### Preview
 
-- [ ] Show tile coordinates on hover
-- [ ] Zoom / inspect specific tiles
 - [ ] Colourblind accessibility options
-- [ ] Terrain traversability preview overlay
 - [ ] Terrain traversability preview (including blocking decors) overlay
 - [ ] Level -1 render as water preview overlay
     
@@ -49,6 +45,9 @@ A living document for tracking ideas, improvements, and future direction for the
 
 Completed items
 
+- [x] Show tile coordinates on hover
+- [x] Zoom / inspect specific tiles
+- [x] Terrain traversability preview overlay
 - [x] Undo/redo action list/History
 - [x] Noise (Perlin/Simplex) generator for quick prototyping
 - [x] Map orientaion controls (flip, invert, rotate)
