@@ -157,7 +157,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   </svg>
   <h1>Starship Troopers Terran Command Terrain Tool</h1>
 </div>
-<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · v1.03 · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
+<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · v1.04-beta01 · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
 
 <div class="layout">
 <!-- ════════════════ LEFT COLUMN ════════════════ -->
@@ -1459,7 +1459,7 @@ function _navBlocked(i,mv){
 //
 // SEEDING: HARD tiles seed at 0 (max danger). SLOPE_UP seeds at SLOPE_SEED
 // (moderate danger — units below experience tension approaching from below).
-// CLIFF_TOP seeds at CLIFF_TOP_SEED (mild — you can see down, less tension).
+// SLOPE_UP seeds at SLOPE_SEED if it borders lower ground (units below experience tension).
 // SLOPE_DOWN and OPEN do not seed.
 //
 // STEP COSTS — level-based direction of travel:
@@ -1472,12 +1472,11 @@ function _navBlocked(i,mv){
 // giving lower-side-of-slope tiles dist~4 (red-orange), while the expensive
 // UP_STEP means the high interior above the slope fades quickly to green/blue.
 
-const CLIFF_TOP_SEED = 8; // upper drop-off edge heat (score 4.0 → amber) — position of power, mild constraint
-const SLOPE_SEED     = 5; // slope-up own score (score 2.5 → yellow)
+const SLOPE_SEED     = 5; // slope-up own score (score 2.5 → yellow); only seeds if has lower neighbour
 const DOWN_STEP      = 1; // stepping down — cheap, power position (0.5 unscaled)
 const OPEN_STEP      = 2; // flat step — standard (1.0 unscaled)
-const UP_STEP        = 8; // stepping up — very expensive (4.0 unscaled); heat barely climbs
-const BW_DIAL = Math.max(CLIFF_TOP_SEED, SLOPE_SEED, UP_STEP) + 1; // = 9
+const UP_STEP        = 12; // stepping up — very expensive (6.0 unscaled); heat barely reaches high ground
+const BW_DIAL = Math.max(SLOPE_SEED, UP_STEP) + 1; // = 13
 
 function computeNavRadius(){
   const n=W*H;
@@ -1515,23 +1514,14 @@ function computeNavRadius(){
   for(let i=0;i<n;i++){
     if(kind[i]===HARD){
       dist[i]=0; push(0,i);
-    } else if(kind[i]===CLIFF_TOP || kind[i]===SLOPE_UP){
-      // Only seed if this tile has at least one lower-level navigable neighbour.
-      // A slope or cliff-top sitting on same-level ground should not radiate heat
-      // sideways — only the edge facing lower ground should seed.
-      const mv=tileData[i];
-      const row=Math.floor(i/W), col=i%W;
-      const n0=row>0   ?tileData[i-W]:mv;
-      const n1=row<H-1 ?tileData[i+W]:mv;
-      const n2=col>0   ?tileData[i-1]:mv;
-      const n3=col<W-1 ?tileData[i+1]:mv;
-      const hasLowerNbr=(n0>=0&&n0<mv)||(n1>=0&&n1<mv)||(n2>=0&&n2<mv)||(n3>=0&&n3<mv);
-      if(hasLowerNbr){
-        const seed=kind[i]===SLOPE_UP?SLOPE_SEED:CLIFF_TOP_SEED;
-        dist[i]=seed; push(seed%BW_DIAL,i);
-      }
+    } else if(kind[i]===SLOPE_UP){
+      // Always seed: even slopes sitting on same-level ground restrict LOS —
+      // units can't see over a bump, and units in a pit can't see out.
+      // The seed value is mild (SLOPE_SEED=5, score 2.5 → yellow) so lateral
+      // spread onto same-level ground stays in the gentle amber/yellow range.
+      dist[i]=SLOPE_SEED; push(SLOPE_SEED%BW_DIAL,i);
     }
-    // SLOPE_DOWN and OPEN: not seeded
+    // CLIFF_TOP, SLOPE_DOWN, OPEN: not seeded — high ground is power position
   }
 
   const DR=[-1,1,0,0], DC=[0,0,-1,1];
@@ -2166,7 +2156,7 @@ document.getElementById('btnExportMap').addEventListener('click',()=>{
   if(embedDebug){
     data._STTCTT={
       exportedAt:new Date().toISOString(),
-      toolVersion:'1.03',
+      toolVersion:'1.04-beta01',
       source:{type:activeSource,tiles:tileData?tileData.length:0,
         ...(activeSource==='gen'?{
           noiseType:document.querySelector('input[name="noiseType"]:checked')?.value,

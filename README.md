@@ -122,7 +122,7 @@ Option: Embed STTC-TT data in `map.json` for diagnositc purposes. The following 
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
- - Slopes now calculate heat in the correct direction
+ - Slopes now calculate heat in the correct direction, and with greater penalties uphill
  - Heatmap scale slider
  - Slopes now differentiated from cliffs, painted separately in preview
  - Heatmap calculated using Dail's algorithm to support multiple weights in future changes (cliffs vs slopes)
