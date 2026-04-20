@@ -1475,7 +1475,7 @@ function _navBlocked(i,mv){
 const SLOPE_SEED     = 5; // slope-up own score (score 2.5 → yellow); only seeds if has lower neighbour
 const DOWN_STEP      = 1; // stepping down — cheap, power position (0.5 unscaled)
 const OPEN_STEP      = 2; // flat step — standard (1.0 unscaled)
-const UP_STEP        = 22; // stepping up — very expensive (6.0 unscaled); heat barely reaches high ground
+const UP_STEP        = 22; // stepping up — very expensive (11.0 unscaled); heat barely reaches high ground
 const BW_DIAL = Math.max(SLOPE_SEED, UP_STEP) + 1; // = 13
 
 function computeNavRadius(){
