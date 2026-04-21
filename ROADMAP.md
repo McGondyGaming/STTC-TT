@@ -6,7 +6,6 @@ A living document for tracking ideas, improvements, and future direction for the
 
 ## Current Focus
 
-- [ ] Selectable colours (high, medium, low, intropolated levels)
 - [ ] Selections in preview
 - [ ] Rotate preview to match game (45° CW)
 
@@ -22,7 +21,6 @@ A living document for tracking ideas, improvements, and future direction for the
 
 ### Preview
 
-- [ ] Colourblind accessibility options
 - [ ] Terrain traversability preview (including blocking decors) overlay
 - [ ] Level -1 render as water preview overlay
     
@@ -49,6 +47,8 @@ A living document for tracking ideas, improvements, and future direction for the
 
 Completed items
 
+- [x] Colourblind accessibility options
+- [x] Selectable colours (high, medium, low + interpolated levels)
 - [x] Show tile coordinates on hover
 - [x] Zoom / inspect specific tiles
 - [x] Terrain traversability preview overlay
