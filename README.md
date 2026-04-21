@@ -123,6 +123,7 @@ Option: Embed STTC-TT data in `map.json` for diagnositc purposes. The following 
 
 ## Change Notes:
  - Generator level limiter added
+ - Preview mode selector now separate buttons
  - Slopes now calculate heat in the correct direction, and with greater penalties uphill
  - Heatmap scale slider
  - Slopes now differentiated from cliffs, painted separately in preview
