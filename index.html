@@ -24,13 +24,9 @@
 body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);padding:20px;font-size:13px;line-height:1.5;}
 h1{font-size:17px;font-weight:600;margin-bottom:3px;}
 .subtitle{font-size:11px;color:var(--text3);margin-bottom:18px;}
-
-/* Two-column layout with sticky preview */
 .layout{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;}
 .left-col{display:flex;flex-direction:column;gap:12px;}
 .right-col{position:sticky;top:20px;}
-
-/* Sections */
 .section{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
 .sh{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;cursor:pointer;user-select:none;gap:8px;}
 .sh:hover{background:var(--bg2);}
@@ -45,8 +41,6 @@ h1{font-size:17px;font-weight:600;margin-bottom:3px;}
 .section.always-open>.sh:hover{background:unset;}
 .section.always-open>.sh>.sv-chev{display:none;}
 .section.always-open>.section-body{display:block;}
-
-/* Form */
 .dz{border:2px dashed var(--border2);border-radius:8px;padding:14px 10px;text-align:center;cursor:pointer;transition:background .15s,border-color .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;margin-bottom:6px;}
 .dz:hover,.dz.over{background:var(--bg2);border-color:var(--text2);}
 .dz.loaded{border-style:solid;border-color:var(--ok);}
@@ -56,7 +50,7 @@ canvas{display:block;image-rendering:pixelated;}
 .field{margin-bottom:10px;}
 .field:last-child{margin-bottom:0;}
 label.fl{font-size:12px;color:var(--text2);display:block;margin-bottom:3px;}
-select,input[type=number]{width:100%;font-size:12px;padding:6px 8px;border:1px solid var(--border2);border-radius:6px;background:var(--bg);color:var(--text);outline:none;}
+select,input[type=number],input[type=text]{width:100%;font-size:12px;padding:6px 8px;border:1px solid var(--border2);border-radius:6px;background:var(--bg);color:var(--text);outline:none;}
 select:focus,input:focus{border-color:var(--text2);}
 select optgroup{font-weight:700;background:var(--bg);color:var(--text);}
 select option{background:var(--bg);color:var(--text);}
@@ -69,20 +63,14 @@ select option{background:var(--bg);color:var(--text);}
 .note{font-size:11px;color:var(--text3);line-height:1.5;margin-bottom:8px;}
 .note:last-child{margin-bottom:0;}
 .warn-box{font-size:11px;color:var(--warn);background:color-mix(in srgb,var(--warn) 10%,var(--bg3));border:1px solid color-mix(in srgb,var(--warn) 25%,var(--bg3));border-radius:6px;padding:6px 10px;line-height:1.5;}
-
-/* Tabs */
 .tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:12px;}
 .tab{padding:6px 12px;font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text3);margin-bottom:-1px;white-space:nowrap;}
 .tab.active{color:var(--text);border-bottom-color:var(--text);}
 .tp{display:none;}
 .tp.active{display:block;}
-
-/* Per-level grid */
 .pl-grid{display:grid;grid-template-columns:46px 1fr;gap:5px 10px;align-items:center;}
 .pl-grid .hdr{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;}
 .lbadge{display:inline-flex;align-items:center;justify-content:center;width:38px;height:26px;border-radius:5px;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;text-shadow:0 1px 2px rgba(0,0,0,.4);}
-
-/* Buttons */
 button{padding:8px 14px;font-size:13px;font-weight:500;border-radius:7px;cursor:pointer;transition:all .12s;border:1px solid var(--border2);background:var(--bg3);color:var(--text);}
 button:hover{background:var(--bg2);}
 button.primary{background:var(--accent);color:var(--accent-fg);border-color:transparent;}
@@ -94,22 +82,16 @@ button.sm{padding:5px 10px;font-size:12px;border-radius:5px;}
 .msg{font-size:11px;min-height:16px;margin-top:5px;}
 .msg.ok{color:var(--ok);}
 .msg.err{color:var(--err);}
-
-/* Preview */
 .preview-canvas-wrap{border-radius:6px;border:1px solid var(--border);background:var(--bg2);line-height:0;}
 .preview-canvas-wrap canvas{width:100%;display:block;border-radius:6px;}
 #previewLabel{font-size:11px;color:var(--text3);text-align:center;margin-top:5px;}
 .legend{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px;}
 .li{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text2);}
 .lsw{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
-
-/* Stats */
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 .stat{background:var(--bg2);border-radius:8px;padding:9px 11px;}
 .stat-l{font-size:10px;color:var(--text3);margin-bottom:2px;}
 .stat-v{font-size:17px;font-weight:600;color:var(--text);}
-
-/* Level tools */
 .lt-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
 .lt-box{background:var(--bg2);border-radius:8px;padding:11px 13px;}
 .lt-title{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:9px;}
@@ -119,18 +101,13 @@ button.sm{padding:5px 10px;font-size:12px;border-radius:5px;}
 .lt-row input[type=number]{width:50px;}
 .lt-row input[type=range]{flex:1;min-width:60px;accent-color:var(--accent);}
 .shift-val{font-size:13px;font-weight:700;min-width:32px;text-align:center;color:var(--text);}
-
-/* Terrain hint */
 .ch{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);margin-top:4px;}
 .tsw{width:11px;height:11px;border-radius:3px;display:inline-block;flex-shrink:0;}
 .landscape-badge{font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;background:var(--bg2);border:1px solid var(--border);color:var(--text);}
-
-/* Export */
 .export-box{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 15px;}
 .export-title{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px;}
 .path-note{font-size:10px;color:var(--text3);margin-top:6px;line-height:1.5;}
 pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-space:pre-wrap;display:none;max-height:160px;overflow:auto;margin-top:8px;border:1px solid var(--border);color:var(--text2);font-family:monospace;}
-/* Tile Inspector */
 .insp-wrap{margin-top:8px;}
 .insp-hdr{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px;}
 .insp-row{display:flex;justify-content:space-between;align-items:baseline;padding:3px 0;border-bottom:1px solid var(--border);font-size:11px;}
@@ -144,6 +121,14 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 .nav-warn{background:color-mix(in srgb,var(--warn) 15%,var(--bg3));color:var(--warn);}
 .insp-empty{font-size:11px;color:var(--text3);text-align:center;padding:8px 0;}
 .cv-xhair{position:absolute;border:1px solid rgba(255,255,255,.85);box-shadow:0 0 0 1px rgba(0,0,0,.5);pointer-events:none;display:none;}
+.scheme-presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.scheme-btn{padding:4px 10px;font-size:11px;border-radius:5px;cursor:pointer;border:1px solid var(--border2);background:var(--bg2);color:var(--text);}
+.scheme-btn.active{background:var(--accent);color:var(--accent-fg);border-color:transparent;}
+.colour-pickers{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:8px;}
+.cp-box{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.cp-box label{font-size:11px;color:var(--text2);}
+.cp-box input[type=color]{width:44px;height:32px;padding:2px;border:1px solid var(--border2);border-radius:5px;cursor:pointer;background:var(--bg);}
+.scheme-preview-strip{height:14px;border-radius:4px;border:1px solid var(--border);margin-top:8px;display:block;width:100%;}
 </style>
 </head>
 <body>
@@ -157,10 +142,9 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   </svg>
   <h1>Starship Troopers Terran Command Terrain Tool</h1>
 </div>
-<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · v1.04 · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
+<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · v1.05-beta · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
 
 <div class="layout">
-<!-- ════════════════ LEFT COLUMN ════════════════ -->
 <div class="left-col">
 
   <!-- SOURCE -->
@@ -190,7 +174,6 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       </div>
       <div class="tp" id="tab-src-gen">
         <div class="note" style="margin-bottom:8px;">Generates a procedural heightmap using fractal noise. Output is deterministic - same seed and settings always produce the same map.</div>
-        <!-- Noise type -->
         <div class="field">
           <label class="fl">Noise type</label>
           <div style="display:flex;gap:8px;">
@@ -198,7 +181,6 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
             <label class="ck-row"><input type="radio" name="noiseType" id="noiseSimplex" value="simplex"> OpenSimplex</label>
           </div>
         </div>
-        <!-- Seed -->
         <div class="field">
           <label class="fl">Seed</label>
           <div style="display:flex;gap:6px;align-items:center;">
@@ -206,23 +188,19 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
             <button class="sm" id="btnRandSeed">Randomize</button>
           </div>
         </div>
-        <!-- Scale -->
-        <div class="field"><label class="fl" title="Controls feature size. Higher = larger landmasses, lower = more fragmented terrain.">Scale <span style="font-size:11px;color:var(--text3)">feature size</span></label><div class="rr"><input type="range" id="genScale" min="1" max="200" value="60" step="1"><span class="rv" id="genScaleOut">60</span><button class="sm gen-reset" data-id="genScale" data-def="60" title="Reset to default">↺</button></div></div>
-        <!-- Lacunarity - primary, large structural effect -->
-        <div class="field"><label class="fl" title="How quickly frequency increases between octaves. Lower = smoother, rounder shapes. Higher = sharper, more jagged terrain.">Lacunarity <span style="font-size:11px;color:var(--text3)">shape coarseness</span></label><div class="rr"><input type="range" id="genLacun" min="100" max="400" value="170" step="10"><span class="rv" id="genLacunOut">1.7</span><button class="sm gen-reset" data-id="genLacun" data-def="170" title="Reset to default">↺</button></div></div>
-        <!-- Water level -->
-        <div class="field"><label class="fl" title="Noise values below this threshold become Level -1 (non-navigable floor). Acts as a horizontal slice through the noise field.">Water level <span style="font-size:11px;color:var(--text3)">% of map at floor</span></label><div class="rr"><input type="range" id="genWater" min="0" max="100" value="20" step="1"><span class="rv" id="genWaterOut">20%</span><button class="sm gen-reset" data-id="genWater" data-def="20" title="Reset to default">↺</button></div></div>
-        <!-- Refine shape (collapsible) -->
+        <div class="field"><label class="fl" title="Controls feature size. Higher = larger landmasses.">Scale <span style="font-size:11px;color:var(--text3)">feature size</span></label><div class="rr"><input type="range" id="genScale" min="1" max="200" value="60" step="1"><span class="rv" id="genScaleOut">60</span><button class="sm gen-reset" data-id="genScale" data-def="60" title="Reset to default">↺</button></div></div>
+        <div class="field"><label class="fl" title="How quickly frequency increases between octaves.">Lacunarity <span style="font-size:11px;color:var(--text3)">shape coarseness</span></label><div class="rr"><input type="range" id="genLacun" min="100" max="400" value="170" step="10"><span class="rv" id="genLacunOut">1.7</span><button class="sm gen-reset" data-id="genLacun" data-def="170" title="Reset to default">↺</button></div></div>
+        <div class="field"><label class="fl" title="Noise values below this threshold become Level -1.">Water level <span style="font-size:11px;color:var(--text3)">% of map at floor</span></label><div class="rr"><input type="range" id="genWater" min="0" max="100" value="20" step="1"><span class="rv" id="genWaterOut">20%</span><button class="sm gen-reset" data-id="genWater" data-def="20" title="Reset to default">↺</button></div></div>
         <div style="margin-top:8px;">
           <div id="genAdvToggle" style="cursor:pointer;font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;user-select:none;display:flex;align-items:center;gap:4px;">
             <span id="genAdvChev">▶</span> Refine shape
           </div>
           <div id="genAdvBody" style="display:none;margin-top:8px;">
-            <div class="field"><label class="fl" title="Number of noise layers summed together. More octaves add finer detail but cost performance.">Octaves <span style="font-size:11px;color:var(--text3)">layers of detail</span></label><div class="rr"><input type="range" id="genOctaves" min="1" max="8" value="4" step="1"><span class="rv" id="genOctavesOut">4</span><button class="sm gen-reset" data-id="genOctaves" data-def="4" title="Reset to default">↺</button></div></div>
-            <div class="field"><label class="fl" title="How much each successive octave contributes. Lower = detail octaves fade quickly, smoother result. Higher = detail octaves stay strong, noisier result.">Persistence <span style="font-size:11px;color:var(--text3)">detail strength</span></label><div class="rr"><input type="range" id="genPersist" min="10" max="100" value="50" step="1"><span class="rv" id="genPersistOut">0.50</span><button class="sm gen-reset" data-id="genPersist" data-def="50" title="Reset to default">↺</button></div></div>
-            <div class="field"><label class="fl" title="Raises the normalised noise to this power before mapping to levels. >1 = more low flat areas, fewer peaks. <1 = levels pushed higher, more elevated terrain.">Power <span style="font-size:11px;color:var(--text3)">slope redistribution</span></label><div class="rr"><input type="range" id="genPower" min="10" max="400" value="100" step="10"><span class="rv" id="genPowerOut">1.0</span><button class="sm gen-reset" data-id="genPower" data-def="100" title="Reset to default">↺</button></div></div>
-            <div class="field"><label class="fl" title="Applies a gamma curve to the noise before level mapping. >1 = compress low levels (more flat floor), <1 = compress high levels (more peaks). Independent of water cutoff.">Gamma <span style="font-size:11px;color:var(--text3)">level distribution curve</span></label><div class="rr"><input type="range" id="genGamma" min="10" max="400" value="100" step="10"><span class="rv" id="genGammaOut">1.0</span><button class="sm gen-reset" data-id="genGamma" data-def="100" title="Reset to default">↺</button></div></div>
-            <div class="field"><label class="fl" title="Shifts the entire noise field up or down before water cutoff and gamma are applied. Positive = more land, negative = more floor. Use with Water Level to fine-tune the balance.">Bias <span style="font-size:11px;color:var(--text3)">raise/lower noise field</span></label><div class="rr"><input type="range" id="genBias" min="-50" max="50" value="0" step="1"><span class="rv" id="genBiasOut">0</span><button class="sm gen-reset" data-id="genBias" data-def="0" title="Reset to default">↺</button></div></div>
+            <div class="field"><label class="fl" title="Number of noise layers summed together.">Octaves <span style="font-size:11px;color:var(--text3)">layers of detail</span></label><div class="rr"><input type="range" id="genOctaves" min="1" max="8" value="4" step="1"><span class="rv" id="genOctavesOut">4</span><button class="sm gen-reset" data-id="genOctaves" data-def="4" title="Reset to default">↺</button></div></div>
+            <div class="field"><label class="fl" title="How much each successive octave contributes.">Persistence <span style="font-size:11px;color:var(--text3)">detail strength</span></label><div class="rr"><input type="range" id="genPersist" min="10" max="100" value="50" step="1"><span class="rv" id="genPersistOut">0.50</span><button class="sm gen-reset" data-id="genPersist" data-def="50" title="Reset to default">↺</button></div></div>
+            <div class="field"><label class="fl" title="Raises normalised noise to this power before mapping.">Power <span style="font-size:11px;color:var(--text3)">slope redistribution</span></label><div class="rr"><input type="range" id="genPower" min="10" max="400" value="100" step="10"><span class="rv" id="genPowerOut">1.0</span><button class="sm gen-reset" data-id="genPower" data-def="100" title="Reset to default">↺</button></div></div>
+            <div class="field"><label class="fl" title="Applies a gamma curve to the noise before level mapping.">Gamma <span style="font-size:11px;color:var(--text3)">level distribution curve</span></label><div class="rr"><input type="range" id="genGamma" min="10" max="400" value="100" step="10"><span class="rv" id="genGammaOut">1.0</span><button class="sm gen-reset" data-id="genGamma" data-def="100" title="Reset to default">↺</button></div></div>
+            <div class="field"><label class="fl" title="Shifts the entire noise field up or down.">Bias <span style="font-size:11px;color:var(--text3)">raise/lower noise field</span></label><div class="rr"><input type="range" id="genBias" min="-50" max="50" value="0" step="1"><span class="rv" id="genBiasOut">0</span><button class="sm gen-reset" data-id="genBias" data-def="0" title="Reset to default">↺</button></div></div>
           </div>
         </div>
         <div class="msg" id="msgGen" style="margin-top:6px;"></div>
@@ -275,10 +253,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       </div>
       <div class="tp active" id="tab-ta-simple">
         <div class="tc">
-          <div class="field">
-            <label class="fl">Default TerrainTypeId</label>
-            <select id="terrainSelect"></select>
-          </div>
+          <div class="field"><label class="fl">Default TerrainTypeId</label><select id="terrainSelect"></select></div>
         </div>
       </div>
       <div class="tp" id="tab-ta-overrides">
@@ -308,13 +283,11 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="note">Cliff walls are written as <code>EdgeGroups</code> entries in the exported <code>map.json</code></div>
       <div class="field"><label class="ck-row"><input type="checkbox" id="lockEdgeLandscape" checked>Restrict to legal landscape edges only</label></div>
       <div class="ch" style="margin-bottom:10px;"><div class="tsw" id="tSwatch"></div><span id="tHint" style="font-size:11px;color:var(--text3);"></span></div>
-
       <div class="tab-bar" id="eBar">
         <div class="tab active" data-tab="ea-simple">No change / all</div>
         <div class="tab" data-tab="ea-overrides">Low / high</div>
         <div class="tab" data-tab="ea-bylevel">Per-level</div>
       </div>
-
       <div class="tp active" id="tab-ea-simple">
         <div class="field">
           <label class="fl">Remap all terrain to edge family</label>
@@ -329,35 +302,19 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         </div>
         <div class="warn-box" id="edgeWarn" style="display:none;">Remapping replaces <em>all</em> TerrainTypeIds. Blend tiles without a direct equivalent fall back to the base type for that family.</div>
       </div>
-
       <div class="tp" id="tab-ea-overrides">
         <div class="note">Override edge family at the extremes - mid levels (editor 3-9) keep the global remap or no change.</div>
         <div class="tc">
           <div class="field">
             <label class="fl">Low (−1 to 2) → edge family</label>
-            <select id="edgeRemapLow">
-              <option value="">- no change -</option>
-              <option value="desert">Desert - Cliffs_A</option>
-              <option value="underground">Underground - Cliffs_Purple</option>
-              <option value="lava">Lava - Cliffs_Lava</option>
-              <option value="storm">Metro / Storm - Cliffs_Storm</option>
-              <option value="spacestation">Space Station - Spacestation_A</option>
-            </select>
+            <select id="edgeRemapLow"><option value="">- no change -</option><option value="desert">Desert - Cliffs_A</option><option value="underground">Underground - Cliffs_Purple</option><option value="lava">Lava - Cliffs_Lava</option><option value="storm">Metro / Storm - Cliffs_Storm</option><option value="spacestation">Space Station - Spacestation_A</option></select>
           </div>
           <div class="field">
             <label class="fl">High (10 to 13) → edge family</label>
-            <select id="edgeRemapHigh">
-              <option value="">- no change -</option>
-              <option value="desert">Desert - Cliffs_A</option>
-              <option value="underground">Underground - Cliffs_Purple</option>
-              <option value="lava">Lava - Cliffs_Lava</option>
-              <option value="storm">Metro / Storm - Cliffs_Storm</option>
-              <option value="spacestation">Space Station - Spacestation_A</option>
-            </select>
+            <select id="edgeRemapHigh"><option value="">- no change -</option><option value="desert">Desert - Cliffs_A</option><option value="underground">Underground - Cliffs_Purple</option><option value="lava">Lava - Cliffs_Lava</option><option value="storm">Metro / Storm - Cliffs_Storm</option><option value="spacestation">Space Station - Spacestation_A</option></select>
           </div>
         </div>
       </div>
-
       <div class="tp" id="tab-ea-bylevel">
         <div class="note">Assign an edge family per level. "No change" keeps the original terrain or global remap.</div>
         <div class="pl-grid" id="edgePLGrid">
@@ -381,7 +338,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
           <div class="lt-title">Rotate</div>
           <div class="lt-row" style="gap:6px;">
             <button class="sm" id="btnRot90CCW" disabled>↺ 90° CCW</button>
-            <button class="sm" id="btnRot90CW"  disabled>↻ 90° CW</button>
+            <button class="sm" id="btnRot90CW" disabled>↻ 90° CW</button>
           </div>
         </div>
         <div class="lt-box">
@@ -429,6 +386,32 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
     </div>
   </div>
 
+  <!-- SETTINGS -->
+  <div class="section" id="secSettings">
+    <div class="sh" data-sec="secSettings">
+      <div class="sh-left"><span class="st">Settings</span></div>
+      <span class="sb">Preview colour scheme</span>
+      <span class="sv-chev">▾</span>
+    </div>
+    <div class="section-body">
+      <div class="note">Height preview colour scheme. Terrain, navigability and heatmap previews use fixed functional colours.</div>
+      <div class="scheme-presets">
+        <button class="scheme-btn active" data-scheme="default">Default</button>
+        <button class="scheme-btn" data-scheme="deuteranopia">Deuteranopia</button>
+        <button class="scheme-btn" data-scheme="highcontrast">High Contrast</button>
+        <button class="scheme-btn" data-scheme="custom">Custom</button>
+      </div>
+      <div id="customPickerWrap" style="display:none;">
+        <div class="colour-pickers">
+          <div class="cp-box"><label>Low (editor −1)</label><input type="color" id="cpLow" value="#0d0d1a"></div>
+          <div class="cp-box"><label>Mid (editor 6)</label><input type="color" id="cpMid" value="#7ec065"></div>
+          <div class="cp-box"><label>High (editor 13)</label><input type="color" id="cpHigh" value="#f0f0f0"></div>
+        </div>
+        <canvas id="schemeStripCanvas" class="scheme-preview-strip" width="280" height="14"></canvas>
+      </div>
+    </div>
+  </div>
+
   <!-- HISTORY -->
   <div class="section" id="secHistory">
     <div class="sh" data-sec="secHistory">
@@ -465,15 +448,13 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 
 </div><!-- end left-col -->
 
-<!-- ════════════════ RIGHT COLUMN (sticky preview) ════════════════ -->
+<!-- RIGHT COLUMN -->
 <div class="right-col">
   <div class="section always-open">
     <div class="sh"><span class="st">Preview</span><span class="sb" id="previewModeBadge"></span><button class="sm" id="btnTogglePreviewMode" style="margin-left:auto;font-size:11px;padding:3px 8px;">Terrain</button></div>
     <div class="section-body" style="padding-top:10px;">
       <div class="preview-canvas-wrap" style="position:relative;" id="previewWrap">
         <canvas id="cvPreview" width="128" height="128"></canvas>
-        <!-- Orientation indicator: fixed N/E/S/W corners matching game-space isometric orientation.
-             Game north = top-left corner. Preview content moves relative to these fixed labels. -->
         <div id="orientOverlay" style="display:none;position:absolute;inset:0;pointer-events:none;">
           <div style="position:absolute;top:2px;left:2px;background:rgba(0,0,0,0.65);color:#e65100;font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">N</div>
           <div style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">E</div>
@@ -483,15 +464,13 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <div class="cv-xhair" id="cvXhair"></div>
       </div>
       <div id="previewLabel">No source loaded</div>
-      <!-- Heatmap scale slider — only shown in heatmap mode -->
       <div id="heatScaleWrap" style="display:none;margin-top:6px;">
         <div style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;">Heat scale</span>
-          <input type="range" id="heatScaleSlider" min="4" max="40" value="14" step="1" style="flex:1;accent-color:var(--accent);">
+          <input type="range" id="heatScaleSlider" min="4" max="24" value="14" step="1" style="flex:1;accent-color:var(--accent);">
           <span style="font-size:11px;font-weight:700;min-width:24px;text-align:right;color:var(--text);" id="heatScaleOut">14</span>
         </div>
       </div>
-      <!-- Tile Inspector -->
       <div class="insp-wrap" id="inspWrap">
         <div class="insp-hdr">Tile inspector</div>
         <div id="inspRows"><div class="insp-empty">Click any tile to inspect</div></div>
@@ -510,236 +489,315 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       </div>
     </div>
   </div>
-</div><!-- end right-col -->
+</div>
 
 </div><!-- end layout -->
-
 <script>
-// ── Constants ─────────────────────────────────────────────────────────────────
-const W=128,H=128,MAX_LEVEL=14; // map.json 0..14 = editor -1..13
-// Convert between display (editor) labels and internal map.json values
-const toMap=e=>Math.max(0,Math.min(14,e+1));   // editor -1..13 -> map 0..14
-const toEditor=m=>m-1;                          // map 0..14 -> editor -1..13
+// ═══════════════════════════════════════════════════════════════════════════════
+// COLOUR HELPERS — Use hex for consistancy
+// ═══════════════════════════════════════════════════════════════════════════════
+function hexToRgb(hex){
+  const h=hex.replace('#','');
+  return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];
+}
+function rgbToHex(r,g,b){
+  return '#'+[r,g,b].map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
+}
+function lerpHex(a,b,t){
+  const [ar,ag,ab]=hexToRgb(a),[br,bg,bb]=hexToRgb(b);
+  return rgbToHex(ar+(br-ar)*t,ag+(bg-ag)*t,ab+(bb-ab)*t);
+}
 
-// 15 level colours: map level 0 (editor -1) = near-black, map 14 (editor 13) = white
-const LV_COL=[
-  '#0d0d1a','#1a3a5c','#1e5e8a','#4a9e6b','#6db87c',
-  '#91c872','#b8d96a','#d4e066','#e8d96f','#e8c040',
-  '#c8a840','#a07830','#805020','#c0c0c0','#ffffff'
+// ── Height level palettes (map levels 0-14 = editor -1 to 13) ────────────────
+const LV_COL_DEFAULT=[
+  '#0d0d1a','#0f2a45','#1a4a70','#2d6e50','#3d8a50',
+  '#5aa858','#7ec065','#a8d060','#ccd858','#e8c838',
+  '#d4a030','#b07828','#8a5020','#c8c8c8','#f0f0f0',
+];
+const LV_COL_DEUTERANOPIA=[
+  '#0d0d2a','#0a2060','#1040a0','#1860c0','#2080d0',
+  '#40a0d8','#70b8d8','#a0c8d0','#c8c080','#d8a840',
+  '#c89020','#b07010','#905008','#d8d8d8','#f8f8f8',
+];
+const LV_COL_HIGH_CONTRAST=[
+  '#000000','#001840','#003880','#0058c0','#0080e0',
+  '#00b8e0','#00e0c0','#00e080','#80e000','#e0c000',
+  '#e08000','#e04000','#c00020','#e0e0e0','#ffffff',
 ];
 
-const TERRAINS=[
-  {id:2,  name:'Sand',             color:[201,163,108],edge:'Cliffs_A',     group:'Desert'},
-  {id:12, name:'Pebbles',          color:[165,136,88], edge:'Cliffs_A',     group:'Desert'},
-  {id:0,  name:'Dunes',            color:[201,163,108],edge:'Cliffs_A',     group:'Desert'},
-  {id:8,  name:'Cracks',           color:[197,158,102],edge:'Cliffs_A',     group:'Desert'},
-  {id:3,  name:'Pavement',         color:[131,131,131],edge:'Outpost',      group:'Desert'},
-  {id:4,  name:'Rocks',            color:[84,65,44],   edge:'Cliffs_A',     group:'Desert'},
-  {id:7,  name:'Tiles',            color:[132,132,132],edge:'Building_A',   group:'Desert'},
-  {id:11, name:'Platform',         color:[132,132,132],edge:'Outpost',      group:'Desert'},
-  {id:13, name:'Sandy_Dunes',      color:[197,158,102],edge:'Cliffs_A',     group:'Desert Blends'},
-  {id:26, name:'Sandy_Pebbles',    color:[197,158,102],edge:'Cliffs_A',     group:'Desert Blends'},
-  {id:25, name:'Pebble_Dunes',     color:[197,158,102],edge:'Cliffs_A',     group:'Desert Blends'},
-  {id:14, name:'Flat_Sand',        color:[204,168,117],edge:'Cliffs_A',     group:'Desert Blends'},
-  {id:27, name:'Flat_Rocks',       color:[84,65,44],   edge:'Cliffs_A',     group:'Desert Blends'},
-  {id:15, name:'Rocky_Sand',       color:[197,158,102],edge:'Cliffs_A',     group:'Desert Blends'},
-  {id:21, name:'Rocky_Pebbles',    color:[165,136,88], edge:'Cliffs_A',     group:'Desert Blends'},
-  {id:16, name:'Sandy_Concrete',   color:[131,131,131],edge:'Outpost',      group:'Desert Blends'},
-  {id:22, name:'Sandy_Tiles',      color:[92,65,36],   edge:'Outpost',      group:'Desert Blends'},
-  {id:17, name:'Cracked_Rocks',    color:[84,65,44],   edge:'Cliffs_A',     group:'Desert Blends'},
-  {id:18, name:'Cracked_Sand',     color:[165,136,88], edge:'Cliffs_A',     group:'Desert Blends'},
-  {id:23, name:'Sidewalk',         color:[131,131,131],edge:'Building_A',   group:'Desert Blends'},
-  {id:24, name:'Sandy_Sidewalk',   color:[197,158,102],edge:'Outpost',      group:'Desert Blends'},
-  {id:1,  name:'Grass',            color:[92,118,43],  edge:'Cliffs_A',     group:'Humid'},
-  {id:6,  name:'Forest',           color:[72,82,25],   edge:'Cliffs_A',     group:'Humid'},
-  {id:5,  name:'Swamp',            color:[79,131,93],  edge:'Cliffs_A',     group:'Humid'},
-  {id:9,  name:'Rubble',           color:[129,129,129],edge:'Building_A',   group:'Humid'},
-  {id:10, name:'Beach',            color:[197,158,102],edge:'Cliffs_A',     group:'Humid'},
-  {id:20, name:'Black',            color:[20,20,20],   edge:'Cliffs_A',     group:'Special'},
-  {id:47, name:'Chemical_Pebbles',    color:[165,136,88], edge:'Cliffs_Storm', group:'Chemical'},
-  {id:49, name:'Chemical_Dunes',      color:[201,163,108],edge:'Cliffs_Storm', group:'Chemical'},
-  {id:48, name:'Chemical_Sand',       color:[30,30,30],   edge:'Cliffs_Storm', group:'Chemical'},
-  {id:52, name:'Chemical_Cliffs',     color:[84,65,44],   edge:'Cliffs_Storm', group:'Chemical'},
-  {id:54, name:'Chemical_Platform',   color:[132,132,132],edge:'Outpost',      group:'Chemical'},
-  {id:51, name:'Chemical_Concrete',   color:[131,131,131],edge:'Outpost',      group:'Chemical'},
-  {id:53, name:'Chemical_Tiles',      color:[132,132,132],edge:'Building_A',   group:'Chemical'},
-  {id:50, name:'Chemical_Dry_Sand',   color:[197,158,102],edge:'Cliffs_Storm', group:'Chemical'},
-  {id:62, name:'Chemical_Dunes_Pebbles',   color:[197,158,102],edge:'Cliffs_Storm', group:'Chemical Blends'},
-  {id:63, name:'Chemical_Sandy_Concrete',  color:[131,131,131],edge:'Outpost',      group:'Chemical Blends'},
-  {id:64, name:'Chemical_Cliffs_Dunes',    color:[197,158,102],edge:'Cliffs_Storm', group:'Chemical Blends'},
-  {id:65, name:'Chemical_Cliffs_Pebbles',  color:[197,158,102],edge:'Cliffs_Storm', group:'Chemical Blends'},
-  {id:66, name:'Chemical_Sandy_Dunes',     color:[197,158,102],edge:'Cliffs_Storm', group:'Chemical Blends'},
-  {id:67, name:'Chemical_Sandy_Platform',  color:[197,158,102],edge:'Outpost',      group:'Chemical Blends'},
-  // Lava
-  {id:80, name:'Ash_Flat',         color:[201,163,108],edge:'Cliffs_Lava',  group:'Lava'},
-  {id:94, name:'Ash_Bumps',        color:[190,155,100],edge:'Cliffs_Lava',  group:'Lava'},
-  {id:82, name:'Ash_Soft_Bumps',   color:[165,136,88], edge:'Cliffs_Lava',  group:'Lava'},
-  {id:81, name:'Dry_Lava',         color:[131,131,131],edge:'Cliffs_Lava',  group:'Lava'},
-  {id:85, name:'Lava_Rocks',       color:[84,65,44],   edge:'Cliffs_Lava',  group:'Lava'},
-  {id:83, name:'Lava_Veins',       color:[180,80,20],  edge:'Cliffs_Lava',  group:'Lava'},
-  {id:84, name:'Lava_Pool',        color:[220,60,10],  edge:'Cliffs_Lava',  group:'Lava'},
-  {id:86, name:'Lava_Blobs',       color:[100,60,40],  edge:'Cliffs_Lava',  group:'Lava'},
-  {id:87, name:'Lava_Platform',    color:[132,132,132],edge:'Cliffs_Lava',  group:'Lava'},
-  {id:88, name:'Lava_Metal_Grid',  color:[100,100,110],edge:'Cliffs_Lava',  group:'Lava'},
-  {id:89, name:'Ashy_Platform',    color:[160,140,110],edge:'Cliffs_Lava',  group:'Lava'},
-  {id:90, name:'Veined_Platform',  color:[150,130,100],edge:'Cliffs_Lava',  group:'Lava'},
-  {id:91, name:'Dry_Lava_Platform',color:[140,120,90], edge:'Cliffs_Lava',  group:'Lava'},
-  {id:92, name:'Veined_Rocks',     color:[110,80,50],  edge:'Cliffs_Lava',  group:'Lava'},
-  {id:93, name:'Ashy_Rocks',       color:[120,100,70], edge:'Cliffs_Lava',  group:'Lava'},
-  // Space Station
-  {id:100,name:'Station_Platform', color:[20,20,30],   edge:'Spacestation_A',group:'Space Station'},
-  {id:101,name:'Station1',         color:[165,136,88], edge:'Spacestation_A',group:'Space Station'},
-  {id:102,name:'Station2',         color:[201,163,108],edge:'Spacestation_A',group:'Space Station'},
-  {id:103,name:'Station3',         color:[197,158,102],edge:'Spacestation_A',group:'Space Station'},
-  {id:104,name:'Station4',         color:[131,131,131],edge:'Spacestation_A',group:'Space Station'},
-  {id:105,name:'Station5',         color:[84,65,44],   edge:'Spacestation_A',group:'Space Station'},
-  {id:106,name:'Station6',         color:[132,132,132],edge:'Spacestation_A',group:'Space Station'},
-  {id:107,name:'Station_Sand',     color:[197,158,102],edge:'Spacestation_A',group:'Space Station'},
-  // Metropolis
-  {id:120,name:'Metropolis_Pavement',   color:[110,110,118],edge:'Cliffs_Storm', group:'Metropolis'},
-  {id:121,name:'Metropolis_Sidewalk',   color:[130,128,135],edge:'Cliffs_Storm', group:'Metropolis'},
-  {id:122,name:'Metropolis_2',          color:[118,115,122],edge:'Cliffs_Storm', group:'Metropolis'},
-  {id:123,name:'Metropolis_3',          color:[105,102,110],edge:'Cliffs_Storm', group:'Metropolis'},
-  {id:124,name:'Metropolis_4',          color:[95,92,100],  edge:'Cliffs_Storm', group:'Metropolis'},
-  {id:125,name:'Metropolis_Sand',       color:[185,155,105],edge:'Cliffs_Storm', group:'Metropolis'},
-  {id:126,name:'Metropolis_Pebbles',    color:[155,135,100],edge:'Cliffs_Storm', group:'Metropolis'},
-  {id:127,name:'Metropolis_Grass',      color:[80,100,50],  edge:'Cliffs_Storm', group:'Metropolis'},
-  {id:128,name:'Metropolis_Sidewalk_Sandy',color:[150,140,110],edge:'Cliffs_Storm',group:'Metropolis Blends'},
-  {id:129,name:'Metropolis_Pavement_Sandy',color:[145,135,108],edge:'Cliffs_Storm',group:'Metropolis Blends'},
-  {id:130,name:'Metropolis_Sidewalk_Pavement',color:[120,118,125],edge:'Cliffs_Storm',group:'Metropolis Blends'},
-  {id:131,name:'Metropolis_Rocks',      color:[90,75,60],   edge:'Cliffs_Storm', group:'Metropolis Blends'},
-  {id:132,name:'Metropolis_Rocks_Sandy',color:[130,110,85], edge:'Cliffs_Storm', group:'Metropolis Blends'},
-  {id:133,name:'Metropolis_Rock_Slopes',color:[115,100,80], edge:'Cliffs_Storm', group:'Metropolis Blends'},
-  {id:134,name:'Metropolis_Grid_Rocks', color:[85,80,75],   edge:'Cliffs_Storm', group:'Metropolis Blends'},
-  {id:135,name:'Metropolis_Grid_Sand',  color:[160,140,100],edge:'Cliffs_Storm', group:'Metropolis Blends'},
-  {id:136,name:'Metropolis_Tiles_Rocks',color:[100,95,90],  edge:'Cliffs_Storm', group:'Metropolis Blends'},
-  // Jungle
-  {id:170,name:'Jungle_Grass',          color:[75,100,40],  edge:'Jungle_Cliff',  group:'Jungle'},
-  {id:171,name:'Jungle_Grassy_Sand',    color:[130,130,70], edge:'Jungle_Cliff',  group:'Jungle'},
-  {id:172,name:'Jungle_Ground',         color:[110,85,55],  edge:'Jungle_Cliff',  group:'Jungle'},
-  {id:173,name:'Jungle_Ground_Cracks',  color:[100,78,50],  edge:'Jungle_Cliff',  group:'Jungle'},
-  {id:174,name:'Jungle_Pavement3',      color:[120,118,125],edge:'Jungle_Cliff',  group:'Jungle'},
-  {id:175,name:'Jungle_Rocks',          color:[84,70,50],   edge:'Jungle_Cliff',  group:'Jungle'},
-  {id:176,name:'Jungle_Platform',       color:[130,130,135],edge:'Jungle_Cliff',  group:'Jungle'},
-  {id:177,name:'Jungle_TODO',           color:[90,90,90],   edge:'Jungle_Cliff',  group:'Jungle'},
-  {id:178,name:'Jungle_Grass_Ground',   color:[95,110,50],  edge:'Jungle_Cliff',  group:'Jungle Blends'},
-  {id:179,name:'Jungle_Soil_Grass',     color:[100,100,55], edge:'Jungle_Cliff',  group:'Jungle Blends'},
-  {id:180,name:'Jungle_Tiles_Soil',     color:[115,105,85], edge:'Jungle_Cliff',  group:'Jungle Blends'},
-  {id:181,name:'Jungle_Rocks_Grass',    color:[88,90,55],   edge:'Jungle_Cliff',  group:'Jungle Blends'},
-  {id:182,name:'Jungle_Pebbles_Cracks', color:[105,95,70],  edge:'Jungle_Cliff',  group:'Jungle Blends'},
-  {id:183,name:'Jungle_Pebbles_Rocks',  color:[95,85,60],   edge:'Jungle_Cliff',  group:'Jungle Blends'},
-  {id:184,name:'Jungle_Grass_Flat',     color:[80,105,42],  edge:'Jungle_Cliff',  group:'Jungle Blends'},
-  {id:185,name:'Jungle_Rockier_Grass',  color:[88,95,48],   edge:'Jungle_Cliff',  group:'Jungle Blends'},
-  {id:186,name:'Jungle_Pavement_Grass', color:[105,108,70], edge:'Jungle_Cliff',  group:'Jungle Blends'},
-  {id:187,name:'Jungle_Grass_Red_Ground',color:[100,85,60], edge:'Jungle_Cliff',  group:'Jungle Blends'},
-  {id:188,name:'Jungle_Underground_Soil',color:[90,75,55],  edge:'Jungle_Underground',group:'Jungle Blends'},
-  {id:189,name:'Jungle_Metal_Grid',     color:[90,95,100],  edge:'Jungle_Cliff',  group:'Jungle Blends'},
-  {id:190,name:'Jungle_Shallow_Water',  color:[80,130,160], edge:'Jungle_Cliff',  group:'Jungle Blends'},
-  // Legacy Purple (older game version - kept for backwards compatibility)
-  {id:28, name:'Sand2 (Legacy)',        color:[201,163,108],edge:'Cliffs_A',      group:'Legacy'},
-  {id:29, name:'Pebbles2 (Legacy)',     color:[165,136,88], edge:'Cliffs_A',      group:'Legacy'},
-  {id:30, name:'Dunes2 (Legacy)',       color:[201,163,108],edge:'Cliffs_A',      group:'Legacy'},
-  {id:31, name:'Cracks2 (Legacy)',      color:[197,158,102],edge:'Cliffs_A',      group:'Legacy'},
-  {id:32, name:'Pavement2 (Legacy)',    color:[131,131,131],edge:'Outpost',       group:'Legacy'},
-  {id:33, name:'Rocks2 (Legacy)',       color:[84,65,44],   edge:'Cliffs_A',      group:'Legacy'},
-  {id:34, name:'Tiles2 (Legacy)',       color:[132,132,132],edge:'Building_A',    group:'Legacy'},
-  {id:35, name:'Platform2 (Legacy)',    color:[132,132,132],edge:'Outpost',       group:'Legacy'},
-  {id:36, name:'Sandy_Dunes2 (Legacy)', color:[197,158,102],edge:'Cliffs_A',      group:'Legacy'},
-  {id:37, name:'Sandy_Pebbles2 (Legacy)',color:[197,158,102],edge:'Cliffs_A',     group:'Legacy'},
-  {id:38, name:'Pebble_Dunes2 (Legacy)',color:[197,158,102],edge:'Cliffs_A',      group:'Legacy'},
-  {id:39, name:'Flat_Sand2 (Legacy)',   color:[204,168,117],edge:'Cliffs_A',      group:'Legacy'},
-  {id:40, name:'Flat_Rocks2 (Legacy)',  color:[84,65,44],   edge:'Cliffs_A',      group:'Legacy'},
-  {id:41, name:'Rocky_Sand2 (Legacy)',  color:[197,158,102],edge:'Cliffs_A',      group:'Legacy'},
-  {id:42, name:'Rocky_Pebbles2 (Legacy)',color:[165,136,88],edge:'Cliffs_A',      group:'Legacy'},
-  {id:43, name:'Sandy_Concrete2 (Legacy)',color:[131,131,131],edge:'Outpost',     group:'Legacy'},
-  {id:44, name:'Sandy_Tiles2 (Legacy)', color:[92,65,36],   edge:'Outpost',       group:'Legacy'},
-  {id:45, name:'Cracked_Rocks2 (Legacy)',color:[84,65,44],  edge:'Cliffs_A',      group:'Legacy'},
-  {id:46, name:'Cracked_Sand2 (Legacy)',color:[165,136,88], edge:'Cliffs_A',      group:'Legacy'},
-];
+let LV_COL=LV_COL_DEFAULT.slice();
+let activeScheme='default';
+let customLow='#0d0d1a',customMid='#7ec065',customHigh='#f0f0f0';
 
-const LS_GROUPS={
-  0:['Desert','Desert Blends'],
-  1:['Chemical','Chemical Blends'],
-  2:['Desert','Desert Blends','Humid'],
-  3:['Lava'],
-  4:['Lava','Special'],
-  5:['Space Station'],
-  6:['Metropolis','Metropolis Blends'],
-  7:['Metropolis','Metropolis Blends','Special'],
-  8:['Jungle','Jungle Blends'],
+function buildCustomPalette(low,mid,high){
+  const cols=[];
+  for(let i=0;i<=14;i++){
+    if(i<=7) cols.push(lerpHex(low,mid,i/7));
+    else     cols.push(lerpHex(mid,high,(i-7)/7));
+  }
+  return cols;
+}
+
+function applyScheme(name){
+  activeScheme=name;
+  document.querySelectorAll('.scheme-btn').forEach(b=>b.classList.toggle('active',b.dataset.scheme===name));
+  const cpWrap=document.getElementById('customPickerWrap');
+  if(cpWrap) cpWrap.style.display=name==='custom'?'block':'none';
+  switch(name){
+    case 'deuteranopia': LV_COL=LV_COL_DEUTERANOPIA.slice(); break;
+    case 'highcontrast': LV_COL=LV_COL_HIGH_CONTRAST.slice(); break;
+    case 'custom':
+      LV_COL=buildCustomPalette(customLow,customMid,customHigh);
+      updateSchemeStrip();
+      break;
+    default: LV_COL=LV_COL_DEFAULT.slice(); break;
+  }
+  if(tileData) updatePreview();
+}
+
+function updateSchemeStrip(){
+  const canvas=document.getElementById('schemeStripCanvas');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  const w=canvas.width,h=canvas.height,bw=w/15;
+  for(let i=0;i<=14;i++){ctx.fillStyle=LV_COL[i];ctx.fillRect(i*bw,0,bw+1,h);}
+}
+
+document.querySelectorAll('.scheme-btn').forEach(btn=>
+  btn.addEventListener('click',()=>applyScheme(btn.dataset.scheme)));
+
+['cpLow','cpMid','cpHigh'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.addEventListener('input',()=>{
+    customLow=document.getElementById('cpLow').value;
+    customMid=document.getElementById('cpMid').value;
+    customHigh=document.getElementById('cpHigh').value;
+    if(activeScheme==='custom') applyScheme('custom');
+  });
+});
+
+// ── Nav colours (hex) ─────────────────────────────────────────────────────────
+const NAV_HEX={
+  water:  '#b41e1e',
+  cliff:  '#c83c0a',
+  slope:  '#3c8fdc',
+  high:   '#c8960a',
+  narrow: '#4a8000',
+  ok:     '#28a046',
 };
-const LS_NAMES={0:'Desert',1:'Chemical/Underground',2:'Desert City',3:'Lava',4:'Lava Underground',5:'Space Station',6:'Metropolis',7:'Metro Underground',8:'Jungle'};
+
+// ── Heatmap colour stops (hex) ────────────────────────────────────────────────
+const HEAT_STOPS_HEX=['#dc2814','#dc8200','#b4d200','#32be46','#1482dc'];
+const HEAT_HARD_HEX='#19191e';
+const HEAT_SLOPE_HEX='#b450b4';
+
+// ── Terrain colours (hex) ─────────────────────────────────────────────────────
+// Each type has a distinct hue representative of its name.
+// Blended types sit between their parent colours.
+// Same-family variants use meaningfully different shades.
+const TERRAINS=[
+  // Desert base
+  {id:2,  name:'Sand',                      hex:'#c9a06c', edge:'Cliffs_A',      group:'Desert'},
+  {id:12, name:'Pebbles',                   hex:'#a08858', edge:'Cliffs_A',      group:'Desert'},
+  {id:0,  name:'Dunes',                     hex:'#d4b45a', edge:'Cliffs_A',      group:'Desert'},
+  {id:8,  name:'Cracks',                    hex:'#8c6030', edge:'Cliffs_A',      group:'Desert'},
+  {id:3,  name:'Pavement',                  hex:'#909090', edge:'Outpost',       group:'Desert'},
+  {id:4,  name:'Rocks',                     hex:'#5a3c22', edge:'Cliffs_A',      group:'Desert'},
+  {id:7,  name:'Tiles',                     hex:'#6e6e6e', edge:'Building_A',    group:'Desert'},
+  {id:11, name:'Platform',                  hex:'#545454', edge:'Outpost',       group:'Desert'},
+  // Desert blends — interpolated between parents, distinct shades
+  {id:13, name:'Sandy_Dunes',               hex:'#ceac60', edge:'Cliffs_A',      group:'Desert Blends'},
+  {id:26, name:'Sandy_Pebbles',             hex:'#b49460', edge:'Cliffs_A',      group:'Desert Blends'},
+  {id:25, name:'Pebble_Dunes',              hex:'#bca05c', edge:'Cliffs_A',      group:'Desert Blends'},
+  {id:14, name:'Flat_Sand',                 hex:'#d4ae7a', edge:'Cliffs_A',      group:'Desert Blends'},
+  {id:27, name:'Flat_Rocks',                hex:'#705030', edge:'Cliffs_A',      group:'Desert Blends'},
+  {id:15, name:'Rocky_Sand',                hex:'#9c7248', edge:'Cliffs_A',      group:'Desert Blends'},
+  {id:21, name:'Rocky_Pebbles',             hex:'#7e5e3c', edge:'Cliffs_A',      group:'Desert Blends'},
+  {id:16, name:'Sandy_Concrete',            hex:'#a89678', edge:'Outpost',       group:'Desert Blends'},
+  {id:22, name:'Sandy_Tiles',               hex:'#887058', edge:'Outpost',       group:'Desert Blends'},
+  {id:17, name:'Cracked_Rocks',             hex:'#4e3018', edge:'Cliffs_A',      group:'Desert Blends'},
+  {id:18, name:'Cracked_Sand',              hex:'#bc9660', edge:'Cliffs_A',      group:'Desert Blends'},
+  {id:23, name:'Sidewalk',                  hex:'#b0b0b0', edge:'Building_A',    group:'Desert Blends'},
+  {id:24, name:'Sandy_Sidewalk',            hex:'#b8a888', edge:'Outpost',       group:'Desert Blends'},
+  // Humid
+  {id:1,  name:'Grass',                     hex:'#5c7628', edge:'Cliffs_A',      group:'Humid'},
+  {id:6,  name:'Forest',                    hex:'#2e4a10', edge:'Cliffs_A',      group:'Humid'},
+  {id:5,  name:'Swamp',                     hex:'#3e7050', edge:'Cliffs_A',      group:'Humid'},
+  {id:9,  name:'Rubble',                    hex:'#7a7a7a', edge:'Building_A',    group:'Humid'},
+  {id:10, name:'Beach',                     hex:'#c8a870', edge:'Cliffs_A',      group:'Humid'},
+  // Special
+  {id:20, name:'Black',                     hex:'#141414', edge:'Cliffs_A',      group:'Special'},
+  // Chemical — sickly yellow-greens, each a distinct value
+  {id:47, name:'Chemical_Pebbles',          hex:'#8a9448', edge:'Cliffs_Storm',  group:'Chemical'},
+  {id:49, name:'Chemical_Dunes',            hex:'#a0a050', edge:'Cliffs_Storm',  group:'Chemical'},
+  {id:48, name:'Chemical_Sand',             hex:'#282818', edge:'Cliffs_Storm',  group:'Chemical'},
+  {id:52, name:'Chemical_Cliffs',           hex:'#4a3c28', edge:'Cliffs_Storm',  group:'Chemical'},
+  {id:54, name:'Chemical_Platform',         hex:'#5e6870', edge:'Outpost',       group:'Chemical'},
+  {id:51, name:'Chemical_Concrete',         hex:'#787c68', edge:'Outpost',       group:'Chemical'},
+  {id:53, name:'Chemical_Tiles',            hex:'#646858', edge:'Building_A',    group:'Chemical'},
+  {id:50, name:'Chemical_Dry_Sand',         hex:'#b0ac58', edge:'Cliffs_Storm',  group:'Chemical'},
+  // Chemical blends
+  {id:62, name:'Chemical_Dunes_Pebbles',    hex:'#989c4c', edge:'Cliffs_Storm',  group:'Chemical Blends'},
+  {id:63, name:'Chemical_Sandy_Concrete',   hex:'#8a8c68', edge:'Outpost',       group:'Chemical Blends'},
+  {id:64, name:'Chemical_Cliffs_Dunes',     hex:'#787040', edge:'Cliffs_Storm',  group:'Chemical Blends'},
+  {id:65, name:'Chemical_Cliffs_Pebbles',   hex:'#685e38', edge:'Cliffs_Storm',  group:'Chemical Blends'},
+  {id:66, name:'Chemical_Sandy_Dunes',      hex:'#a8a450', edge:'Cliffs_Storm',  group:'Chemical Blends'},
+  {id:67, name:'Chemical_Sandy_Platform',   hex:'#8a8860', edge:'Outpost',       group:'Chemical Blends'},
+  // Lava — dark ashy greys to vivid orange-reds
+  {id:80, name:'Ash_Flat',                  hex:'#706050', edge:'Cliffs_Lava',   group:'Lava'},
+  {id:94, name:'Ash_Bumps',                 hex:'#5a4c3c', edge:'Cliffs_Lava',   group:'Lava'},
+  {id:82, name:'Ash_Soft_Bumps',            hex:'#847060', edge:'Cliffs_Lava',   group:'Lava'},
+  {id:81, name:'Dry_Lava',                  hex:'#3a2c22', edge:'Cliffs_Lava',   group:'Lava'},
+  {id:85, name:'Lava_Rocks',               hex:'#281c0e', edge:'Cliffs_Lava',   group:'Lava'},
+  {id:83, name:'Lava_Veins',               hex:'#c04810', edge:'Cliffs_Lava',   group:'Lava'},
+  {id:84, name:'Lava_Pool',                hex:'#e02c06', edge:'Cliffs_Lava',   group:'Lava'},
+  {id:86, name:'Lava_Blobs',               hex:'#7a2c10', edge:'Cliffs_Lava',   group:'Lava'},
+  {id:87, name:'Lava_Platform',            hex:'#525252', edge:'Cliffs_Lava',   group:'Lava'},
+  {id:88, name:'Lava_Metal_Grid',          hex:'#40404c', edge:'Cliffs_Lava',   group:'Lava'},
+  {id:89, name:'Ashy_Platform',            hex:'#8c7c60', edge:'Cliffs_Lava',   group:'Lava'},
+  {id:90, name:'Veined_Platform',          hex:'#7c6c50', edge:'Cliffs_Lava',   group:'Lava'},
+  {id:91, name:'Dry_Lava_Platform',        hex:'#6a5a3c', edge:'Cliffs_Lava',   group:'Lava'},
+  {id:92, name:'Veined_Rocks',             hex:'#5a3c20', edge:'Cliffs_Lava',   group:'Lava'},
+  {id:93, name:'Ashy_Rocks',              hex:'#483618', edge:'Cliffs_Lava',   group:'Lava'},
+  // Space Station — dark blues through steels, each clearly distinct
+  {id:100,name:'Station_Platform',         hex:'#14141e', edge:'Spacestation_A', group:'Space Station'},
+  {id:101,name:'Station1',                 hex:'#1e2e50', edge:'Spacestation_A', group:'Space Station'},
+  {id:102,name:'Station2',                 hex:'#2c4068', edge:'Spacestation_A', group:'Space Station'},
+  {id:103,name:'Station3',                 hex:'#3a5280', edge:'Spacestation_A', group:'Space Station'},
+  {id:104,name:'Station4',                 hex:'#486498', edge:'Spacestation_A', group:'Space Station'},
+  {id:105,name:'Station5',                 hex:'#2e2418', edge:'Spacestation_A', group:'Space Station'},
+  {id:106,name:'Station6',                 hex:'#5878a8', edge:'Spacestation_A', group:'Space Station'},
+  {id:107,name:'Station_Sand',             hex:'#8c7c5c', edge:'Spacestation_A', group:'Space Station'},
+  // Metropolis — cool blue-greys, clear step between each
+  {id:120,name:'Metropolis_Pavement',      hex:'#505058', edge:'Cliffs_Storm',  group:'Metropolis'},
+  {id:121,name:'Metropolis_Sidewalk',      hex:'#747280', edge:'Cliffs_Storm',  group:'Metropolis'},
+  {id:122,name:'Metropolis_2',             hex:'#5e5c6a', edge:'Cliffs_Storm',  group:'Metropolis'},
+  {id:123,name:'Metropolis_3',             hex:'#4c4a58', edge:'Cliffs_Storm',  group:'Metropolis'},
+  {id:124,name:'Metropolis_4',             hex:'#3c3a48', edge:'Cliffs_Storm',  group:'Metropolis'},
+  {id:125,name:'Metropolis_Sand',          hex:'#c8a854', edge:'Cliffs_Storm',  group:'Metropolis'},
+  {id:126,name:'Metropolis_Pebbles',       hex:'#9c8858', edge:'Cliffs_Storm',  group:'Metropolis'},
+  {id:127,name:'Metropolis_Grass',         hex:'#486428', edge:'Cliffs_Storm',  group:'Metropolis'},
+  // Metropolis blends
+  {id:128,name:'Metropolis_Sidewalk_Sandy',      hex:'#a09870', edge:'Cliffs_Storm', group:'Metropolis Blends'},
+  {id:129,name:'Metropolis_Pavement_Sandy',      hex:'#928868', edge:'Cliffs_Storm', group:'Metropolis Blends'},
+  {id:130,name:'Metropolis_Sidewalk_Pavement',   hex:'#646270', edge:'Cliffs_Storm', group:'Metropolis Blends'},
+  {id:131,name:'Metropolis_Rocks',               hex:'#504038', edge:'Cliffs_Storm', group:'Metropolis Blends'},
+  {id:132,name:'Metropolis_Rocks_Sandy',         hex:'#847058', edge:'Cliffs_Storm', group:'Metropolis Blends'},
+  {id:133,name:'Metropolis_Rock_Slopes',         hex:'#746450', edge:'Cliffs_Storm', group:'Metropolis Blends'},
+  {id:134,name:'Metropolis_Grid_Rocks',          hex:'#484038', edge:'Cliffs_Storm', group:'Metropolis Blends'},
+  {id:135,name:'Metropolis_Grid_Sand',           hex:'#a89060', edge:'Cliffs_Storm', group:'Metropolis Blends'},
+  {id:136,name:'Metropolis_Tiles_Rocks',         hex:'#585250', edge:'Cliffs_Storm', group:'Metropolis Blends'},
+  // Jungle — rich greens and earthy browns, clearly distinct
+  {id:170,name:'Jungle_Grass',                   hex:'#486428', edge:'Jungle_Cliff',      group:'Jungle'},
+  {id:171,name:'Jungle_Grassy_Sand',             hex:'#8a8440', edge:'Jungle_Cliff',      group:'Jungle'},
+  {id:172,name:'Jungle_Ground',                  hex:'#6e5430', edge:'Jungle_Cliff',      group:'Jungle'},
+  {id:173,name:'Jungle_Ground_Cracks',           hex:'#5a4228', edge:'Jungle_Cliff',      group:'Jungle'},
+  {id:174,name:'Jungle_Pavement3',               hex:'#78767c', edge:'Jungle_Cliff',      group:'Jungle'},
+  {id:175,name:'Jungle_Rocks',                   hex:'#4a4230', edge:'Jungle_Cliff',      group:'Jungle'},
+  {id:176,name:'Jungle_Platform',                hex:'#64626c', edge:'Jungle_Cliff',      group:'Jungle'},
+  {id:177,name:'Jungle_TODO',                    hex:'#505050', edge:'Jungle_Cliff',      group:'Jungle'},
+  // Jungle blends
+  {id:178,name:'Jungle_Grass_Ground',            hex:'#587030', edge:'Jungle_Cliff',      group:'Jungle Blends'},
+  {id:179,name:'Jungle_Soil_Grass',              hex:'#646438', edge:'Jungle_Cliff',      group:'Jungle Blends'},
+  {id:180,name:'Jungle_Tiles_Soil',              hex:'#786858', edge:'Jungle_Cliff',      group:'Jungle Blends'},
+  {id:181,name:'Jungle_Rocks_Grass',             hex:'#526030', edge:'Jungle_Cliff',      group:'Jungle Blends'},
+  {id:182,name:'Jungle_Pebbles_Cracks',          hex:'#685c42', edge:'Jungle_Cliff',      group:'Jungle Blends'},
+  {id:183,name:'Jungle_Pebbles_Rocks',           hex:'#5a5038', edge:'Jungle_Cliff',      group:'Jungle Blends'},
+  {id:184,name:'Jungle_Grass_Flat',              hex:'#507828', edge:'Jungle_Cliff',      group:'Jungle Blends'},
+  {id:185,name:'Jungle_Rockier_Grass',           hex:'#5c6832', edge:'Jungle_Cliff',      group:'Jungle Blends'},
+  {id:186,name:'Jungle_Pavement_Grass',          hex:'#6a7044', edge:'Jungle_Cliff',      group:'Jungle Blends'},
+  {id:187,name:'Jungle_Grass_Red_Ground',        hex:'#6a5038', edge:'Jungle_Cliff',      group:'Jungle Blends'},
+  {id:188,name:'Jungle_Underground_Soil',        hex:'#564838', edge:'Jungle_Underground', group:'Jungle Blends'},
+  {id:189,name:'Jungle_Metal_Grid',              hex:'#585e64', edge:'Jungle_Cliff',      group:'Jungle Blends'},
+  {id:190,name:'Jungle_Shallow_Water',           hex:'#3a7890', edge:'Jungle_Cliff',      group:'Jungle Blends'},
+  // Legacy Purple — slightly purple-shifted desert variants
+  {id:28, name:'Sand2 (Legacy)',                 hex:'#c0a080', edge:'Cliffs_A',      group:'Legacy'},
+  {id:29, name:'Pebbles2 (Legacy)',              hex:'#9c8870', edge:'Cliffs_A',      group:'Legacy'},
+  {id:30, name:'Dunes2 (Legacy)',                hex:'#ccaa70', edge:'Cliffs_A',      group:'Legacy'},
+  {id:31, name:'Cracks2 (Legacy)',               hex:'#987050', edge:'Cliffs_A',      group:'Legacy'},
+  {id:32, name:'Pavement2 (Legacy)',             hex:'#8c8898', edge:'Outpost',       group:'Legacy'},
+  {id:33, name:'Rocks2 (Legacy)',                hex:'#503c2a', edge:'Cliffs_A',      group:'Legacy'},
+  {id:34, name:'Tiles2 (Legacy)',                hex:'#6e6e7e', edge:'Building_A',    group:'Legacy'},
+  {id:35, name:'Platform2 (Legacy)',             hex:'#585868', edge:'Outpost',       group:'Legacy'},
+  {id:36, name:'Sandy_Dunes2 (Legacy)',          hex:'#c8a870', edge:'Cliffs_A',      group:'Legacy'},
+  {id:37, name:'Sandy_Pebbles2 (Legacy)',        hex:'#b09870', edge:'Cliffs_A',      group:'Legacy'},
+  {id:38, name:'Pebble_Dunes2 (Legacy)',         hex:'#b8a068', edge:'Cliffs_A',      group:'Legacy'},
+  {id:39, name:'Flat_Sand2 (Legacy)',            hex:'#d0b080', edge:'Cliffs_A',      group:'Legacy'},
+  {id:40, name:'Flat_Rocks2 (Legacy)',           hex:'#6a5038', edge:'Cliffs_A',      group:'Legacy'},
+  {id:41, name:'Rocky_Sand2 (Legacy)',           hex:'#9c7858', edge:'Cliffs_A',      group:'Legacy'},
+  {id:42, name:'Rocky_Pebbles2 (Legacy)',        hex:'#887068', edge:'Cliffs_A',      group:'Legacy'},
+  {id:43, name:'Sandy_Concrete2 (Legacy)',       hex:'#a09080', edge:'Outpost',       group:'Legacy'},
+  {id:44, name:'Sandy_Tiles2 (Legacy)',          hex:'#887068', edge:'Outpost',       group:'Legacy'},
+  {id:45, name:'Cracked_Rocks2 (Legacy)',        hex:'#4a3020', edge:'Cliffs_A',      group:'Legacy'},
+  {id:46, name:'Cracked_Sand2 (Legacy)',         hex:'#b89070', edge:'Cliffs_A',      group:'Legacy'},
+];
+
 const T_BY_ID=Object.fromEntries(TERRAINS.map(t=>[t.id,t]));
 
-// ── Edge data (from edges.csv) ────────────────────────────────────────────────
-// Each entry: key used in dropdowns, edge name, dlc group, noEditor flag,
-// and a terrain remap table (cat->terrainId) for that edge family.
-// 'default' = fallback terrain when no category match exists.
+const W=128,H=128,MAX_LEVEL=14;
+const toMap=e=>Math.max(0,Math.min(14,e+1));
+const toEditor=m=>m-1;
+
+const LS_GROUPS={
+  0:['Desert','Desert Blends'],1:['Chemical','Chemical Blends'],2:['Desert','Desert Blends','Humid'],
+  3:['Lava'],4:['Lava','Special'],5:['Space Station'],6:['Metropolis','Metropolis Blends'],
+  7:['Metropolis','Metropolis Blends','Special'],8:['Jungle','Jungle Blends'],
+};
+const LS_NAMES={0:'Desert',1:'Chemical/Underground',2:'Desert City',3:'Lava',4:'Lava Underground',5:'Space Station',6:'Metropolis',7:'Metro Underground',8:'Jungle'};
+
 const EDGES=[
-  // BASE DLC
-  {id:0,    key:'cliffs_a',       name:'Cliffs_A',              dlc:'Base',   noEditor:false, remap:{base:2,  rubble:12, flat:0,  rocks:4,  cracks:8,  pave:3,  tiles:7,  platform:11, default:2  }},
-  {id:1,    key:'building_a',     name:'Building_A',            dlc:'Base',   noEditor:false, remap:{base:7,  rubble:9,  flat:7,  rocks:9,  cracks:7,  pave:7,  tiles:7,  platform:11, default:7  }},
-  {id:6,    key:'building_b',     name:'Building_B',            dlc:'Base',   noEditor:false, remap:{default:9  }},
-  {id:9,    key:'building_c',     name:'Building_C',            dlc:'Base',   noEditor:false, remap:{default:9  }},
-  {id:8,    key:'skyscraper_a',   name:'Skyscraper_A',          dlc:'Base',   noEditor:false, remap:{default:7  }},
-  {id:2,    key:'outpost',        name:'Outpost',               dlc:'Base',   noEditor:false, remap:{base:3,  rubble:3,  flat:3,  rocks:4,  cracks:3,  pave:3,  tiles:11, platform:11, default:3  }},
-  {id:3,    key:'damaged_outpost',name:'Damaged_Outpost',       dlc:'Base',   noEditor:true,  remap:{default:3  }},
-  {id:4,    key:'destroyed_wall', name:'Destroyed_Wall',        dlc:'Base',   noEditor:true,  remap:{default:4  }},
-  {id:7,    key:'trenches',       name:'Trenches',              dlc:'Base',   noEditor:false, remap:{default:5  }},
-  {id:5,    key:'quay',           name:'Quay',                  dlc:'Base',   noEditor:false, remap:{default:10 }},
-  {id:10,   key:'tunnel_cliffs',  name:'Tunnel_Cliffs',         dlc:'Base',   noEditor:false, remap:{base:4,  rubble:4,  flat:4,  rocks:4,  cracks:4,  pave:3,  tiles:7,  platform:11, default:4  }},
-  {id:1001, key:'canal_wall',     name:'Canal_Wall',            dlc:'Base',   noEditor:false, remap:{default:3  }},
-  {id:1002, key:'internal_wall',  name:'Internal_Wall',         dlc:'Base',   noEditor:false, remap:{default:7  }},
-  {id:400,  key:'skyscraper_b',   name:'Skyscraper_B',          dlc:'Base',   noEditor:false, remap:{default:7  }},
-  {id:404,  key:'destroyed',      name:'Destroyed',             dlc:'Base',   noEditor:false, remap:{default:9  }},
-  {id:405,  key:'settler_house',  name:'Settler_House',         dlc:'Base',   noEditor:false, remap:{default:1  }},
-  // LAVA DLC
-  {id:11,   key:'industrial_b',   name:'Industrial_B',          dlc:'Lava',   noEditor:false, remap:{default:87 }},
-  {id:12,   key:'spacestation_a', name:'Spacestation_A',        dlc:'Lava',   noEditor:false, remap:{base:102,rubble:101,flat:100,rocks:105,cracks:103,pave:104,tiles:106,platform:107,default:102}},
-  {id:300,  key:'cliffs_lava',    name:'Cliffs_Lava',           dlc:'Lava',   noEditor:false, remap:{base:80, rubble:82, flat:81, rocks:85, cracks:83, pave:87, tiles:87, platform:87, default:80 }},
-  {id:301,  key:'cliffs_lava_veins',name:'Cliffs_Lava_Veins',  dlc:'Lava',   noEditor:false, remap:{base:83, rubble:86, flat:81, rocks:92, cracks:83, pave:87, tiles:87, platform:87, default:83 }},
-  {id:302,  key:'cliffs_lava_tunnel',name:'Cliffs_Lava_Tunnel',dlc:'Lava',   noEditor:false, remap:{base:81, rubble:82, flat:81, rocks:85, cracks:83, pave:87, tiles:87, platform:87, default:81 }},
-  // CHEM DLC
-  {id:200,  key:'cliffs_storm',   name:'Cliffs_Storm',          dlc:'Chem',   noEditor:false, remap:{base:49, rubble:48, flat:47, rocks:52, cracks:64, pave:51, tiles:53, platform:54, default:49 }},
-  {id:201,  key:'bug_prison',     name:'Bug_Prison',            dlc:'Chem',   noEditor:false, remap:{default:51 }},
-  {id:502,  key:'frost_building', name:'Frost_Building',        dlc:'Chem',   noEditor:false, remap:{default:51 }},
-  // METRO DLC
-  {id:401,  key:'under_construction',name:'UnderConstruction',  dlc:'Metro',  noEditor:false, remap:{base:120,rubble:126,flat:125,rocks:131,cracks:123,pave:120,tiles:121,platform:124,default:120}},
-  {id:402,  key:'office_walls',   name:'Office_Walls',          dlc:'Metro',  noEditor:false, remap:{base:120,rubble:126,flat:125,rocks:131,cracks:123,pave:120,tiles:121,platform:124,default:120}},
-  {id:406,  key:'warehouse',      name:'Warehouse',             dlc:'Metro',  noEditor:false, remap:{default:124}},
-  // JUNGLE DLC
-  {id:407,  key:'jungle_cliff',   name:'Jungle_Cliff',          dlc:'Jungle', noEditor:false, remap:{base:170,rubble:175,flat:172,rocks:175,cracks:173,pave:174,tiles:176,platform:176,default:170}},
-  {id:408,  key:'jungle_cliff_climbable',name:'Jungle_Cliff_Climbable',dlc:'Jungle',noEditor:false,remap:{base:170,rubble:175,flat:172,rocks:175,cracks:173,pave:174,tiles:176,platform:176,default:170}},
-  {id:409,  key:'jungle_underground',name:'Jungle_Underground', dlc:'Jungle', noEditor:false, remap:{base:188,rubble:175,flat:172,rocks:175,cracks:173,pave:174,tiles:189,platform:176,default:188}},
-  {id:410,  key:'settler_house_jungle',name:'Settler_House_Jungle',dlc:'Jungle',noEditor:false,remap:{default:170}},
+  {id:0,    key:'cliffs_a',              name:'Cliffs_A',              dlc:'Base',   noEditor:false, remap:{base:2,  rubble:12,flat:0,  rocks:4,  cracks:8,  pave:3,  tiles:7,  platform:11,default:2}},
+  {id:1,    key:'building_a',            name:'Building_A',            dlc:'Base',   noEditor:false, remap:{base:7,  rubble:9, flat:7,  rocks:9,  cracks:7,  pave:7,  tiles:7,  platform:11,default:7}},
+  {id:6,    key:'building_b',            name:'Building_B',            dlc:'Base',   noEditor:false, remap:{default:9}},
+  {id:9,    key:'building_c',            name:'Building_C',            dlc:'Base',   noEditor:false, remap:{default:9}},
+  {id:8,    key:'skyscraper_a',          name:'Skyscraper_A',          dlc:'Base',   noEditor:false, remap:{default:7}},
+  {id:2,    key:'outpost',               name:'Outpost',               dlc:'Base',   noEditor:false, remap:{base:3,  rubble:3, flat:3,  rocks:4,  cracks:3,  pave:3,  tiles:11, platform:11,default:3}},
+  {id:3,    key:'damaged_outpost',       name:'Damaged_Outpost',       dlc:'Base',   noEditor:true,  remap:{default:3}},
+  {id:4,    key:'destroyed_wall',        name:'Destroyed_Wall',        dlc:'Base',   noEditor:true,  remap:{default:4}},
+  {id:7,    key:'trenches',              name:'Trenches',              dlc:'Base',   noEditor:false, remap:{default:5}},
+  {id:5,    key:'quay',                  name:'Quay',                  dlc:'Base',   noEditor:false, remap:{default:10}},
+  {id:10,   key:'tunnel_cliffs',         name:'Tunnel_Cliffs',         dlc:'Base',   noEditor:false, remap:{base:4,  rubble:4, flat:4,  rocks:4,  cracks:4,  pave:3,  tiles:7,  platform:11,default:4}},
+  {id:1001, key:'canal_wall',            name:'Canal_Wall',            dlc:'Base',   noEditor:false, remap:{default:3}},
+  {id:1002, key:'internal_wall',         name:'Internal_Wall',         dlc:'Base',   noEditor:false, remap:{default:7}},
+  {id:400,  key:'skyscraper_b',          name:'Skyscraper_B',          dlc:'Base',   noEditor:false, remap:{default:7}},
+  {id:404,  key:'destroyed',             name:'Destroyed',             dlc:'Base',   noEditor:false, remap:{default:9}},
+  {id:405,  key:'settler_house',         name:'Settler_House',         dlc:'Base',   noEditor:false, remap:{default:1}},
+  {id:11,   key:'industrial_b',          name:'Industrial_B',          dlc:'Lava',   noEditor:false, remap:{default:87}},
+  {id:12,   key:'spacestation_a',        name:'Spacestation_A',        dlc:'Lava',   noEditor:false, remap:{base:102,rubble:101,flat:100,rocks:105,cracks:103,pave:104,tiles:106,platform:107,default:102}},
+  {id:300,  key:'cliffs_lava',           name:'Cliffs_Lava',           dlc:'Lava',   noEditor:false, remap:{base:80, rubble:82,flat:81, rocks:85, cracks:83, pave:87, tiles:87, platform:87,default:80}},
+  {id:301,  key:'cliffs_lava_veins',     name:'Cliffs_Lava_Veins',     dlc:'Lava',   noEditor:false, remap:{base:83, rubble:86,flat:81, rocks:92, cracks:83, pave:87, tiles:87, platform:87,default:83}},
+  {id:302,  key:'cliffs_lava_tunnel',    name:'Cliffs_Lava_Tunnel',    dlc:'Lava',   noEditor:false, remap:{base:81, rubble:82,flat:81, rocks:85, cracks:83, pave:87, tiles:87, platform:87,default:81}},
+  {id:200,  key:'cliffs_storm',          name:'Cliffs_Storm',          dlc:'Chem',   noEditor:false, remap:{base:49, rubble:48,flat:47, rocks:52, cracks:64, pave:51, tiles:53, platform:54,default:49}},
+  {id:201,  key:'bug_prison',            name:'Bug_Prison',            dlc:'Chem',   noEditor:false, remap:{default:51}},
+  {id:502,  key:'frost_building',        name:'Frost_Building',        dlc:'Chem',   noEditor:false, remap:{default:51}},
+  {id:401,  key:'under_construction',    name:'UnderConstruction',     dlc:'Metro',  noEditor:false, remap:{base:120,rubble:126,flat:125,rocks:131,cracks:123,pave:120,tiles:121,platform:124,default:120}},
+  {id:402,  key:'office_walls',          name:'Office_Walls',          dlc:'Metro',  noEditor:false, remap:{base:120,rubble:126,flat:125,rocks:131,cracks:123,pave:120,tiles:121,platform:124,default:120}},
+  {id:406,  key:'warehouse',             name:'Warehouse',             dlc:'Metro',  noEditor:false, remap:{default:124}},
+  {id:407,  key:'jungle_cliff',          name:'Jungle_Cliff',          dlc:'Jungle', noEditor:false, remap:{base:170,rubble:175,flat:172,rocks:175,cracks:173,pave:174,tiles:176,platform:176,default:170}},
+  {id:408,  key:'jungle_cliff_climbable',name:'Jungle_Cliff_Climbable',dlc:'Jungle', noEditor:false, remap:{base:170,rubble:175,flat:172,rocks:175,cracks:173,pave:174,tiles:176,platform:176,default:170}},
+  {id:409,  key:'jungle_underground',    name:'Jungle_Underground',    dlc:'Jungle', noEditor:false, remap:{base:188,rubble:175,flat:172,rocks:175,cracks:173,pave:174,tiles:189,platform:176,default:188}},
+  {id:410,  key:'settler_house_jungle',  name:'Settler_House_Jungle',  dlc:'Jungle', noEditor:false, remap:{default:170}},
 ];
 const EDGE_BY_KEY=Object.fromEntries(EDGES.map(e=>[e.key,e]));
 
-// Underground biome uses Cliffs_Purple in terrain.csv (legacy name = Cliffs_A visual for Purple terrain)
-// Map it to the desert remap table since Purple terrain IS the underground cliff family
 const T_CAT={
-  // Desert
   2:'base',12:'rubble',0:'flat',4:'rocks',8:'cracks',3:'pave',7:'tiles',11:'platform',
   13:'base',26:'rubble',25:'flat',27:'rocks',18:'cracks',16:'pave',23:'tiles',14:'flat',15:'rocks',17:'rocks',22:'pave',21:'rubble',24:'pave',
   1:'base',6:'flat',5:'flat',9:'rubble',10:'base',20:'flat',
-  // Legacy Purple (maps to desert categories)
   28:'base',29:'rubble',30:'flat',33:'rocks',31:'cracks',32:'pave',34:'tiles',35:'platform',
   36:'base',37:'rubble',38:'flat',40:'rocks',46:'cracks',43:'pave',44:'pave',39:'flat',41:'rocks',42:'rubble',45:'rocks',
-  // Chemical (Storm)
   49:'base',48:'rubble',47:'flat',52:'rocks',50:'flat',51:'pave',53:'tiles',54:'platform',
   62:'base',63:'pave',64:'base',65:'rubble',66:'base',67:'platform',
-  // Lava
   80:'base',94:'rubble',82:'rubble',81:'flat',85:'rocks',83:'cracks',84:'cracks',86:'rubble',87:'platform',88:'tiles',89:'platform',90:'platform',91:'platform',92:'rocks',93:'rocks',
-  // Space Station
   100:'platform',101:'rubble',102:'base',103:'cracks',104:'pave',105:'rocks',106:'tiles',107:'base',
-  // Metropolis
   120:'pave',121:'tiles',122:'tiles',123:'tiles',124:'tiles',125:'base',126:'rubble',127:'base',
   128:'pave',129:'pave',130:'tiles',131:'rocks',132:'rocks',133:'rocks',134:'rocks',135:'base',136:'tiles',
-  // Jungle
   170:'base',171:'base',172:'flat',173:'rocks',174:'pave',175:'rocks',176:'platform',177:'flat',
   178:'base',179:'flat',180:'tiles',181:'rocks',182:'cracks',183:'rubble',184:'base',185:'rocks',
   186:'pave',187:'base',188:'flat',189:'tiles',190:'flat',
 };
+
 function remapTerrain(tid,edgeKey){
   if(!edgeKey)return tid;
   const e=EDGE_BY_KEY[edgeKey];if(!e)return tid;
@@ -747,31 +805,12 @@ function remapTerrain(tid,edgeKey){
   return e.remap[cat]??e.remap.default??tid;
 }
 
-// ── State ─────────────────────────────────────────────────────────────────────
-let imgGray=null;
-let tileData=null;          // Int16Array[16384], values 0..14 (map.json levels)
-let origTileData=null;      // snapshot at load time for reset
-let srcTiles=null;
-let srcByIndex={};          // Index -> original tile object
-let srcEdgeGroups=null;     // original EdgeGroups array from loaded map.json (null if none)
-let scenarioData=null;
-let activeSource='image';
-let activeLandscape=0;
-let previewMode='height';  // 'terrain' | 'height'
-
-// Undo/redo stacks (each entry is an Int16Array snapshot)
+// ── State ──────────────────────────────────────────────────────────────────────
+let imgGray=null,tileData=null,origTileData=null,srcTiles=null,srcByIndex={},srcEdgeGroups=null,scenarioData=null;
+let activeSource='image',activeLandscape=0,previewMode='height';
 const UNDO_MAX=30;
-// Single flat history array with cursor. history[0]=oldest, history[n]=newest.
-// historyCursor points to the currently active state (what tileData matches).
-// Entries before cursor = undoable, entries after cursor = redoable.
-// Each entry: {data, label, genState, readOnly}
-let history=[];
-let historyCursor=-1;  // -1 = no history yet
+let history=[],historyCursor=-1;
 
-// Compatibility shims so existing call-sites keep working
-function undoStackLength(){ return historyCursor+1; }
-function redoStackLength(){ return history.length-1-historyCursor; }
-// Legacy aliases used in debug embed
 Object.defineProperty(window,'undoStack',{get:()=>history.slice(0,historyCursor+1)});
 Object.defineProperty(window,'redoStack',{get:()=>history.slice(historyCursor+1)});
 
@@ -808,27 +847,18 @@ wireTabs('tBar',updatePreview);
 wireTabs('eBar',updatePreview);
 
 // ── Edge select builder ────────────────────────────────────────────────────────
-// Landscape -> which DLC groups are "legal"
 const LS_EDGE_DLCS={
-  0:['Base'],
-  1:['Base','Chem'],
-  2:['Base'],
-  3:['Base','Lava'],
-  4:['Base','Lava'],
-  5:['Base','Lava'],
-  6:['Base','Metro'],
-  7:['Base','Metro'],
-  8:['Base','Jungle'],
+  0:['Base'],1:['Base','Chem'],2:['Base'],3:['Base','Lava'],4:['Base','Lava'],
+  5:['Base','Lava'],6:['Base','Metro'],7:['Base','Metro'],8:['Base','Jungle'],
 };
 
 function buildEdgeSelect(el){
   const locked=document.getElementById('lockEdgeLandscape').checked;
   const legalDlcs=locked?LS_EDGE_DLCS[activeLandscape]:null;
-  const showNoEditor=!locked; // noEditor visible only when restriction is off
+  const showNoEditor=!locked;
   const prev=el.value;
   el.innerHTML='';
   el.appendChild(new Option('- no change -',''));
-  // Group by DLC
   const dlcs=[...new Set(EDGES.map(e=>e.dlc))];
   dlcs.forEach(dlc=>{
     if(legalDlcs&&!legalDlcs.includes(dlc))return;
@@ -842,13 +872,8 @@ function buildEdgeSelect(el){
 }
 
 function rebuildEdgeSelects(){
-  ['edgeRemap','edgeRemapLow','edgeRemapHigh'].forEach(id=>{
-    const el=document.getElementById(id);if(el)buildEdgeSelect(el);
-  });
-  for(let mv=0;mv<=MAX_LEVEL;mv++){
-    const s=document.getElementById(`edgePL_${mv}`);if(s)buildEdgeSelect(s);
-  }
-  // Update warn box
+  ['edgeRemap','edgeRemapLow','edgeRemapHigh'].forEach(id=>{const el=document.getElementById(id);if(el)buildEdgeSelect(el);});
+  for(let mv=0;mv<=MAX_LEVEL;mv++){const s=document.getElementById(`edgePL_${mv}`);if(s)buildEdgeSelect(s);}
   const anySet=['edgeRemap','edgeRemapLow','edgeRemapHigh'].some(id=>document.getElementById(id)?.value);
   const w=document.getElementById('edgeWarn');if(w)w.style.display=anySet?'block':'none';
 }
@@ -861,8 +886,7 @@ function buildEdgePLGrid(){
     const b=document.createElement('div');b.className='lbadge';b.style.background=LV_COL[mv];
     b.style.color=mv>=12?'#1a1a1a':'#fff';b.textContent=ev;
     const s=document.createElement('select');s.id=`edgePL_${mv}`;s.style.fontSize='11px';
-    buildEdgeSelect(s);
-    s.addEventListener('change',updatePreview);
+    buildEdgeSelect(s);s.addEventListener('change',updatePreview);
     g.appendChild(b);g.appendChild(s);
   }
 }
@@ -872,8 +896,7 @@ buildEdgePLGrid();
 function buildSelect(el,withNone,lockId){
   const locked=document.getElementById(lockId||'lockLandscape').checked;
   const legal=locked?LS_GROUPS[activeLandscape]:null;
-  const prev=el.value;
-  el.innerHTML='';
+  const prev=el.value;el.innerHTML='';
   if(withNone)el.appendChild(new Option('- no change -',''));
   const groups=[...new Set(TERRAINS.map(t=>t.group))];
   groups.forEach(g=>{
@@ -894,13 +917,11 @@ function rebuildTerrainSelects(){
 }
 
 function updateTHint(){
-  // Show info about the currently selected edge family
   const edgeKey=document.getElementById('edgeRemap')?.value||'';
   const edgeDef=EDGE_BY_KEY[edgeKey];
   if(edgeDef){
-    // Show a colour swatch from the first terrain that uses this edge (for visual reference)
     const sampleTerrain=TERRAINS.find(t=>t.edge===edgeDef.name);
-    document.getElementById('tSwatch').style.background=sampleTerrain?`rgb(${sampleTerrain.color.join(',')})`:''
+    document.getElementById('tSwatch').style.background=sampleTerrain?sampleTerrain.hex:'';
     document.getElementById('tHint').textContent=`${edgeDef.name} · id ${edgeDef.id} · ${edgeDef.dlc}`;
   }else{
     document.getElementById('tSwatch').style.background='';
@@ -908,15 +929,13 @@ function updateTHint(){
   }
 }
 
-// ── Per-level grid ─────────────────────────────────────────────────────────────
 function buildPLGrid(){
   const g=document.getElementById('plGrid');
   while(g.children.length>2)g.removeChild(g.lastChild);
   for(let mv=0;mv<=MAX_LEVEL;mv++){
     const ev=toEditor(mv);
     const b=document.createElement('div');b.className='lbadge';b.style.background=LV_COL[mv];
-    b.style.color=mv>=12?'#1a1a1a':'#fff';
-    b.textContent=ev;
+    b.style.color=mv>=12?'#1a1a1a':'#fff';b.textContent=ev;
     const s=document.createElement('select');s.id=`plT_${mv}`;s.style.fontSize='11px';buildSelect(s,true,'lockLandscape');
     g.appendChild(b);g.appendChild(s);
   }
@@ -940,16 +959,10 @@ function setActiveLandscape(id,source){
   const badge=document.getElementById('lsBadge');
   badge.style.display='inline-block';badge.textContent=LS_NAMES[id];
   document.getElementById('lsBadgeNote').textContent={auto:'Auto-detected',scenario:'From scenario.json',manual:''}[source]||'';
-  rebuildTerrainSelects();
-  rebuildEdgeSelects();
-  // Only snap to a legal terrain if the user has explicitly picked one (not '- no change -').
-  // When loading a map.json the default should stay as '- no change -' so existing
-  // terrain values are preserved on export.
+  rebuildTerrainSelects();rebuildEdgeSelects();
   const curVal=document.getElementById('terrainSelect').value;
   if(curVal!==''){
-    const legal=LS_GROUPS[id];
-    const cur=parseInt(curVal);
-    const curT=T_BY_ID[cur];
+    const legal=LS_GROUPS[id],cur=parseInt(curVal),curT=T_BY_ID[cur];
     if(!curT||!legal.includes(curT.group)){
       const first=TERRAINS.find(t=>legal.includes(t.group));
       if(first)document.getElementById('terrainSelect').value=first.id;
@@ -966,32 +979,21 @@ document.getElementById('lockEdgeLandscape').addEventListener('change',updatePre
 function activeEdgeTab(){const a=document.querySelector('#eBar .tab.active');return a?a.dataset.tab:'ea-simple';}
 
 function edgeFamilyForMapLevel(mv){
-  const tab=activeEdgeTab();
-  const ev=toEditor(mv);
+  const tab=activeEdgeTab(),ev=toEditor(mv);
   if(tab==='ea-bylevel'){const s=document.getElementById(`edgePL_${mv}`);if(s&&s.value!=='')return s.value;}
   if(tab==='ea-overrides'){
-    const lo=document.getElementById('edgeRemapLow').value;
-    const hi=document.getElementById('edgeRemapHigh').value;
+    const lo=document.getElementById('edgeRemapLow').value,hi=document.getElementById('edgeRemapHigh').value;
     if(lo!==''&&ev<=2)return lo;
     if(hi!==''&&ev>=10)return hi;
   }
-  if(tab==='ea-simple'||tab==='ea-overrides'){
-    // fall back to global remap if set
-    const g=document.getElementById('edgeRemap').value;
-    return g||'';
-  }
+  if(tab==='ea-simple'||tab==='ea-overrides'){return document.getElementById('edgeRemap').value||'';}
   return '';
 }
 
-// Show/hide warn box when global remap changes
 ['edgeRemap','edgeRemapLow','edgeRemapHigh'].forEach(id=>{
   const el=document.getElementById(id);
   if(el)el.addEventListener('change',()=>{
-    const anySet=[
-      document.getElementById('edgeRemap').value,
-      document.getElementById('edgeRemapLow').value,
-      document.getElementById('edgeRemapHigh').value,
-    ].some(v=>v!=='');
+    const anySet=['edgeRemap','edgeRemapLow','edgeRemapHigh'].some(id=>document.getElementById(id)?.value!=='');
     document.getElementById('edgeWarn').style.display=anySet?'block':'none';
     updatePreview();
   });
@@ -1001,21 +1003,13 @@ function edgeFamilyForMapLevel(mv){
 function mkSlider(id,outId,cb,displayFn){
   const s=document.getElementById(id),o=outId?document.getElementById(outId):null;
   if(o)o.textContent=displayFn?displayFn(parseInt(s.value)):s.value;
-  s.addEventListener('input',()=>{
-    if(o)o.textContent=displayFn?displayFn(parseInt(s.value)):s.value;
-    cb&&cb();
-  });
+  s.addEventListener('input',()=>{if(o)o.textContent=displayFn?displayFn(parseInt(s.value)):s.value;cb&&cb();});
 }
 mkSlider('levels','levelsOut',()=>{if(activeSource==='image')recompute();});
 mkSlider('minLevel','minLevelOut',()=>{if(activeSource==='image')recompute();});
 mkSlider('maxLevel','maxLevelOut',()=>{if(activeSource==='image')recompute();});
-
-const shiftSlider=document.getElementById('shiftSlider');
-const shiftValEl=document.getElementById('shiftVal');
-shiftSlider.addEventListener('input',()=>{
-  const v=parseInt(shiftSlider.value);
-  shiftValEl.textContent=(v>0?'+':'')+v;
-});
+const shiftSlider=document.getElementById('shiftSlider'),shiftValEl=document.getElementById('shiftVal');
+shiftSlider.addEventListener('input',()=>{const v=parseInt(shiftSlider.value);shiftValEl.textContent=(v>0?'+':'')+v;});
 
 // ── Drop zones ─────────────────────────────────────────────────────────────────
 function makeDrop(zoneId,inputId,fn){
@@ -1038,13 +1032,7 @@ makeDrop('dzImg','fiImg',file=>{
     const px=tmp.getContext('2d').getImageData(0,0,W,H).data;
     imgGray=new Float32Array(W*H);
     for(let i=0;i<W*H;i++){
-      // Flip rows at read time: image row 0 (top) → game row H-1 (bottom).
-      // This way tileData[Index] is already in game coordinate order,
-      // and the preview renders without any additional transform -
-      // the map will match the image as drawn.
-      const imgRow=Math.floor(i/W), col=i%W;
-      const flippedRow=H-1-imgRow;
-      const pi=(flippedRow*W+col)*4;
+      const imgRow=Math.floor(i/W),col=i%W,flippedRow=H-1-imgRow,pi=(flippedRow*W+col)*4;
       imgGray[i]=(0.299*px[pi]+0.587*px[pi+1]+0.114*px[pi+2])/255;
     }
     URL.revokeObjectURL(url);
@@ -1066,32 +1054,21 @@ makeDrop('dzMap','fiMap',file=>{
     try{
       const data=JSON.parse(e.target.result);
       if(!Array.isArray(data.Tiles))throw new Error('No Tiles array');
-      srcTiles=data.Tiles;
-      srcEdgeGroups=Array.isArray(data.EdgeGroups)?data.EdgeGroups:null;
-      srcByIndex={};
+      srcTiles=data.Tiles;srcEdgeGroups=Array.isArray(data.EdgeGroups)?data.EdgeGroups:null;srcByIndex={};
       srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)srcByIndex[t.Index]=t;});
       tileData=new Int16Array(W*H);
       srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)tileData[t.Index]=Math.max(0,Math.min(MAX_LEVEL,t.Level));});
-      origTileData=tileData.slice();
-      history=[];historyCursor=-1;
-      // Restore history from embedded _STTCTT debug block if present
+      origTileData=tileData.slice();history=[];historyCursor=-1;
       if(data._STTCTT?.undoHistory?.length){
-        const hist=data._STTCTT.undoHistory;
-        // Show as display-only undo entries (no tileData snapshots - data not stored)
-        // They appear in the history list with a visual indicator that they are from a previous session
-        hist.forEach(label=>{
-          history.push({data:null, label:`[prev] ${label}`, genState:null, readOnly:true});
-        });
+        data._STTCTT.undoHistory.forEach(label=>history.push({data:null,label:`[prev] ${label}`,genState:null,readOnly:true}));
         historyCursor=history.length-1;
       }
       updateUndoButtons();
-      // file.name is always just the filename in browsers, never a path
       const fname=(file.name||'map.json').replace(/^.*[\\/]/,'');
       msg.textContent=`${fname} - ${data.Tiles.length.toLocaleString()} tiles`;msg.className='msg ok';
       document.getElementById('dzMap').classList.add('loaded');
       document.getElementById('srcBadge').textContent=`${data.Tiles.length.toLocaleString()} tiles`;
-      activeSource='map';
-      setActiveLandscape(detectLandscape(srcTiles),'auto');
+      activeSource='map';setActiveLandscape(detectLandscape(srcTiles),'auto');
       updatePreview();enableTools();resetCompass();
     }catch(err){msg.textContent='Error: '+err.message;msg.className='msg err';}
   };
@@ -1118,95 +1095,58 @@ makeDrop('dzScenario','fiScenario',file=>{
 
 // ── Image quantize ─────────────────────────────────────────────────────────────
 function quantize(gray,q,lo,hi){
-  // lo/hi are editor values; internally use map values
-  const loM=toMap(lo),hiM=toMap(hi);
-  const b=Math.min(q-1,Math.floor(gray*q));
+  const loM=toMap(lo),hiM=toMap(hi),b=Math.min(q-1,Math.floor(gray*q));
   return Math.round(loM+(b/Math.max(1,q-1))*(hiM-loM));
 }
-
 function recompute(){
   if(!imgGray)return;
   const q=parseInt(document.getElementById('levels').value);
-  const lo=parseInt(document.getElementById('minLevel').value);
-  const hi=parseInt(document.getElementById('maxLevel').value);
+  const lo=parseInt(document.getElementById('minLevel').value),hi=parseInt(document.getElementById('maxLevel').value);
   const lo2=Math.min(lo,hi),hi2=Math.max(lo,hi);
   tileData=new Int16Array(W*H);
   for(let i=0;i<W*H;i++)tileData[i]=quantize(imgGray[i],q,lo2,hi2);
-  origTileData=tileData.slice();
-  history=[];historyCursor=-1;updateUndoButtons();
-  updatePreview();
+  origTileData=tileData.slice();history=[];historyCursor=-1;updateUndoButtons();updatePreview();
 }
 
-// ── Heightmap Generator ────────────────────────────────────────────────────────
-// Seed hashing: FNV-1a 32-bit variant - produces consistent uint32 from any string
-function hashSeed(str){
-  let h=2166136261;
-  for(let i=0;i<str.length;i++){h=(h^str.charCodeAt(i))>>>0;h=(h*16777619)>>>0;}
-  return h;
-}
-
-// Sanitise seed input: printable ASCII only, max 64 chars
+// ── Noise generator ────────────────────────────────────────────────────────────
+function hashSeed(str){let h=2166136261;for(let i=0;i<str.length;i++){h=(h^str.charCodeAt(i))>>>0;h=(h*16777619)>>>0;}return h;}
 function sanitiseSeed(s){return s.replace(/[^\x20-\x7E]/g,'').slice(0,64)||'sttc-tt';}
 
-// ── Improved Perlin Noise (Ken Perlin 2002, patent expired 2021) ──────────────
 function buildPerlin(seed32){
-  const p=new Uint8Array(512);
-  // Build permutation from seed using LCG shuffle
-  const perm=Array.from({length:256},(_,i)=>i);
+  const p=new Uint8Array(512),perm=Array.from({length:256},(_,i)=>i);
   let s=seed32>>>0;
   for(let i=255;i>0;i--){s=(s*1664525+1013904223)>>>0;const j=s%(i+1);[perm[i],perm[j]]=[perm[j],perm[i]];}
   for(let i=0;i<512;i++)p[i]=perm[i&255];
-  const fade=t=>t*t*t*(t*(t*6-15)+10);
-  const lerp=(a,b,t)=>a+(b-a)*t;
-  const grad=(h,x,y)=>{const u=h&1?-x:x,v=h&2?-y:y;return u+v;};
-  return (x,y)=>{
-    const X=Math.floor(x)&255,Y=Math.floor(y)&255;
-    x-=Math.floor(x);y-=Math.floor(y);
-    const u=fade(x),v=fade(y);
-    const a=p[X]+Y,b=p[X+1]+Y;
-    return lerp(lerp(grad(p[a],x,y),grad(p[b],x-1,y),u),
-                lerp(grad(p[a+1],x,y-1),grad(p[b+1],x-1,y-1),u),v);
+  const fade=t=>t*t*t*(t*(t*6-15)+10),lerp=(a,b,t)=>a+(b-a)*t,grad=(h,x,y)=>{const u=h&1?-x:x,v=h&2?-y:y;return u+v;};
+  return(x,y)=>{
+    const X=Math.floor(x)&255,Y=Math.floor(y)&255;x-=Math.floor(x);y-=Math.floor(y);
+    const u=fade(x),v=fade(y),a=p[X]+Y,b=p[X+1]+Y;
+    return lerp(lerp(grad(p[a],x,y),grad(p[b],x-1,y),u),lerp(grad(p[a+1],x,y-1),grad(p[b+1],x-1,y-1),u),v);
   };
 }
 
-// ── OpenSimplex2 2D (Kurt Spencer, public domain) ────────────────────────────
-// Compact faithful implementation of the 2D case using triangular grid skewing
 function buildSimplex(seed32){
-  const p=new Uint8Array(512);
-  const perm=Array.from({length:256},(_,i)=>i);
+  const p=new Uint8Array(512),perm=Array.from({length:256},(_,i)=>i);
   let s=seed32>>>0;
   for(let i=255;i>0;i--){s=(s*1664525+1013904223)>>>0;const j=s%(i+1);[perm[i],perm[j]]=[perm[j],perm[i]];}
   for(let i=0;i<512;i++)p[i]=perm[i&255];
-  const GRAD=[[ 1, 2],[-1, 2],[ 1,-2],[-1,-2],[2, 1],[-2, 1],[2,-1],[-2,-1]];
-  const F2=0.5*(Math.sqrt(3)-1), G2=(3-Math.sqrt(3))/6;
-  return (x,y)=>{
-    const s2=(x+y)*F2;
-    const i=Math.floor(x+s2),j=Math.floor(y+s2);
-    const t=(i+j)*G2;
-    const x0=x-(i-t),y0=y-(j-t);
-    const [i1,j1]=x0>y0?[1,0]:[0,1];
-    const x1=x0-i1+G2,y1=y0-j1+G2;
-    const x2=x0-1+2*G2,y2=y0-1+2*G2;
-    let n=0;
+  const GRAD=[[1,2],[-1,2],[1,-2],[-1,-2],[2,1],[-2,1],[2,-1],[-2,-1]];
+  const F2=0.5*(Math.sqrt(3)-1),G2=(3-Math.sqrt(3))/6;
+  return(x,y)=>{
+    const s2=(x+y)*F2,i=Math.floor(x+s2),j=Math.floor(y+s2),t=(i+j)*G2;
+    const x0=x-(i-t),y0=y-(j-t),[i1,j1]=x0>y0?[1,0]:[0,1];
+    const x1=x0-i1+G2,y1=y0-j1+G2,x2=x0-1+2*G2,y2=y0-1+2*G2;
     const contrib=(cx,cy,gi)=>{const t2=0.5-cx*cx-cy*cy;if(t2<0)return 0;const g=GRAD[gi&7];return t2*t2*t2*t2*(g[0]*cx+g[1]*cy);};
-    n+=contrib(x0,y0,p[(i+p[j&255])&255]);
-    n+=contrib(x1,y1,p[(i+i1+p[(j+j1)&255])&255]);
-    n+=contrib(x2,y2,p[(i+1+p[(j+1)&255])&255]);
-    return Math.max(-1,Math.min(1,n*70));
+    return Math.max(-1,Math.min(1,(contrib(x0,y0,p[(i+p[j&255])&255])+contrib(x1,y1,p[(i+i1+p[(j+j1)&255])&255])+contrib(x2,y2,p[(i+1+p[(j+1)&255])&255]))*70));
   };
 }
 
-// ── Fractal Brownian Motion ───────────────────────────────────────────────────
-function fbm(noiseFn, x, y, octaves, persistence, lacunarity){
-  let val=0, amp=1, freq=1, maxAmp=0;
-  for(let o=0;o<octaves;o++){
-    val+=noiseFn(x*freq, y*freq)*amp;
-    maxAmp+=amp; amp*=persistence; freq*=lacunarity;
-  }
-  return val/maxAmp; // normalised to ~[-1,1]
+function fbm(noiseFn,x,y,octaves,persistence,lacunarity){
+  let val=0,amp=1,freq=1,maxAmp=0;
+  for(let o=0;o<octaves;o++){val+=noiseFn(x*freq,y*freq)*amp;maxAmp+=amp;amp*=persistence;freq*=lacunarity;}
+  return val/maxAmp;
 }
 
-// Core noise generation - shared by preview and undo-committing paths
 function runNoiseGen(){
   const rawSeed=sanitiseSeed(document.getElementById('genSeed').value);
   document.getElementById('genSeed').value=rawSeed;
@@ -1220,201 +1160,124 @@ function runNoiseGen(){
   const power=Math.max(0.1,(parseInt(document.getElementById('genPower').value)||100)/100);
   const gamma=Math.max(0.1,(parseInt(document.getElementById('genGamma').value)||100)/100);
   const bias=(parseInt(document.getElementById('genBias').value)||0)/100;
-
   const noiseFn=type==='simplex'?buildSimplex(seed32):buildPerlin(seed32);
   const raw=new Float32Array(W*H);
-  for(let row=0;row<H;row++)
-    for(let col=0;col<W;col++)
-      raw[row*W+col]=fbm(noiseFn,col/scale,row/scale,octaves,persistence,lacunarity);
-
+  for(let row=0;row<H;row++)for(let col=0;col<W;col++)raw[row*W+col]=fbm(noiseFn,col/scale,row/scale,octaves,persistence,lacunarity);
   let mn=raw[0],mx=raw[0];
   for(let i=1;i<W*H;i++){if(raw[i]<mn)mn=raw[i];if(raw[i]>mx)mx=raw[i];}
-  const range=mx-mn||1;
-  const result=new Int16Array(W*H);
+  const range=mx-mn||1,result=new Int16Array(W*H);
   for(let i=0;i<W*H;i++){
-    let v=(raw[i]-mn)/range;          // normalise to [0,1]
-    v=Math.max(0,Math.min(1,v+bias)); // bias: shift field, clamp
-    v=Math.pow(v,gamma);              // gamma: curve the distribution
-    v=Math.pow(v,power);              // power: redistribute slopes
-    result[i]=v<waterPct/100 ? 0 : Math.max(1,Math.min(14,Math.round(1+(v-waterPct/100)/(1-waterPct/100)*13)));
+    let v=(raw[i]-mn)/range;v=Math.max(0,Math.min(1,v+bias));v=Math.pow(v,gamma);v=Math.pow(v,power);
+    result[i]=v<waterPct/100?0:Math.max(1,Math.min(14,Math.round(1+(v-waterPct/100)/(1-waterPct/100)*13)));
   }
-  // Flip rows to match game coordinate order
   const flipped=new Int16Array(W*H);
-  for(let row=0;row<H;row++)
-    for(let col=0;col<W;col++)
-      flipped[row*W+col]=result[(H-1-row)*W+col];
-  return {data:flipped, seed:rawSeed, type};
+  for(let row=0;row<H;row++)for(let col=0;col<W;col++)flipped[row*W+col]=result[(H-1-row)*W+col];
+  return{data:flipped,seed:rawSeed,type};
 }
 
-// Preview only - no undo push (called while dragging)
-function recomputeGenPreview(){
-  if(!tileData)return;
-  const {data}=runNoiseGen();
-  tileData=data;
-  updatePreview();
-}
-
-// Full regenerate - pushes undo when commitUndo=true, resets origTileData on first load
+function recomputeGenPreview(){if(!tileData)return;const{data}=runNoiseGen();tileData=data;updatePreview();}
 function recomputeGen(commitUndo=false){
   const firstLoad=!tileData||activeSource!=='gen';
-  if(commitUndo&&!firstLoad) pushUndo('generate');
-  const {data,seed,type}=runNoiseGen();
-  tileData=data;
+  if(commitUndo&&!firstLoad)pushUndo('generate');
+  const{data,seed,type}=runNoiseGen();tileData=data;
   if(firstLoad){
-    origTileData=tileData.slice();
-    history=[];historyCursor=-1;
-    // Push the initial generated state so the very first action is undoable
+    origTileData=tileData.slice();history=[];historyCursor=-1;
     history.push({data:tileData.slice(),label:'initial generate',genState:captureGenState()});
-    historyCursor=0;
-    updateUndoButtons();
+    historyCursor=0;updateUndoButtons();
   }
   document.getElementById('srcBadge').textContent='Generated';
   document.getElementById('msgGen').textContent=`Seed: ${seed} · ${type}`;
   document.getElementById('msgGen').className='msg ok';
-  activeSource='gen';
-  updatePreview();enableTools();resetCompass();
+  activeSource='gen';updatePreview();enableTools();resetCompass();
 }
 
-// ── Generator controls wiring ─────────────────────────────────────────────────
-// Undo strategy:
-//   pointerdown -> snapshot tileData+genState BEFORE the drag starts
-//   input       -> live preview, no undo push
-//   pointerup   -> push the pre-drag snapshot as undo entry, then commit new state
-// Maps slider id -> {name, displayFn} for human-readable history labels
+// ── Generator slider wiring ────────────────────────────────────────────────────
 const GEN_SLIDER_META={
-  genScale:   {name:'Scale',      fmt:v=>v},
-  genWater:   {name:'Water',      fmt:v=>v+'%'},
-  genOctaves: {name:'Octaves',    fmt:v=>v},
-  genPersist: {name:'Persist',    fmt:v=>(v/100).toFixed(2)},
-  genLacun:   {name:'Lacunarity', fmt:v=>(v/100).toFixed(1)},
-  genPower:   {name:'Power',      fmt:v=>(v/100).toFixed(1)},
-  genGamma:   {name:'Gamma',      fmt:v=>(v/100).toFixed(1)},
-  genBias:    {name:'Bias',       fmt:v=>(v/100).toFixed(2)},
+  genScale:{name:'Scale',fmt:v=>v},genWater:{name:'Water',fmt:v=>v+'%'},genOctaves:{name:'Octaves',fmt:v=>v},
+  genPersist:{name:'Persist',fmt:v=>(v/100).toFixed(2)},genLacun:{name:'Lacunarity',fmt:v=>(v/100).toFixed(1)},
+  genPower:{name:'Power',fmt:v=>(v/100).toFixed(1)},genGamma:{name:'Gamma',fmt:v=>(v/100).toFixed(1)},
+  genBias:{name:'Bias',fmt:v=>(v/100).toFixed(2)},
 };
-
-// Build a label comparing pre-drag genState to current slider value for one slider
 function genDragLabel(sliderId,preState){
-  const meta=GEN_SLIDER_META[sliderId];
-  if(!meta||!preState)return'Generate';
-  const stateKey={genScale:'scale',genWater:'water',genOctaves:'octaves',
-                  genPersist:'persist',genLacun:'lacun',genPower:'power',
-                  genGamma:'gamma',genBias:'bias'}[sliderId];
+  const meta=GEN_SLIDER_META[sliderId];if(!meta||!preState)return'Generate';
+  const stateKey={genScale:'scale',genWater:'water',genOctaves:'octaves',genPersist:'persist',genLacun:'lacun',genPower:'power',genGamma:'gamma',genBias:'bias'}[sliderId];
   const before=meta.fmt(preState[stateKey]??document.getElementById(sliderId).value);
   const after=meta.fmt(document.getElementById(sliderId).value);
   return before===after?`Generate - ${meta.name}`:`Generate - ${meta.name} (${before} -> ${after})`;
 }
 
-let genPreDragSnapshot=null;
-let genPreDragSliderId=null; // which slider started the drag
-
+let genPreDragSnapshot=null,genPreDragSliderId=null;
 function mkGenSlider(id,outId,displayFn){
   const s=document.getElementById(id),o=document.getElementById(outId);
   if(!s||!o)return;
   o.textContent=displayFn(s.value);
-  s.addEventListener('pointerdown',()=>{
-    if(activeSource==='gen'){
-      genPreDragSnapshot={data:tileData.slice(),genState:captureGenState()};
-      genPreDragSliderId=id;
-    }
-  });
-  s.addEventListener('input',()=>{
-    o.textContent=displayFn(s.value);
-    if(activeSource==='gen') recomputeGenPreview();
-  });
+  s.addEventListener('pointerdown',()=>{if(activeSource==='gen'){genPreDragSnapshot={data:tileData.slice(),genState:captureGenState()};genPreDragSliderId=id;}});
+  s.addEventListener('input',()=>{o.textContent=displayFn(s.value);if(activeSource==='gen')recomputeGenPreview();});
   s.addEventListener('pointerup',()=>{
     if(activeSource==='gen'&&genPreDragSnapshot){
       const label=genDragLabel(genPreDragSliderId,genPreDragSnapshot.genState);
-      // Truncate redo, push pre-drag snapshot, advance cursor
       history.splice(historyCursor+1);
       history.push({data:genPreDragSnapshot.data,label,genState:genPreDragSnapshot.genState});
       if(history.length>UNDO_MAX+1)history.shift();
-      historyCursor=history.length-1;
-      updateUndoButtons();
-      genPreDragSnapshot=null;
-      genPreDragSliderId=null;
-      recomputeGen(false);
+      historyCursor=history.length-1;updateUndoButtons();genPreDragSnapshot=null;genPreDragSliderId=null;recomputeGen(false);
     }
   });
 }
-mkGenSlider('genScale',  'genScaleOut',  v=>v);
-mkGenSlider('genWater',  'genWaterOut',  v=>v+'%');
+mkGenSlider('genScale','genScaleOut',v=>v);
+mkGenSlider('genWater','genWaterOut',v=>v+'%');
 mkGenSlider('genOctaves','genOctavesOut',v=>v);
 mkGenSlider('genPersist','genPersistOut',v=>(v/100).toFixed(2));
-mkGenSlider('genLacun',  'genLacunOut',  v=>(v/100).toFixed(1));
-mkGenSlider('genPower',  'genPowerOut',  v=>(v/100).toFixed(1));
-mkGenSlider('genGamma',  'genGammaOut',  v=>(v/100).toFixed(1));
-mkGenSlider('genBias',   'genBiasOut',   v=>(v/100).toFixed(2));
+mkGenSlider('genLacun','genLacunOut',v=>(v/100).toFixed(1));
+mkGenSlider('genPower','genPowerOut',v=>(v/100).toFixed(1));
+mkGenSlider('genGamma','genGammaOut',v=>(v/100).toFixed(1));
+mkGenSlider('genBias','genBiasOut',v=>(v/100).toFixed(2));
 
-// Reset buttons: push undo of current state FIRST, then update slider and regenerate
 document.querySelectorAll('.gen-reset').forEach(btn=>{
   btn.addEventListener('click',()=>{
-    const sl=document.getElementById(btn.dataset.id);
-    const out=document.getElementById(btn.dataset.id+'Out');
+    const sl=document.getElementById(btn.dataset.id),out=document.getElementById(btn.dataset.id+'Out');
     if(!sl)return;
     if(activeSource==='gen'){
       const meta=GEN_SLIDER_META[btn.dataset.id];
-      const before=meta?meta.fmt(sl.value):sl.value;
-      const after=meta?meta.fmt(btn.dataset.def):btn.dataset.def;
-      pushUndo(`Reset ${meta?meta.name:btn.dataset.id} (${before} -> ${after})`);
+      pushUndo(`Reset ${meta?meta.name:btn.dataset.id} (${meta?meta.fmt(sl.value):sl.value} -> ${meta?meta.fmt(btn.dataset.def):btn.dataset.def})`);
     }
-    sl.value=btn.dataset.def;
-    if(out) sl.dispatchEvent(new Event('input'));
-    if(activeSource==='gen') recomputeGen(false);
+    sl.value=btn.dataset.def;if(out)sl.dispatchEvent(new Event('input'));
+    if(activeSource==='gen')recomputeGen(false);
   });
 });
-
-document.querySelectorAll('input[name="noiseType"]').forEach(r=>
-  r.addEventListener('change',()=>{
-    if(activeSource==='gen') recomputeGen(true); // pushUndo('generate') inside
-  }));
-
+document.querySelectorAll('input[name="noiseType"]').forEach(r=>r.addEventListener('change',()=>{if(activeSource==='gen')recomputeGen(true);}));
 document.getElementById('genSeed').addEventListener('change',()=>{
-  const prev=document.getElementById('genSeed').value;
-  document.getElementById('genSeed').value=sanitiseSeed(prev);
-  if(activeSource==='gen') recomputeGen(true);
+  document.getElementById('genSeed').value=sanitiseSeed(document.getElementById('genSeed').value);
+  if(activeSource==='gen')recomputeGen(true);
 });
-
 document.getElementById('btnRandSeed').addEventListener('click',()=>{
   const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const seed=Array.from({length:12},()=>chars[Math.floor(Math.random()*chars.length)]).join('');
   const prev=document.getElementById('genSeed').value;
   document.getElementById('genSeed').value=seed;
   if(activeSource==='gen'){
-    // Build descriptive label before committing
     history.splice(historyCursor+1);
     history.push({data:tileData.slice(),label:`Generate - Seed (${prev} -> ${seed})`,genState:captureGenState()});
     if(history.length>UNDO_MAX+1)history.shift();
-    historyCursor=history.length-1;
-    updateUndoButtons();
-    recomputeGen(false);
+    historyCursor=history.length-1;updateUndoButtons();recomputeGen(false);
   }
 });
-
 document.getElementById('genAdvToggle').addEventListener('click',()=>{
-  const body=document.getElementById('genAdvBody');
-  const chev=document.getElementById('genAdvChev');
-  const open=body.style.display==='none';
-  body.style.display=open?'block':'none';
-  chev.textContent=open?'▼':'▶';
+  const body=document.getElementById('genAdvBody'),chev=document.getElementById('genAdvChev'),open=body.style.display==='none';
+  body.style.display=open?'block':'none';chev.textContent=open?'▼':'▶';
 });
-function activeTerrainTab(){const a=document.querySelector('#tBar .tab.active');return a?a.dataset.tab:'ta-simple';}
 
+function activeTerrainTab(){const a=document.querySelector('#tBar .tab.active');return a?a.dataset.tab:'ta-simple';}
 function terrainForMapLevel(mv){
-  const tab=activeTerrainTab();
-  const ev=toEditor(mv);
+  const tab=activeTerrainTab(),ev=toEditor(mv);
   if(tab==='ta-bylevel'){const s=document.getElementById(`plT_${mv}`);if(s&&s.value!=='')return parseInt(s.value);}
   if(tab==='ta-overrides'){
-    const lt=document.getElementById('lowTerrain').value;
-    const ht=document.getElementById('highTerrain').value;
-    if(lt!==''&&ev<=2)return parseInt(lt);
-    if(ht!==''&&ev>=10)return parseInt(ht);
+    const lt=document.getElementById('lowTerrain').value,ht=document.getElementById('highTerrain').value;
+    if(lt!==''&&ev<=2)return parseInt(lt);if(ht!==''&&ev>=10)return parseInt(ht);
   }
-  const v=document.getElementById('terrainSelect').value;
-  // '' means no change - caller should use preserved original; return null as sentinel
-  return v===''?null:parseInt(v);
+  const v=document.getElementById('terrainSelect').value;return v===''?null:parseInt(v);
 }
 
-// ── Preview mode toggle (cycles: height → terrain → nav → heatmap → height) ───
+// ── Preview mode ───────────────────────────────────────────────────────────────
 const PREVIEW_MODES=['height','terrain','nav','heatmap'];
 const PREVIEW_BTN_LABELS={height:'Terrain',terrain:'Navigability',nav:'Heatmap',heatmap:'Height'};
 document.getElementById('btnTogglePreviewMode').addEventListener('click',()=>{
@@ -1424,285 +1287,119 @@ document.getElementById('btnTogglePreviewMode').addEventListener('click',()=>{
   document.getElementById('heatScaleWrap').style.display=next==='heatmap'?'block':'none';
   updatePreview();
 });
-
-// Heatmap scale slider
-(function(){
-  const sl=document.getElementById('heatScaleSlider');
-  const out=document.getElementById('heatScaleOut');
+(()=>{
+  const sl=document.getElementById('heatScaleSlider'),out=document.getElementById('heatScaleOut');
   if(!sl||!out)return;
-  sl.addEventListener('input',()=>{
-    out.textContent=sl.value;
-    if(previewMode==='heatmap') updatePreview();
-  });
+  sl.addEventListener('input',()=>{out.textContent=sl.value;if(previewMode==='heatmap')updatePreview();});
 })();
 
-// ── Preview ────────────────────────────────────────────────────────────────────
-
-// Returns true if a tile (by map-value level) is non-navigable on its own.
-// A tile is blocked if it is water (editor -1) OR is a cliff base (has a
-// higher orthogonal neighbour). Used by both nav preview and heatmap.
+// ── Nav / heatmap ──────────────────────────────────────────────────────────────
 function _navBlocked(i,mv){
-  if(mv===0)return true;
-  if(srcByIndex[i]?.Type===1)return false;
+  if(mv===0)return true;if(srcByIndex[i]?.Type===1)return false;
   const row=Math.floor(i/W),col=i%W;
-  const n0=row>0   ?tileData[i-W]:mv;
-  const n1=row<H-1 ?tileData[i+W]:mv;
-  const n2=col>0   ?tileData[i-1]:mv;
-  const n3=col<W-1 ?tileData[i+1]:mv;
+  const n0=row>0?tileData[i-W]:mv,n1=row<H-1?tileData[i+W]:mv,n2=col>0?tileData[i-1]:mv,n3=col<W-1?tileData[i+1]:mv;
   return n0>mv||n1>mv||n2>mv||n3>mv;
 }
-
-// ── Heatmap model ──────────────────────────────────────────────────────────────
-// Heat = tactical disadvantage of a unit ON that tile.
-// High ground / looking down = position of power = low heat.
-// Low ground / looking up at barrier = vulnerability = high heat.
-//
-// SEEDING: HARD tiles seed at 0 (max danger). SLOPE_UP seeds at SLOPE_SEED
-// (moderate danger — units below experience tension approaching from below).
-// SLOPE_UP seeds at SLOPE_SEED if it borders lower ground (units below experience tension).
-// SLOPE_DOWN and OPEN do not seed.
-//
-// STEP COSTS — level-based direction of travel:
-//   Stepping UP   (dst_lv > src_lv): UP_STEP   = 4 (2.0 unscaled) — vulnerable
-//   Stepping FLAT (dst_lv = src_lv): OPEN_STEP  = 2 (1.0 unscaled) — standard
-//   Stepping DOWN (dst_lv < src_lv): DOWN_STEP  = 1 (0.5 unscaled) — power position
-//   Into HARD: always 0
-//
-// This means slope seeds propagate cheaply to lower tiles (DOWN_STEP=1),
-// giving lower-side-of-slope tiles dist~4 (red-orange), while the expensive
-// UP_STEP means the high interior above the slope fades quickly to green/blue.
-
-const SLOPE_SEED     = 5; // slope-up own score (score 2.5 → yellow); only seeds if has lower neighbour
-const DOWN_STEP      = 1; // stepping down — cheap, power position (0.5 unscaled)
-const OPEN_STEP      = 2; // flat step — standard (1.0 unscaled)
-const UP_STEP        = 22; // stepping up — very expensive (11.0 unscaled); heat barely reaches high ground
-const BW_DIAL = Math.max(SLOPE_SEED, UP_STEP) + 1; // = 13
-
+const SLOPE_SEED=5,DOWN_STEP=1,OPEN_STEP=2,UP_STEP=22,BW_DIAL=Math.max(5,22)+1;
 function computeNavRadius(){
-  const n=W*H;
-  const HARD=1, CLIFF_TOP=2, SLOPE_UP=3, SLOPE_DOWN=4, OPEN=0;
-  const kind=new Uint8Array(n);
-
+  const n=W*H,HARD=1,CLIFF_TOP=2,SLOPE_UP=3,SLOPE_DOWN=4,kind=new Uint8Array(n);
   for(let i=0;i<n;i++){
-    const mv=Math.max(0,Math.min(MAX_LEVEL,tileData[i]));
-    const row=Math.floor(i/W), col=i%W;
-    if(_navBlocked(i,mv)){
-      kind[i]=HARD;
-    } else if(srcByIndex[i]?.Type===1){
-      const n0=row>0   ?tileData[i-W]:mv;
-      const n1=row<H-1 ?tileData[i+W]:mv;
-      const n2=col>0   ?tileData[i-1]:mv;
-      const n3=col<W-1 ?tileData[i+1]:mv;
-      kind[i]=(n0>mv||n1>mv||n2>mv||n3>mv) ? SLOPE_UP : SLOPE_DOWN;
-    } else {
-      const n0=row>0   ?tileData[i-W]:mv;
-      const n1=row<H-1 ?tileData[i+W]:mv;
-      const n2=col>0   ?tileData[i-1]:mv;
-      const n3=col<W-1 ?tileData[i+1]:mv;
-      const hasLower=(n0>=0&&n0<mv)||(n1>=0&&n1<mv)||(n2>=0&&n2<mv)||(n3>=0&&n3<mv);
-      kind[i]=hasLower ? CLIFF_TOP : OPEN;
+    const mv=Math.max(0,Math.min(MAX_LEVEL,tileData[i])),row=Math.floor(i/W),col=i%W;
+    if(_navBlocked(i,mv)){kind[i]=HARD;}
+    else if(srcByIndex[i]?.Type===1){
+      const n0=row>0?tileData[i-W]:mv,n1=row<H-1?tileData[i+W]:mv,n2=col>0?tileData[i-1]:mv,n3=col<W-1?tileData[i+1]:mv;
+      kind[i]=(n0>mv||n1>mv||n2>mv||n3>mv)?SLOPE_UP:SLOPE_DOWN;
+    }else{
+      const n0=row>0?tileData[i-W]:mv,n1=row<H-1?tileData[i+W]:mv,n2=col>0?tileData[i-1]:mv,n3=col<W-1?tileData[i+1]:mv;
+      kind[i]=((n0>=0&&n0<mv)||(n1>=0&&n1<mv)||(n2>=0&&n2<mv)||(n3>=0&&n3<mv))?CLIFF_TOP:0;
     }
   }
-
-  const INF=0x7fff;
-  const dist=new Int16Array(n).fill(INF);
-  const buckets=Array.from({length:BW_DIAL},()=>[]);
+  const INF=0x7fff,dist=new Int16Array(n).fill(INF),buckets=Array.from({length:BW_DIAL},()=>[]);
   let minCost=0;
-  function push(d,i){ buckets[d%BW_DIAL].push(i); }
-
-  // Seed sources
-  for(let i=0;i<n;i++){
-    if(kind[i]===HARD){
-      dist[i]=0; push(0,i);
-    } else if(kind[i]===SLOPE_UP){
-      // Always seed: even slopes sitting on same-level ground restrict LOS —
-      // units can't see over a bump, and units in a pit can't see out.
-      // The seed value is mild (SLOPE_SEED=5, score 2.5 → yellow) so lateral
-      // spread onto same-level ground stays in the gentle amber/yellow range.
-      dist[i]=SLOPE_SEED; push(SLOPE_SEED%BW_DIAL,i);
-    }
-    // CLIFF_TOP, SLOPE_DOWN, OPEN: not seeded — high ground is power position
-  }
-
-  const DR=[-1,1,0,0], DC=[0,0,-1,1];
-  let remaining=n;
-
-  outer: while(remaining>0){
-    while(buckets[minCost%BW_DIAL].length===0){
-      minCost++;
-      if(minCost>=INF) break outer;
-    }
+  const push=(d,i)=>buckets[d%BW_DIAL].push(i);
+  for(let i=0;i<n;i++){if(kind[i]===HARD){dist[i]=0;push(0,i);}else if(kind[i]===SLOPE_UP){dist[i]=SLOPE_SEED;push(SLOPE_SEED%BW_DIAL,i);}}
+  const DR=[-1,1,0,0],DC=[0,0,-1,1];let remaining=n;
+  outer:while(remaining>0){
+    while(buckets[minCost%BW_DIAL].length===0){minCost++;if(minCost>=INF)break outer;}
     const batch=buckets[minCost%BW_DIAL].splice(0);
     for(const i of batch){
-      if(dist[i]!==minCost) continue;
-      remaining--;
-      const r=Math.floor(i/W), c=i%W;
-      const srcLv=tileData[i];
+      if(dist[i]!==minCost)continue;remaining--;
+      const r=Math.floor(i/W),c=i%W,srcLv=tileData[i];
       for(let k=0;k<4;k++){
-        const nr=r+DR[k], nc=c+DC[k];
-        if(nr<0||nr>=H||nc<0||nc>=W) continue;
-        const ni=nr*W+nc;
-        let step;
-        if(kind[ni]===HARD){
-          step=0;
-        } else {
-          const dstLv=tileData[ni];
-          if(dstLv>srcLv)      step=UP_STEP;
-          else if(dstLv<srcLv) step=DOWN_STEP;
-          else                 step=OPEN_STEP;
-        }
-        const nd=minCost+step;
-        if(nd<dist[ni]){ dist[ni]=nd; push(nd%BW_DIAL,ni); }
+        const nr=r+DR[k],nc=c+DC[k];if(nr<0||nr>=H||nc<0||nc>=W)continue;
+        const ni=nr*W+nc,dstLv=tileData[ni];
+        const step=kind[ni]===HARD?0:dstLv>srcLv?UP_STEP:dstLv<srcLv?DOWN_STEP:OPEN_STEP;
+        const nd=minCost+step;if(nd<dist[ni]){dist[ni]=nd;push(nd%BW_DIAL,ni);}
       }
     }
     minCost++;
   }
-
-  // Convert scaled dist to unscaled float radius
   const radius=new Float32Array(n);
-  for(let i=0;i<n;i++){
-    radius[i]=kind[i]===HARD?0:dist[i]/OPEN_STEP;
-  }
+  for(let i=0;i<n;i++)radius[i]=kind[i]===HARD?0:dist[i]/OPEN_STEP;
   return radius;
 }
-
-// Heatmap colour. Slopes render purple. Everything else: red→amber→green→blue.
-function heatmapColour(r, isSlope){
-  if(r===0)    return [25,25,30];
-  if(isSlope)  return [180,80,180];
+function heatmapColour(r,isSlope){
+  if(r===0)return hexToRgb(HEAT_HARD_HEX);
+  if(isSlope)return hexToRgb(HEAT_SLOPE_HEX);
   const maxR=parseInt(document.getElementById('heatScaleSlider')?.value??'14');
-  const t=Math.min(r-1,maxR-1)/(maxR-1);
-  const stops=[
-    [220, 40, 20],
-    [220,130,  0],
-    [180,210,  0],
-    [ 50,190, 70],
-    [ 20,130,220],
-  ];
-  const si=stops.length-1;
-  const pos=t*si;
-  const lo=Math.floor(pos), hi=Math.min(si,lo+1);
-  const f=pos-lo;
-  const s0=stops[lo], s1=stops[hi];
-  return[
-    Math.round(s0[0]+(s1[0]-s0[0])*f),
-    Math.round(s0[1]+(s1[1]-s0[1])*f),
-    Math.round(s0[2]+(s1[2]-s0[2])*f),
-  ];
+  const t=Math.min(r-1,maxR-1)/(maxR-1),stops=HEAT_STOPS_HEX.map(hexToRgb),si=stops.length-1;
+  const pos=t*si,lo=Math.floor(pos),hi=Math.min(si,lo+1),f=pos-lo,s0=stops[lo],s1=stops[hi];
+  return[Math.round(s0[0]+(s1[0]-s0[0])*f),Math.round(s0[1]+(s1[1]-s0[1])*f),Math.round(s0[2]+(s1[2]-s0[2])*f)];
 }
+let _heatCache=null,_heatCacheStamp=null;
+function invalidateHeatCache(){_heatCache=null;_heatCacheStamp=null;}
 
-// Cache for heatmap — recomputed when tileData changes
-let _heatCache=null;
-let _heatCacheStamp=null;
-
-function getHeatmap(){
-  // Use tileData reference as a stamp — recompute if tileData has been replaced
-  if(_heatCache===null||_heatCacheStamp!==tileData){
-    _heatCache=computeNavRadius();
-    _heatCacheStamp=tileData;
-  }
-  return _heatCache;
-}
-
-// Invalidate heatmap cache whenever tileData is replaced (after edits/undo/reset)
-// We patch updatePreview to call this, and also invalidate on any tool action.
-function invalidateHeatCache(){ _heatCache=null; _heatCacheStamp=null; }
-
+// ── Preview render ─────────────────────────────────────────────────────────────
 function updatePreview(){
   if(!tileData)return;
-  invalidateHeatCache(); // always recompute on next heatmap access after any change
-  const canvas=document.getElementById('cvPreview');
-  const ctx=canvas.getContext('2d');
-  const imgData=ctx.createImageData(W,H);
+  invalidateHeatCache();
+  const canvas=document.getElementById('cvPreview'),ctx=canvas.getContext('2d'),imgData=ctx.createImageData(W,H);
   const dist=new Array(MAX_LEVEL+1).fill(0);
-
-  const showTerrainColours=previewMode==='terrain';
-  const showNav=previewMode==='nav';
-  const showHeat=previewMode==='heatmap';
-
-  // Pre-compute heatmap once per updatePreview call if needed
+  const showTerrain=previewMode==='terrain',showNav=previewMode==='nav',showHeat=previewMode==='heatmap';
   const heat=showHeat?computeNavRadius():null;
-
-  // Nav colours
-  const NAV_WATER =[180, 30, 30];
-  const NAV_CLIFF =[200, 60, 10];
-  const NAV_SLOPE =[ 80,160,220];  // blue — slope (Type=1), navigable but distinct
-  const NAV_HIGH  =[200,150, 30];
-  const NAV_NARROW=[ 80,130,  0];
-  const NAV_OK    =[ 40,160, 70];
+  const NAV_WATER=hexToRgb(NAV_HEX.water),NAV_CLIFF=hexToRgb(NAV_HEX.cliff),NAV_SLOPE=hexToRgb(NAV_HEX.slope);
+  const NAV_HIGH=hexToRgb(NAV_HEX.high),NAV_NARROW=hexToRgb(NAV_HEX.narrow),NAV_OK=hexToRgb(NAV_HEX.ok);
 
   for(let i=0;i<W*H;i++){
-    const mv=Math.max(0,Math.min(MAX_LEVEL,tileData[i]));
-    dist[mv]++;
+    const mv=Math.max(0,Math.min(MAX_LEVEL,tileData[i]));dist[mv]++;
     let r,g,b;
-
     if(showHeat){
-      const _isSlope=srcByIndex[i]?.Type===1;
-      [r,g,b]=heatmapColour(heat[i],_isSlope);
-
-    } else if(showNav){
+      [r,g,b]=heatmapColour(heat[i],srcByIndex[i]?.Type===1);
+    }else if(showNav){
       const ev=toEditor(mv);
-      if(ev===-1){
-        [r,g,b]=NAV_WATER;
-      } else {
+      if(ev===-1){[r,g,b]=NAV_WATER;}
+      else{
         const row2=Math.floor(i/W),col2=i%W;
-        const n0=row2>0   ?tileData[i-W]:mv;
-        const n1=row2<H-1 ?tileData[i+W]:mv;
-        const n2=col2>0   ?tileData[i-1]:mv;
-        const n3=col2<W-1 ?tileData[i+1]:mv;
-        const isCliffBase=n0>mv||n1>mv||n2>mv||n3>mv;
-        const isSlope=srcByIndex[i]?.Type===1; // Type=1 = slope, navigable
-        if(isCliffBase && !isSlope){
-          [r,g,b]=NAV_CLIFF;
-        } else if(isSlope){
-          [r,g,b]=NAV_SLOPE;
-        } else if(ev>=10){
-          [r,g,b]=NAV_HIGH;
-        } else {
-          // Check if this navigable tile is 1-wide in any cardinal axis
-          // (i.e. its direct neighbours in at least one axis are both blocked)
-          const bN=row2===0    ||_navBlocked(i-W,Math.max(0,Math.min(MAX_LEVEL,tileData[i-W])));
-          const bS=row2===H-1  ||_navBlocked(i+W,Math.max(0,Math.min(MAX_LEVEL,tileData[i+W])));
-          const bW=col2===0    ||_navBlocked(i-1, Math.max(0,Math.min(MAX_LEVEL,tileData[i-1])));
-          const bE=col2===W-1  ||_navBlocked(i+1, Math.max(0,Math.min(MAX_LEVEL,tileData[i+1])));
-          const narrow1=(bN&&bS)||(bW&&bE); // blocked on both sides in one axis = 1-tile corridor
-          const narrow2=( // 2-wide: neighbours 2 steps out are blocked on both sides
-            (row2<2||_navBlocked(i-2*W,Math.max(0,Math.min(MAX_LEVEL,tileData[i-2*W]))))&&
-            (row2>H-3||_navBlocked(i+2*W,Math.max(0,Math.min(MAX_LEVEL,tileData[i+2*W]))))
-          )||(
-            (col2<2||_navBlocked(i-2,Math.max(0,Math.min(MAX_LEVEL,tileData[i-2]))))&&
-            (col2>W-3||_navBlocked(i+2,Math.max(0,Math.min(MAX_LEVEL,tileData[i+2]))))
-          );
-          if(narrow1){[r,g,b]=NAV_NARROW;}
-          else{[r,g,b]=NAV_OK;}
+        const n0=row2>0?tileData[i-W]:mv,n1=row2<H-1?tileData[i+W]:mv,n2=col2>0?tileData[i-1]:mv,n3=col2<W-1?tileData[i+1]:mv;
+        const isCliffBase=n0>mv||n1>mv||n2>mv||n3>mv,isSlope=srcByIndex[i]?.Type===1;
+        if(isCliffBase&&!isSlope){[r,g,b]=NAV_CLIFF;}
+        else if(isSlope){[r,g,b]=NAV_SLOPE;}
+        else if(ev>=10){[r,g,b]=NAV_HIGH;}
+        else{
+          const bN=row2===0||_navBlocked(i-W,Math.max(0,Math.min(MAX_LEVEL,tileData[i-W])));
+          const bS=row2===H-1||_navBlocked(i+W,Math.max(0,Math.min(MAX_LEVEL,tileData[i+W])));
+          const bW=col2===0||_navBlocked(i-1,Math.max(0,Math.min(MAX_LEVEL,tileData[i-1])));
+          const bE=col2===W-1||_navBlocked(i+1,Math.max(0,Math.min(MAX_LEVEL,tileData[i+1])));
+          const narrow1=(bN&&bS)||(bW&&bE);
+          if(narrow1){[r,g,b]=NAV_NARROW;}else{[r,g,b]=NAV_OK;}
         }
       }
-
-    } else if(showTerrainColours){
-      const chosen=terrainForMapLevel(mv);
-      const tid=chosen!==null?chosen:(srcByIndex[i]?srcByIndex[i].TerrainTypeId:-1);
+    }else if(showTerrain){
+      const chosen=terrainForMapLevel(mv),tid=chosen!==null?chosen:(srcByIndex[i]?srcByIndex[i].TerrainTypeId:-1);
       const t=tid>=0?T_BY_ID[tid]:null;
-      if(t){[r,g,b]=t.color;}
-      else{const h=LV_COL[mv];r=parseInt(h.slice(1,3),16);g=parseInt(h.slice(3,5),16);b=parseInt(h.slice(5,7),16);}
-    } else {
-      const h=LV_COL[mv];r=parseInt(h.slice(1,3),16);g=parseInt(h.slice(3,5),16);b=parseInt(h.slice(5,7),16);
+      if(t){[r,g,b]=hexToRgb(t.hex);}else{[r,g,b]=hexToRgb(LV_COL[mv]);}
+    }else{
+      [r,g,b]=hexToRgb(LV_COL[mv]);
     }
-
-    const row=Math.floor(i/W),col=i%W;
-    const ci=(H-1-row)*W+col;
+    const row=Math.floor(i/W),col=i%W,ci=(H-1-row)*W+col;
     imgData.data[ci*4]=r;imgData.data[ci*4+1]=g;imgData.data[ci*4+2]=b;imgData.data[ci*4+3]=255;
   }
   ctx.putImageData(imgData,0,0);
-
   const used=dist.map((c,i)=>c>0?toEditor(i):null).filter(x=>x!==null);
   const lo=used.length?Math.min(...used):0,hi=used.length?Math.max(...used):0;
-  const modeLabel=showHeat
-    ?'heatmap (black=cliff base, purple=slope, red=tight, amber=narrow, green=open, blue=wide)'
-    :showNav
-    ?'navigability (green=ok, yellow-green=1-tile wide, blue=slope, red=water/cliff, amber=high)'
-    :showTerrainColours?'terrain colours':'height colours (dark=low)';
+  const modeLabel=showHeat?'heatmap (black=cliff, purple=slope, red=tight, green=open, blue=wide)':showNav?'navigability (green=ok, yellow-green=narrow, blue=slope, red=blocked, amber=high)':showTerrain?'terrain colours':'height colours (dark=low)';
   document.getElementById('previewLabel').textContent=`Editor levels ${lo}-${hi} · ${modeLabel}`;
-  document.getElementById('previewModeBadge').textContent=showHeat?'Heatmap':showNav?'Navigability':showTerrainColours?'Terrain':'Height';
+  document.getElementById('previewModeBadge').textContent=showHeat?'Heatmap':showNav?'Navigability':showTerrain?'Terrain':'Height';
   document.getElementById('sTiles').textContent=(W*H).toLocaleString();
   document.getElementById('sRange').textContent=used.length?`${lo}-${hi}`:'-';
   document.getElementById('sNonZero').textContent=dist.slice(1).reduce((a,b)=>a+b,0).toLocaleString();
@@ -1710,73 +1407,51 @@ function updatePreview(){
 }
 
 function buildHistLabels(){
-  const el=document.getElementById('histLabels');
-  el.innerHTML='';
+  const el=document.getElementById('histLabels');el.innerHTML='';
   for(let mv=0;mv<=MAX_LEVEL;mv++){
     const d=document.createElement('div');
-    d.style.cssText=`flex:1;text-align:center;font-size:9px;color:var(--text3);font-family:monospace;min-width:0;overflow:hidden;`;
-    d.textContent=toEditor(mv);
-    el.appendChild(d);
+    d.style.flex='1';d.style.textAlign='center';d.style.fontSize='9px';d.style.color='var(--text3)';
+    d.style.fontFamily='monospace';d.style.minWidth='0';d.style.overflow='hidden';
+    d.textContent=toEditor(mv);el.appendChild(d);
   }
 }
 buildHistLabels();
 
 function drawHist(dist){
-  const c=document.getElementById('cvHist');
-  const cw=c.width,ch=c.height;
-  const ctx=c.getContext('2d');
-  ctx.clearRect(0,0,cw,ch);
-  const max=Math.max(...dist,1),bw=cw/(MAX_LEVEL+1);
-  for(let mv=0;mv<=MAX_LEVEL;mv++){
-    const bh=Math.round((dist[mv]/max)*ch);
-    if(bh>0){ctx.fillStyle=LV_COL[mv];ctx.fillRect(mv*bw+1,ch-bh,bw-2,bh);}
-  }
+  const c=document.getElementById('cvHist'),cw=c.width,ch=c.height,ctx=c.getContext('2d');
+  ctx.clearRect(0,0,cw,ch);const max=Math.max(...dist,1),bw=cw/(MAX_LEVEL+1);
+  for(let mv=0;mv<=MAX_LEVEL;mv++){const bh=Math.round((dist[mv]/max)*ch);if(bh>0){ctx.fillStyle=LV_COL[mv];ctx.fillRect(mv*bw+1,ch-bh,bw-2,bh);}}
 }
-
 function drawLegend(dist){
   const el=document.getElementById('legend');el.innerHTML='';
   for(let mv=0;mv<=MAX_LEVEL;mv++){
     if(!dist[mv])continue;
     const d=document.createElement('div');d.className='li';
-    const t=T_BY_ID[terrainForMapLevel(mv)];
-    const ev=toEditor(mv);
+    const t=T_BY_ID[terrainForMapLevel(mv)],ev=toEditor(mv);
     d.innerHTML=`<div class="lsw" style="background:${LV_COL[mv]}"></div>${t?t.name:'id?'} Lv${ev} (${dist[mv].toLocaleString()})`;
     el.appendChild(d);
   }
 }
 
 // ── Undo/redo ──────────────────────────────────────────────────────────────────
-// Capture all generator slider values for undo state storage
 function captureGenState(){
-  return activeSource!=='gen' ? null : {
-    seed:    document.getElementById('genSeed').value,
-    scale:   document.getElementById('genScale').value,
-    water:   document.getElementById('genWater').value,
-    octaves: document.getElementById('genOctaves').value,
-    persist: document.getElementById('genPersist').value,
-    lacun:   document.getElementById('genLacun').value,
-    power:   document.getElementById('genPower').value,
-    gamma:   document.getElementById('genGamma').value,
-    bias:    document.getElementById('genBias').value,
-    type:    document.querySelector('input[name="noiseType"]:checked')?.value||'perlin',
+  return activeSource!=='gen'?null:{
+    seed:document.getElementById('genSeed').value,scale:document.getElementById('genScale').value,
+    water:document.getElementById('genWater').value,octaves:document.getElementById('genOctaves').value,
+    persist:document.getElementById('genPersist').value,lacun:document.getElementById('genLacun').value,
+    power:document.getElementById('genPower').value,gamma:document.getElementById('genGamma').value,
+    bias:document.getElementById('genBias').value,
+    type:document.querySelector('input[name="noiseType"]:checked')?.value||'perlin',
   };
 }
-
-// Restore generator slider values from a captured state (without re-running noise)
 function restoreGenState(gs){
   if(!gs)return;
-  document.getElementById('genSeed').value=gs.seed;
-  document.getElementById('genScale').value=gs.scale;
-  document.getElementById('genWater').value=gs.water;
-  document.getElementById('genOctaves').value=gs.octaves;
-  document.getElementById('genPersist').value=gs.persist;
-  document.getElementById('genLacun').value=gs.lacun;
-  document.getElementById('genPower').value=gs.power;
-  document.getElementById('genGamma').value=gs.gamma??100;
+  document.getElementById('genSeed').value=gs.seed;document.getElementById('genScale').value=gs.scale;
+  document.getElementById('genWater').value=gs.water;document.getElementById('genOctaves').value=gs.octaves;
+  document.getElementById('genPersist').value=gs.persist;document.getElementById('genLacun').value=gs.lacun;
+  document.getElementById('genPower').value=gs.power;document.getElementById('genGamma').value=gs.gamma??100;
   document.getElementById('genBias').value=gs.bias??0;
-  const radio=document.querySelector(`input[name="noiseType"][value="${gs.type}"]`);
-  if(radio)radio.checked=true;
-  // Update display labels
+  const radio=document.querySelector(`input[name="noiseType"][value="${gs.type}"]`);if(radio)radio.checked=true;
   document.getElementById('genScaleOut').textContent=gs.scale;
   document.getElementById('genWaterOut').textContent=gs.water+'%';
   document.getElementById('genOctavesOut').textContent=gs.octaves;
@@ -1786,442 +1461,196 @@ function restoreGenState(gs){
   document.getElementById('genGammaOut').textContent=((gs.gamma??100)/100).toFixed(1);
   document.getElementById('genBiasOut').textContent=((gs.bias??0)/100).toFixed(2);
 }
-
 function pushUndo(label='edit'){
-  // Truncate any redo entries after current cursor
   history.splice(historyCursor+1);
-  history.push({data:tileData.slice(), label, genState:captureGenState()});
+  history.push({data:tileData.slice(),label,genState:captureGenState()});
   if(history.length>UNDO_MAX+1)history.shift();
-  historyCursor=history.length-1;
-  updateUndoButtons();
+  historyCursor=history.length-1;updateUndoButtons();
 }
-
 function updateUndoButtons(){
-  const canUndo=historyCursor>0;
-  const canRedo=historyCursor<history.length-1;
+  const canUndo=historyCursor>0,canRedo=historyCursor<history.length-1;
   document.getElementById('btnUndo').disabled=!canUndo;
   document.getElementById('btnRedo').disabled=!canRedo;
-
-  const badge=document.getElementById('undoBadge');
-  if(badge){
-    const cur=history[historyCursor];
-    badge.textContent=canUndo?(historyCursor+1)+' undoable - last: '+(cur?.label??''):'';
-  }
-
-  const list=document.getElementById('historyList');
-  if(!list)return;
+  const badge=document.getElementById('undoBadge'),cur=history[historyCursor];
+  if(badge)badge.textContent=canUndo?(historyCursor+1)+' undoable - last: '+(cur?.label??''):'';
+  const list=document.getElementById('historyList');if(!list)return;
   list.innerHTML='';
-
-  // Display history as a static list, newest at top.
-  // cursor position determines which entry is "current".
-  // Entries above cursor = redo (future), entry AT cursor = current, entries below = undo (past).
   for(let i=history.length-1;i>=0;i--){
-    const entry=history[i];
-    const isCurrent=(i===historyCursor);
-    const isRedo=(i>historyCursor);
-    const isReadOnly=!!entry.readOnly;
-
+    const entry=history[i],isCurrent=(i===historyCursor),isRedo=(i>historyCursor),isReadOnly=!!entry.readOnly;
     const el=document.createElement('div');
-    el.style.cssText=[
-      'padding:3px 8px',
-      'white-space:nowrap','overflow:hidden','text-overflow:ellipsis',
-      isReadOnly?'font-style:italic;opacity:0.55':'',
-      isCurrent?'background:var(--bg3)':'',
-      (!isCurrent&&!isReadOnly)?'cursor:pointer':'',
-    ].filter(Boolean).join(';');
-
-    // Colour: current=green, redo=dimmed, undo=normal
+    el.style.padding='3px 8px';
+    el.style.whiteSpace='nowrap';
+    el.style.overflow='hidden';
+    el.style.textOverflow='ellipsis';
+    if(isReadOnly){el.style.fontStyle='italic';el.style.opacity='0.55';}
+    if(isCurrent){el.style.background='var(--bg3)';}
+    if(!isCurrent&&!isReadOnly){el.style.cursor='pointer';}
     el.style.color=isCurrent?'var(--ok)':isRedo?'var(--text3)':'var(--text)';
-
-    // Label: current entry keeps its original label (just highlighted green)
     el.textContent=(isRedo?'↪ ':'↩ ')+entry.label;
-
     if(!isCurrent&&!isReadOnly){
       el.title='Click to jump to: '+entry.label;
-      el.addEventListener('mouseenter',()=>{if(!isCurrent)el.style.background='var(--bg3)';});
-      el.addEventListener('mouseleave',()=>{if(!isCurrent)el.style.background='';});
+      el.addEventListener('mouseenter',()=>{el.style.background='var(--bg3)';});
+      el.addEventListener('mouseleave',()=>{el.style.background='';});
       el.addEventListener('click',()=>{
-        // Move cursor to i by restoring that entry's data
-        // No stack mutation - just move cursor and restore state
-        const target=history[i];
-        tileData=target.data.slice();
-        restoreGenState(target.genState);
-        historyCursor=i;
-        syncSrc();updatePreview();updateUndoButtons();
+        tileData=history[i].data.slice();restoreGenState(history[i].genState);
+        historyCursor=i;syncSrc();updatePreview();updateUndoButtons();
       });
     }
     list.appendChild(el);
   }
 }
-
-
 function syncSrc(){if(srcTiles)srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)t.Level=tileData[t.Index];});}
+function toolMsg(txt){const m=document.getElementById('msgTool');m.textContent=txt;m.className='msg ok';setTimeout(()=>{if(m.textContent===txt)m.textContent='';},4000);}
 
-function toolMsg(txt){
-  const m=document.getElementById('msgTool');m.textContent=txt;m.className='msg ok';
-  setTimeout(()=>{if(m.textContent===txt)m.textContent='';},4000);
-}
-
-// ── Level tool handlers ────────────────────────────────────────────────────────
+// ── Level tools ────────────────────────────────────────────────────────────────
 function clampMap(v){return Math.max(0,Math.min(MAX_LEVEL,Math.round(v)));}
-
 document.getElementById('btnShiftAll').addEventListener('click',()=>{
-  if(!tileData)return;
-  const sh=parseInt(shiftSlider.value);
-  if(sh===0){toolMsg('Shift is 0 - nothing to do.');return;}
-  pushUndo('shift all');
-  for(let i=0;i<tileData.length;i++)tileData[i]=clampMap(tileData[i]+sh);
-  syncSrc();updatePreview();
-  toolMsg(`Shifted all by ${sh>0?'+':''}${sh} (editor levels)`);
-  shiftSlider.value=0;shiftValEl.textContent='0';
+  if(!tileData)return;const sh=parseInt(shiftSlider.value);if(sh===0){toolMsg('Shift is 0 - nothing to do.');return;}
+  pushUndo('shift all');for(let i=0;i<tileData.length;i++)tileData[i]=clampMap(tileData[i]+sh);
+  syncSrc();updatePreview();toolMsg(`Shifted all by ${sh>0?'+':''}${sh} (editor levels)`);shiftSlider.value=0;shiftValEl.textContent='0';
 });
-
 document.getElementById('btnClamp').addEventListener('click',()=>{
   if(!tileData)return;
-  const loE=parseInt(document.getElementById('clampLow').value);
-  const loVE=parseInt(document.getElementById('clampLowVal').value);
-  const hiE=parseInt(document.getElementById('clampHigh').value);
-  const hiVE=parseInt(document.getElementById('clampHighVal').value);
-  pushUndo('clamp');
-  let n=0;
-  for(let i=0;i<tileData.length;i++){
-    const ev=toEditor(tileData[i]);
-    if(ev<=loE){tileData[i]=clampMap(toMap(loVE));n++;}
-    else if(ev>=hiE){tileData[i]=clampMap(toMap(hiVE));n++;}
-  }
+  const loE=parseInt(document.getElementById('clampLow').value),loVE=parseInt(document.getElementById('clampLowVal').value);
+  const hiE=parseInt(document.getElementById('clampHigh').value),hiVE=parseInt(document.getElementById('clampHighVal').value);
+  pushUndo('clamp');let n=0;
+  for(let i=0;i<tileData.length;i++){const ev=toEditor(tileData[i]);if(ev<=loE){tileData[i]=clampMap(toMap(loVE));n++;}else if(ev>=hiE){tileData[i]=clampMap(toMap(hiVE));n++;}}
   syncSrc();updatePreview();toolMsg(`Clamped ${n.toLocaleString()} tiles`);
 });
-
 document.getElementById('btnBand').addEventListener('click',()=>{
   if(!tileData)return;
-  const op=document.getElementById('bandOp').value;
-  const threshE=parseInt(document.getElementById('bandThresh').value);
-  const sh=parseInt(document.getElementById('bandShift').value)||0;
-  pushUndo('band shift');
-  let n=0;
-  for(let i=0;i<tileData.length;i++){
-    const ev=toEditor(tileData[i]);
-    const hit=(op==='eq'?ev===threshE:op==='lte'?ev<=threshE:ev>=threshE);
-    if(hit){tileData[i]=clampMap(tileData[i]+sh);n++;}
-  }
+  const op=document.getElementById('bandOp').value,threshE=parseInt(document.getElementById('bandThresh').value),sh=parseInt(document.getElementById('bandShift').value)||0;
+  pushUndo('band shift');let n=0;
+  for(let i=0;i<tileData.length;i++){const ev=toEditor(tileData[i]);const hit=(op==='eq'?ev===threshE:op==='lte'?ev<=threshE:ev>=threshE);if(hit){tileData[i]=clampMap(tileData[i]+sh);n++;}}
   syncSrc();updatePreview();toolMsg(`Shifted ${n.toLocaleString()} tiles by ${sh>0?'+':''}${sh}`);
 });
-
 document.getElementById('btnUndo').addEventListener('click',()=>{
-  if(historyCursor<=0)return;
-  historyCursor--;
-  const entry=history[historyCursor];
-  tileData=entry.data.slice();
-  restoreGenState(entry.genState);
+  if(historyCursor<=0)return;historyCursor--;
+  const entry=history[historyCursor];tileData=entry.data.slice();restoreGenState(entry.genState);
   syncSrc();updatePreview();updateUndoButtons();toolMsg(`Undone: ${history[historyCursor+1].label}`);
 });
-
 document.getElementById('btnRedo').addEventListener('click',()=>{
-  if(historyCursor>=history.length-1)return;
-  historyCursor++;
-  const entry=history[historyCursor];
-  tileData=entry.data.slice();
-  restoreGenState(entry.genState);
+  if(historyCursor>=history.length-1)return;historyCursor++;
+  const entry=history[historyCursor];tileData=entry.data.slice();restoreGenState(entry.genState);
   syncSrc();updatePreview();updateUndoButtons();toolMsg(`Redone: ${entry.label}`);
 });
-
 document.getElementById('btnReset').addEventListener('click',()=>{
-  if(!origTileData)return;
-  pushUndo('before reset');
-  tileData=origTileData.slice();
-  resetCompass();
+  if(!origTileData)return;pushUndo('before reset');tileData=origTileData.slice();resetCompass();
   syncSrc();updatePreview();toolMsg('Reset to loaded state.');
 });
 
-// ── Orientation (rotate / flip) ────────────────────────────────────────────────
-// orientAngle: cumulative CW rotation of the DATA in degrees (0/90/180/270).
-// orientFlippedH: whether data has been flipped horizontally.
-// The preview has a built-in display flip (row 0 at bottom), which inverts
-// the apparent rotation. CW and CCW button transforms are swapped to compensate,
-// so the user sees the expected visual result while the game data is also correct.
-let orientAngle=0;
-let orientFlippedH=false;
-// History of orientation operations for debug export
-let orientHistory=[];
-
-function orientMsg(txt){
-  const m=document.getElementById('msgOrient');m.textContent=txt;m.className='msg ok';
-  setTimeout(()=>{if(m.textContent===txt)m.textContent='';},4000);
-}
-
-// Corner indicators are fixed: N=top-right, E=bottom-right, S=bottom-left, W=top-left.
-// This matches the game's isometric presentation. Preview content rotates relative to them.
-// The section badge shows which data direction currently faces "up" in the preview.
-const ORIENT_BADGE_DIRS=['N↑','W←','S↓','E→']; // at 0°/90°/180°/270° CW rotation of data
-
+// ── Orientation ────────────────────────────────────────────────────────────────
+let orientAngle=0,orientFlippedH=false,orientHistory=[];
+function orientMsg(txt){const m=document.getElementById('msgOrient');m.textContent=txt;m.className='msg ok';setTimeout(()=>{if(m.textContent===txt)m.textContent='';},4000);}
+const ORIENT_BADGE_DIRS=['N↑','W←','S↓','E→'];
 function drawOrientIndicator(){
   const show=document.getElementById('chkCompass')?.checked;
-  const overlay=document.getElementById('orientOverlay');
-  if(overlay)overlay.style.display=show?'block':'none';
-  // Badge: which cardinal was originally "up" (north) is now facing preview-top
-  const idx=((orientAngle/90)%4+4)%4;
-  let badge=ORIENT_BADGE_DIRS[idx];
-  if(orientFlippedH)badge+=' ⟺';
-  const ob=document.getElementById('orientBadge');
-  if(ob)ob.textContent=badge;
+  const overlay=document.getElementById('orientOverlay');if(overlay)overlay.style.display=show?'block':'none';
+  const idx=((orientAngle/90)%4+4)%4;let badge=ORIENT_BADGE_DIRS[idx];if(orientFlippedH)badge+=' ⟺';
+  const ob=document.getElementById('orientBadge');if(ob)ob.textContent=badge;
 }
-
-function applyTransform(fn, label){
-  if(!tileData)return;
-  pushUndo(label);
-  const src=tileData.slice();
-  const dst=new Int16Array(W*H);
-  for(let row=0;row<H;row++){
-    for(let col=0;col<W;col++){
-      const {r:nr,c:nc}=fn(row,col);
-      dst[nr*W+nc]=src[row*W+col];
-    }
-  }
-  tileData=dst;
-  orientHistory.push(label);
-  syncSrc();updatePreview();
-  orientMsg(label);
+function applyTransform(fn,label){
+  if(!tileData)return;pushUndo(label);
+  const src=tileData.slice(),dst=new Int16Array(W*H);
+  for(let row=0;row<H;row++)for(let col=0;col<W;col++){const{r:nr,c:nc}=fn(row,col);dst[nr*W+nc]=src[row*W+col];}
+  tileData=dst;orientHistory.push(label);syncSrc();updatePreview();orientMsg(label);
 }
-
-// Transform functions: given source (row,col), return destination (r,c)
-// NOTE: CW and CCW are swapped vs naive maths to compensate for the
-// preview's vertical display flip (row 0 at bottom), so that:
-//   - the button labelled CW rotates CW both in preview AND in-game
-//   - the exported map.json is also correct
-function rot90CW (row,col){return {r:W-1-col, c:row      };}  // compensated for display flip
-function rot90CCW(row,col){return {r:col,      c:H-1-row  };}  // compensated for display flip
-function flipH   (row,col){return {r:row,      c:W-1-col  };}
-function flipV   (row,col){return {r:H-1-row,  c:col      };}
-
-document.getElementById('btnRot90CW').addEventListener('click',()=>{
-  applyTransform(rot90CW,'Rotate 90° CW');
-  orientAngle=(orientAngle+90)%360;
-  drawOrientIndicator();
-});
-
-document.getElementById('btnRot90CCW').addEventListener('click',()=>{
-  applyTransform(rot90CCW,'Rotate 90° CCW');
-  orientAngle=(orientAngle-90+360)%360;
-  drawOrientIndicator();
-});
-
-document.getElementById('btnFlipH').addEventListener('click',()=>{
-  applyTransform(flipH,'Flip horizontal');
-  orientFlippedH=!orientFlippedH;
-  drawOrientIndicator();
-});
-
-document.getElementById('btnFlipV').addEventListener('click',()=>{
-  applyTransform(flipV,'Flip vertical');
-  orientAngle=(orientAngle+180)%360;
-  orientFlippedH=!orientFlippedH;
-  drawOrientIndicator();
-});
-
+function rot90CW(row,col){return{r:W-1-col,c:row};}
+function rot90CCW(row,col){return{r:col,c:H-1-row};}
+function flipH(row,col){return{r:row,c:W-1-col};}
+function flipV(row,col){return{r:H-1-row,c:col};}
+document.getElementById('btnRot90CW').addEventListener('click',()=>{applyTransform(rot90CW,'Rotate 90° CW');orientAngle=(orientAngle+90)%360;drawOrientIndicator();});
+document.getElementById('btnRot90CCW').addEventListener('click',()=>{applyTransform(rot90CCW,'Rotate 90° CCW');orientAngle=(orientAngle-90+360)%360;drawOrientIndicator();});
+document.getElementById('btnFlipH').addEventListener('click',()=>{applyTransform(flipH,'Flip horizontal');orientFlippedH=!orientFlippedH;drawOrientIndicator();});
+document.getElementById('btnFlipV').addEventListener('click',()=>{applyTransform(flipV,'Flip vertical');orientAngle=(orientAngle+180)%360;orientFlippedH=!orientFlippedH;drawOrientIndicator();});
 document.getElementById('chkCompass').addEventListener('change',drawOrientIndicator);
+function resetCompass(){orientAngle=0;orientFlippedH=false;orientHistory=[];drawOrientIndicator();}
 
-function resetCompass(){
-  orientAngle=0;orientFlippedH=false;orientHistory=[];
-  drawOrientIndicator();
-}
-
-// ── Build export tiles ─────────────────────────────────────────────────────────
-
-// Type=2 = cliff BASE: tile that has at least one orthogonal neighbour at a HIGHER level.
-// The engine renders cliff walls upward from these tiles.
-// Type=0 = flat ground, or cliff top (no wall rendered from this tile upward).
+// ── Export ─────────────────────────────────────────────────────────────────────
 function computeTypesForExport(levels){
   const types=new Uint8Array(W*H);
   for(let i=0;i<W*H;i++){
-    const lv=levels[i];
-    const row=Math.floor(i/W),col=i%W;
-    const nbrs=[
-      row>0   ?levels[i-W]:lv, row<H-1?levels[i+W]:lv,
-      col>0   ?levels[i-1]:lv, col<W-1?levels[i+1]:lv,
-    ];
+    const lv=levels[i],row=Math.floor(i/W),col=i%W;
+    const nbrs=[row>0?levels[i-W]:lv,row<H-1?levels[i+W]:lv,col>0?levels[i-1]:lv,col<W-1?levels[i+1]:lv];
     if(nbrs.some(n=>n>lv))types[i]=2;
   }
   return types;
 }
-
 function buildTiles(){
   if(!tileData)return null;
-  const tab=activeTerrainTab();
-  const lockEdge=document.getElementById('lockEdgeLandscape').checked;
-
-  // Resolve the EdgeTypeId to write for each tile.
-  // Edges are stored in EdgeGroups[].EdgeTypeId (from edges.csv id column),
-  // completely separate from TerrainTypeId (surface texture).
-  // edgeFamilyForMapLevel() returns an EDGES key (e.g. 'building_a').
-  // We look up the numeric id from EDGES to write into EdgeGroups.
-  // If no edge is selected, we preserve the original EdgeGroup if available,
-  // or default to Cliffs_A (id=0).
-
-  // Build a lookup: TileIndex -> original EdgeTypeId (from loaded map)
-  const origEdgeById={};
-  if(srcEdgeGroups){
-    srcEdgeGroups.forEach(eg=>{origEdgeById[eg.TileIndex]=eg.EdgeTypeId;});
-  }
-
-  // Pre-compute cliff-base Types
-  const computedTypes=computeTypesForExport(tileData);
-
-  const tiles=[];
-  const edgeGroups=[];
-
+  const lockEdge=document.getElementById('lockEdgeLandscape').checked,origEdgeById={};
+  if(srcEdgeGroups)srcEdgeGroups.forEach(eg=>{origEdgeById[eg.TileIndex]=eg.EdgeTypeId;});
+  const computedTypes=computeTypesForExport(tileData),tiles=[],edgeGroups=[];
   for(let i=0;i<W*H;i++){
-    const mv=clampMap(tileData[i]);
-    let terrain,type;
-    const origTile=srcByIndex[i];
-
-    // ── Terrain (surface texture) ────────────────────────────────────────────
-    // null from terrainForMapLevel means "no change" - preserve original or fall back to Sand
-    const chosen=terrainForMapLevel(mv);
-    terrain=chosen!==null?chosen:(origTile?origTile.TerrainTypeId:2);
-    if(origTile?.Type===1){ type=1; }
-    else{ type=computedTypes[i]; }
-
+    const mv=clampMap(tileData[i]),origTile=srcByIndex[i];
+    const chosen=terrainForMapLevel(mv),terrain=chosen!==null?chosen:(origTile?origTile.TerrainTypeId:2);
+    const type=origTile?.Type===1?1:computedTypes[i];
     tiles.push({Index:i,Level:mv,Type:type,TerrainTypeId:terrain});
-
-    // ── EdgeGroups (cliff wall style) ────────────────────────────────────────
-    // Only Type=2 tiles get EdgeGroup entries (confirmed from editor-saved maps)
     if(type===2){
-      // Determine which edge family the user selected for this level
-      const edgeKey=edgeFamilyForMapLevel(mv);
-      let edgeTypeId;
-
-      if(!edgeKey){
-        // No edge selected - preserve original if available, else Cliffs_A
-        edgeTypeId=origEdgeById.hasOwnProperty(i)?origEdgeById[i]:0;
-      }else{
-        // Look up numeric EdgeTypeId from EDGES array
+      const edgeKey=edgeFamilyForMapLevel(mv);let edgeTypeId;
+      if(!edgeKey){edgeTypeId=origEdgeById.hasOwnProperty(i)?origEdgeById[i]:0;}
+      else{
         const edgeDef=EDGE_BY_KEY[edgeKey];
-        if(!edgeDef){
-          edgeTypeId=origEdgeById.hasOwnProperty(i)?origEdgeById[i]:0;
-        }else if(lockEdge){
-          // Only apply if within legal landscape DLCs
-          const legalDlcs=LS_EDGE_DLCS[activeLandscape]||[];
-          edgeTypeId=legalDlcs.includes(edgeDef.dlc)?edgeDef.id
-            :(origEdgeById.hasOwnProperty(i)?origEdgeById[i]:0);
-        }else{
-          edgeTypeId=edgeDef.id;
-        }
+        if(!edgeDef){edgeTypeId=origEdgeById.hasOwnProperty(i)?origEdgeById[i]:0;}
+        else if(lockEdge){const legalDlcs=LS_EDGE_DLCS[activeLandscape]||[];edgeTypeId=legalDlcs.includes(edgeDef.dlc)?edgeDef.id:(origEdgeById.hasOwnProperty(i)?origEdgeById[i]:0);}
+        else{edgeTypeId=edgeDef.id;}
       }
-
-      edgeGroups.push({
-        TileIndex:i,
-        EdgeTypeId:edgeTypeId||0,
-        EdgeVariationsIncludeFootAndRoof:true,
-        EdgeVariations:[-1,-1,i%3],  // third value matches editor pattern (0/1/2 variation seed)
-      });
+      edgeGroups.push({TileIndex:i,EdgeTypeId:edgeTypeId||0,EdgeVariationsIncludeFootAndRoof:true,EdgeVariations:[-1,-1,i%3]});
     }
   }
-
-  // Include Decorations from source if present (pass-through, don't modify)
   const result={Width:W,Height:H,Tiles:tiles,EdgeGroups:edgeGroups};
-  if(srcEdgeGroups===null&&edgeGroups.length===0){
-    // Image import with no edge selection - omit EdgeGroups entirely
-    // so the game uses its defaults (same as original image-only export)
-    delete result.EdgeGroups;
-  }
+  if(srcEdgeGroups===null&&edgeGroups.length===0)delete result.EdgeGroups;
   return result;
 }
-
-// ── Export ─────────────────────────────────────────────────────────────────────
 function enableTools(){
-  ['btnShiftAll','btnClamp','btnBand','btnPreview','btnExportMap','btnReset',
-   'btnRot90CW','btnRot90CCW','btnFlipH','btnFlipV'].forEach(id=>document.getElementById(id).disabled=false);
+  ['btnShiftAll','btnClamp','btnBand','btnPreview','btnExportMap','btnReset','btnRot90CW','btnRot90CCW','btnFlipH','btnFlipV']
+    .forEach(id=>document.getElementById(id).disabled=false);
 }
-
 function dl(name,text){
-  const blob=new Blob([text],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=name;a.click();
-  URL.revokeObjectURL(url);
+  const blob=new Blob([text],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);
 }
-
 document.getElementById('btnPreview').addEventListener('click',()=>{
   const data=buildTiles();if(!data)return;
   const pre=document.getElementById('jsonPre');
   pre.textContent=JSON.stringify({Width:data.Width,Height:data.Height,TileCount:data.Tiles.length,SampleTiles:data.Tiles.slice(0,5)},null,2);
   pre.style.display='block';
 });
-
 document.getElementById('btnExportMap').addEventListener('click',()=>{
   const data=buildTiles();if(!data)return;
-
-  // Optionally embed STTC-TT debug info in map.json under _STTCTT key.
-  // Unknown fields are ignored by the game's JSON parser.
-  const embedDebug=document.getElementById('chkEmbedDebug').checked;
-  if(embedDebug){
+  if(document.getElementById('chkEmbedDebug').checked){
     data._STTCTT={
-      exportedAt:new Date().toISOString(),
-      toolVersion:'1.04',
+      exportedAt:new Date().toISOString(),toolVersion:'1.05-beta',
       source:{type:activeSource,tiles:tileData?tileData.length:0,
         ...(activeSource==='gen'?{
           noiseType:document.querySelector('input[name="noiseType"]:checked')?.value,
-          seed:document.getElementById('genSeed').value,
-          scale:document.getElementById('genScale').value,
-          waterLevel:document.getElementById('genWater').value+'%',
-          octaves:document.getElementById('genOctaves').value,
+          seed:document.getElementById('genSeed').value,scale:document.getElementById('genScale').value,
+          waterLevel:document.getElementById('genWater').value+'%',octaves:document.getElementById('genOctaves').value,
           persistence:(document.getElementById('genPersist').value/100).toFixed(2),
           lacunarity:(document.getElementById('genLacun').value/100).toFixed(1),
           power:(document.getElementById('genPower').value/100).toFixed(1),
           gamma:(document.getElementById('genGamma').value/100).toFixed(1),
           bias:(document.getElementById('genBias').value/100).toFixed(2),
-        }:{})
-      },
+        }:{})},
       landscape:{id:activeLandscape,name:LS_NAMES[activeLandscape]},
-      terrain:{
-        tab:activeTerrainTab(),
-        defaultValue:document.getElementById('terrainSelect').value,
-        preserve:'n/a - no change dropdown preserves original',
-        lockToLandscape:document.getElementById('lockLandscape').checked,
-        lowOverride:document.getElementById('lowTerrain').value,
-        highOverride:document.getElementById('highTerrain').value,
-      },
-      edges:{
-        tab:activeEdgeTab(),
-        globalRemap:document.getElementById('edgeRemap').value,
-        lowRemap:document.getElementById('edgeRemapLow').value,
-        highRemap:document.getElementById('edgeRemapHigh').value,
-        lockToLandscape:document.getElementById('lockEdgeLandscape').checked,
-      },
-      output:{
-        totalTiles:data.Tiles.length,
-        edgeGroupCount:data.EdgeGroups?data.EdgeGroups.length:0,
-        levelRange:{min:Math.min(...data.Tiles.map(t=>t.Level)),max:Math.max(...data.Tiles.map(t=>t.Level))},
-      },
-      undoHistoryDepth:historyCursor+1,
-      undoHistory:history.slice(0,historyCursor+1).map(e=>e.label),
-      orientation:{
-        angleCW:orientAngle,
-        flippedH:orientFlippedH,
-        history:orientHistory,
-      },
+      colourScheme:activeScheme,
+      terrain:{tab:activeTerrainTab(),defaultValue:document.getElementById('terrainSelect').value,lockToLandscape:document.getElementById('lockLandscape').checked,lowOverride:document.getElementById('lowTerrain').value,highOverride:document.getElementById('highTerrain').value},
+      edges:{tab:activeEdgeTab(),globalRemap:document.getElementById('edgeRemap').value,lowRemap:document.getElementById('edgeRemapLow').value,highRemap:document.getElementById('edgeRemapHigh').value,lockToLandscape:document.getElementById('lockEdgeLandscape').checked},
+      output:{totalTiles:data.Tiles.length,edgeGroupCount:data.EdgeGroups?data.EdgeGroups.length:0,levelRange:{min:Math.min(...data.Tiles.map(t=>t.Level)),max:Math.max(...data.Tiles.map(t=>t.Level))}},
+      undoHistoryDepth:historyCursor+1,undoHistory:history.slice(0,historyCursor+1).map(e=>e.label),
+      orientation:{angleCW:orientAngle,flippedH:orientFlippedH,history:orientHistory},
     };
   }
-
   dl('map.json',JSON.stringify(data));
-
   const m=document.getElementById('msgExport');
-  if(scenarioData){
-    scenarioData.LandscapeId=activeLandscape;
-    dl('scenario.json',JSON.stringify(scenarioData,null,2));
-    m.textContent=`map.json + scenario.json exported (LandscapeId: ${activeLandscape} - ${LS_NAMES[activeLandscape]})`;
-  }else{
-    m.textContent='map.json exported. (Drop a scenario.json to also update LandscapeId on export.)';
-  }
+  if(scenarioData){scenarioData.LandscapeId=activeLandscape;dl('scenario.json',JSON.stringify(scenarioData,null,2));m.textContent=`map.json + scenario.json exported (LandscapeId: ${activeLandscape} - ${LS_NAMES[activeLandscape]})`;}
+  else{m.textContent='map.json exported. (Drop a scenario.json to also update LandscapeId on export.)';}
   m.className='msg ok';
-  // History is intentionally NOT cleared on export - continue working after saving
 });
-
 document.getElementById('btnExportScenario').addEventListener('click',()=>{
   if(!scenarioData){document.getElementById('msgExport').textContent='No scenario.json loaded.';document.getElementById('msgExport').className='msg err';return;}
-  scenarioData.LandscapeId=activeLandscape;
-  dl('scenario.json',JSON.stringify(scenarioData,null,2));
-  const m=document.getElementById('msgExport');
-  m.textContent=`scenario.json exported - LandscapeId: ${activeLandscape} (${LS_NAMES[activeLandscape]})`;m.className='msg ok';
+  scenarioData.LandscapeId=activeLandscape;dl('scenario.json',JSON.stringify(scenarioData,null,2));
+  const m=document.getElementById('msgExport');m.textContent=`scenario.json exported - LandscapeId: ${activeLandscape} (${LS_NAMES[activeLandscape]})`;m.className='msg ok';
 });
 
 // ── Change listeners ───────────────────────────────────────────────────────────
@@ -2229,149 +1658,67 @@ document.getElementById('terrainSelect').addEventListener('change',updatePreview
 ['lowTerrain','highTerrain'].forEach(id=>document.getElementById(id).addEventListener('change',updatePreview));
 document.getElementById('edgeRemap').addEventListener('change',updateTHint);
 
+// ── Tile Inspector ─────────────────────────────────────────────────────────────
+(()=>{
+  const cvEl=document.getElementById('cvPreview'),xhair=document.getElementById('cvXhair');
+  const rowsEl=document.getElementById('inspRows'),hintEl=document.getElementById('inspHint');
+  if(!cvEl||!xhair||!rowsEl)return;
+  const EDGE_NAMES={0:'Cliffs_A',1:'Building_A',2:'Outpost',3:'Damaged_Outpost',4:'Destroyed_Wall',5:'Quay',6:'Building_B',7:'Trenches',8:'Skyscraper_A',9:'Building_C',10:'Tunnel_Cliffs',11:'Industrial_B',12:'Spacestation_A',200:'Cliffs_Storm',201:'Bug_Prison',300:'Cliffs_Lava',301:'Cliffs_Lava_Veins',302:'Cliffs_Lava_Tunnel',400:'Skyscraper_B',401:'UnderConstruction',402:'Office_Walls',404:'Destroyed',405:'Settler_House',406:'Warehouse',407:'Jungle_Cliff',408:'Jungle_Cliff_Climbable',409:'Jungle_Underground',410:'Settler_House_Jungle',502:'Frost_Building',1001:'Canal_Wall',1002:'Internal_Wall'};
+  function navInfo(mv,type){
+    const ev=toEditor(mv);
+    if(ev===-1)return{cls:'nav-no',label:'Non-navigable (water)',hint:'Level -1 tiles are the non-navigable base floor. Infantry cannot traverse.'};
+    if(type===2)return{cls:'nav-no',label:'Non-navigable (cliff base)',hint:'This tile has a higher neighbour, generating a cliff wall upward. Non-navigable from below.'};
+    if(type===1)return{cls:'nav-yes',label:'Navigable (slope)',hint:'Type=1 is a slope — confirmed navigable by in-game testing.'};
+    if(ev>=10)return{cls:'nav-warn',label:'High ground',hint:'Editor level 10+ can restrict some unit types and line-of-sight.'};
+    return{cls:'nav-yes',label:'Navigable',hint:'Standard navigable tile. Infantry and most ground units traverse freely.'};
+  }
+  function edgeIdForTile(idx,mv){
+    if(srcEdgeGroups){const eg=srcEdgeGroups.find(e=>e.TileIndex===idx);if(eg)return eg.EdgeTypeId;}
+    const key=edgeFamilyForMapLevel(mv);if(key){const ed=EDGE_BY_KEY[key];if(ed)return ed.id;}return 0;
+  }
+  function computeType(idx){
+    const origTile=srcByIndex[idx];if(origTile?.Type===1)return 1;
+    const lv=Math.max(0,Math.min(MAX_LEVEL,tileData[idx])),row=Math.floor(idx/W),col=idx%W;
+    const nbrs=[row>0?tileData[idx-W]:lv,row<H-1?tileData[idx+W]:lv,col>0?tileData[idx-1]:lv,col<W-1?tileData[idx+1]:lv];
+    return nbrs.some(n=>n>lv)?2:0;
+  }
+  function mkRow(key,val){return`<div class="insp-row"><span class="insp-key">${key}</span><span class="insp-val">${val}</span></div>`;}
+  function showInspector(canvasCol,canvasRow){
+    if(!tileData)return;
+    const gameRow=H-1-canvasRow,gameCol=canvasCol;
+    if(gameRow<0||gameRow>=H||gameCol<0||gameCol>=W)return;
+    const idx=gameRow*W+gameCol,mv=Math.max(0,Math.min(MAX_LEVEL,tileData[idx])),ev=toEditor(mv),type=computeType(idx);
+    const chosen=terrainForMapLevel(mv),origTile=srcByIndex[idx];
+    const tid=chosen!==null?chosen:(origTile?origTile.TerrainTypeId:2),terrainDef=T_BY_ID[tid];
+    const isCliffBase=type===2,edgeId=isCliffBase?edgeIdForTile(idx,mv):null;
+    const edgeName=edgeId!==null?(EDGE_NAMES[edgeId]||`id ${edgeId}`):'-';
+    const nav=navInfo(mv,type),lvcol=LV_COL[mv];
+    const swatch=`<span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${lvcol};border:1px solid rgba(128,128,128,.3);vertical-align:middle;margin-right:3px;"></span>`;
+    const typeLabel={0:'0 - flat',1:'1 - slope (navigable)',2:'2 - cliff base (non-navigable)'}[type]??type;
+    const navBadge=`<span class="nav-badge ${nav.cls}">${nav.label}</span>`;
+    rowsEl.innerHTML=mkRow('Index',idx)+mkRow('Grid (col, row)',`${gameCol}, ${gameRow}`)+mkRow('Map / Editor lv',`${mv} / ${ev}`)+mkRow('Level colour',swatch+lvcol)+mkRow('TerrainTypeId',`${tid}${terrainDef?` - ${terrainDef.name}`:''}`)+mkRow('Terrain group',terrainDef?terrainDef.group:'?')+mkRow('Tile type',typeLabel)+mkRow('Edge family',isCliffBase?`${edgeName} (id ${edgeId})`:'- (non-cliff)')+mkRow('Navigability',navBadge);
+    hintEl.textContent=nav.hint;hintEl.style.display='block';
+  }
+  function tileCoords(e){
+    const rect=cvEl.getBoundingClientRect();
+    return{col:Math.floor((e.clientX-rect.left)/(rect.width/W)),row:Math.floor((e.clientY-rect.top)/(rect.height/H))};
+  }
+  function moveXhair(col,row){
+    const rect=cvEl.getBoundingClientRect(),tw=rect.width/W,th=rect.height/H;
+    xhair.style.display='block';xhair.style.left=(col*tw)+'px';xhair.style.top=(row*th)+'px';
+    xhair.style.width=Math.max(2,tw)+'px';xhair.style.height=Math.max(2,th)+'px';
+  }
+  cvEl.style.cursor='crosshair';
+  cvEl.addEventListener('click',e=>{
+    if(!tileData)return;const{col,row}=tileCoords(e);
+    if(col<0||col>=W||row<0||row>=H)return;moveXhair(col,row);showInspector(col,row);
+  });
+})();
+
 // ── Init ───────────────────────────────────────────────────────────────────────
 setActiveLandscape(0,'manual');
 updateTHint();
-
-// ── Tile Inspector ─────────────────────────────────────────────────────────────
-(function(){
-  const cvEl  = document.getElementById('cvPreview');
-  const wrap  = document.getElementById('previewWrap');
-  const xhair = document.getElementById('cvXhair');
-  const rowsEl= document.getElementById('inspRows');
-  const hintEl= document.getElementById('inspHint');
-  if(!cvEl||!xhair||!rowsEl)return;
-
-  // EdgeTypeId → human-readable name
-  const EDGE_NAMES={
-    0:'Cliffs_A',1:'Building_A',2:'Outpost',3:'Damaged_Outpost',4:'Destroyed_Wall',
-    5:'Quay',6:'Building_B',7:'Trenches',8:'Skyscraper_A',9:'Building_C',
-    10:'Tunnel_Cliffs',11:'Industrial_B',12:'Spacestation_A',
-    200:'Cliffs_Storm',201:'Bug_Prison',
-    300:'Cliffs_Lava',301:'Cliffs_Lava_Veins',302:'Cliffs_Lava_Tunnel',
-    400:'Skyscraper_B',401:'UnderConstruction',402:'Office_Walls',
-    404:'Destroyed',405:'Settler_House',406:'Warehouse',
-    407:'Jungle_Cliff',408:'Jungle_Cliff_Climbable',409:'Jungle_Underground',
-    410:'Settler_House_Jungle',502:'Frost_Building',
-    1001:'Canal_Wall',1002:'Internal_Wall',
-  };
-
-  // Navigability heuristic
-  function navInfo(mv, type){
-    const ev = toEditor(mv);
-    if(ev === -1) return {cls:'nav-no',  label:'Non-navigable (water)', hint:'Level -1 tiles are the non-navigable base floor. Infantry cannot traverse. Bugs can emerge from below adjacent floor tiles.'};
-    if(type === 2) return {cls:'nav-no',  label:'Non-navigable (cliff base)', hint:'This tile has a higher neighbour, generating a cliff wall upward. Based on testing, 1-2 tile corridors cut into land (cliff base edges) block unit pathing. The raised surface itself may be passable, but the approach from below is not.'};
-    if(type === 1) return {cls:'nav-yes',  label:'Navigable (slope)',       hint:'Type=1 is a slope — confirmed navigable by in-game testing. Units can traverse these tiles freely. The slope forms the sides of raised mounds and similar terrain features.'};
-    if(ev >= 10)   return {cls:'nav-warn',label:'High ground',           hint:'Editor level 10+ can restrict some unit types and line-of-sight. Traversable for infantry but verify in-game.'};
-    return           {cls:'nav-yes', label:'Navigable',                  hint:'Standard navigable tile. Infantry and most ground units can traverse freely.'};
-  }
-
-  // Find EdgeTypeId for a tile from the loaded srcEdgeGroups (if available)
-  function edgeIdForTile(tileIndex, mv){
-    if(srcEdgeGroups){
-      const eg = srcEdgeGroups.find(e=>e.TileIndex===tileIndex);
-      if(eg) return eg.EdgeTypeId;
-    }
-    // Fall back to current UI selection
-    const key = edgeFamilyForMapLevel(mv);
-    if(key){ const ed=EDGE_BY_KEY[key]; if(ed) return ed.id; }
-    return 0;
-  }
-
-  // Compute tile type on the fly (matches export logic)
-  function computeType(tileIndex){
-    const origTile = srcByIndex[tileIndex];
-    if(origTile?.Type===1) return 1;
-    const lv = Math.max(0, Math.min(MAX_LEVEL, tileData[tileIndex]));
-    const row=Math.floor(tileIndex/W), col=tileIndex%W;
-    const nbrs=[
-      row>0     ? tileData[tileIndex-W] : lv,
-      row<H-1   ? tileData[tileIndex+W] : lv,
-      col>0     ? tileData[tileIndex-1] : lv,
-      col<W-1   ? tileData[tileIndex+1] : lv,
-    ];
-    return nbrs.some(n=>n>lv) ? 2 : 0;
-  }
-
-  function mkRow(key, val){
-    return `<div class="insp-row"><span class="insp-key">${key}</span><span class="insp-val">${val}</span></div>`;
-  }
-
-  function showInspector(canvasCol, canvasRow){
-    if(!tileData) return;
-    // Preview has row 0 at the bottom (display flip), so convert:
-    const gameRow = H-1-canvasRow;
-    const gameCol = canvasCol;
-    if(gameRow<0||gameRow>=H||gameCol<0||gameCol>=W) return;
-
-    const idx     = gameRow*W+gameCol;
-    const mv      = Math.max(0, Math.min(MAX_LEVEL, tileData[idx]));
-    const ev      = toEditor(mv);
-    const type    = computeType(idx);
-
-    // Terrain
-    const chosenTerrain = terrainForMapLevel(mv);
-    const origTile = srcByIndex[idx];
-    const tid = chosenTerrain!==null ? chosenTerrain : (origTile ? origTile.TerrainTypeId : 2);
-    const terrainDef = T_BY_ID[tid];
-
-    // Edge
-    const isCliffBase = type===2;
-    const edgeId = isCliffBase ? edgeIdForTile(idx, mv) : null;
-    const edgeName = edgeId!==null ? (EDGE_NAMES[edgeId]||`id ${edgeId}`) : '-';
-
-    const nav = navInfo(mv, type);
-    const lvcol = LV_COL[mv];
-    const swatch = `<span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${lvcol};border:1px solid rgba(128,128,128,.3);vertical-align:middle;margin-right:3px;"></span>`;
-
-    const typeLabel = {0:'0 - flat',1:'1 - slope (navigable)',2:'2 - cliff base (non-navigable)'}[type]??type;
-    const navBadge  = `<span class="nav-badge ${nav.cls}">${nav.label}</span>`;
-
-    let html = '';
-    html += mkRow('Index',           idx);
-    html += mkRow('Grid (col, row)', `${gameCol}, ${gameRow}`);
-    html += mkRow('Map / Editor lv', `${mv} / ${ev}`);
-    html += mkRow('Level colour',    swatch+lvcol);
-    html += mkRow('TerrainTypeId',   `${tid}${terrainDef?` - ${terrainDef.name}`:''}`);
-    html += mkRow('Terrain group',   terrainDef ? terrainDef.group : '?');
-    html += mkRow('Tile type',       typeLabel);
-    html += mkRow('Edge family',     isCliffBase ? `${edgeName} (id ${edgeId})` : '- (non-cliff)');
-    html += mkRow('Navigability',    navBadge);
-
-    rowsEl.innerHTML = html;
-    hintEl.textContent = nav.hint;
-    hintEl.style.display = 'block';
-  }
-
-  // Convert mouse event → canvas tile coords
-  function tileCoords(e){
-    const rect = cvEl.getBoundingClientRect();
-    const col  = Math.floor((e.clientX-rect.left) / (rect.width/W));
-    const row  = Math.floor((e.clientY-rect.top)  / (rect.height/H));
-    return {col, row};
-  }
-
-  // Move crosshair overlay
-  function moveXhair(col, row){
-    const rect = cvEl.getBoundingClientRect();
-    const tw = rect.width/W, th = rect.height/H;
-    xhair.style.display = 'block';
-    xhair.style.left    = (col*tw)+'px';
-    xhair.style.top     = (row*th)+'px';
-    xhair.style.width   = Math.max(2,tw)+'px';
-    xhair.style.height  = Math.max(2,th)+'px';
-  }
-
-  cvEl.style.cursor = 'crosshair';
-
-  cvEl.addEventListener('click', e=>{
-    if(!tileData) return;
-    const {col,row} = tileCoords(e);
-    if(col<0||col>=W||row<0||row>=H) return;
-    moveXhair(col, row);
-    showInspector(col, row);
-  });
-})();
+applyScheme('default');
 </script>
 </body>
 </html>
