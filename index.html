@@ -205,7 +205,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   </svg>
   <h1>Starship Troopers Terran Command Terrain Tool</h1>
 </div>
-<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · v1.05 · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
+<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · <span id="versionDisplay"></span> · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
 
 <div class="layout">
 <div class="left-col">
@@ -213,7 +213,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <!-- SOURCE -->
   <div class="section open" id="secSource">
     <div class="sh" data-sec="secSource">
-      <div class="sh-left"><span class="st">Source</span><span class="sb" id="srcBadge">No source loaded</span></div>
+      <div class="sh-left"><span class="st">Source</span><span class="landscape-badge" id="srcBadge">No source loaded</span></div>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
@@ -289,8 +289,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <!-- LANDSCAPE -->
   <div class="section" id="secLandscape">
     <div class="sh" data-sec="secLandscape">
-      <div class="sh-left"><span class="st">Landscape</span><span id="lsBadge" class="landscape-badge" style="display:none"></span></div>
-      <span class="sb" id="lsBadgeNote"></span>
+      <div class="sh-left"><span class="st">Landscape</span><span id="lsBadge" class="landscape-badge" style="display:none"></span><span class="landscape-badge" id="lsBadgeNote" style="display:none"></span></div>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
@@ -317,8 +316,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <!-- TERRAIN -->
   <div class="section" id="secTerrain">
     <div class="sh" data-sec="secTerrain">
-      <div class="sh-left"><span class="st">Terrain</span></div>
-      <span class="sb">Default: no change</span>
+      <div class="sh-left"><span class="st">Terrain</span><span class="landscape-badge" id="terrainBadge">No change</span></div>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
@@ -353,8 +351,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <!-- EDGES -->
   <div class="section" id="secEdges">
     <div class="sh" data-sec="secEdges">
-      <div class="sh-left"><span class="st">Edges</span></div>
-      <span class="sb">Default: no change</span>
+      <div class="sh-left"><span class="st">Edges</span><span class="landscape-badge" id="edgesBadge">No change</span></div>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
@@ -405,8 +402,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <!-- ORIENTATION -->
   <div class="section" id="secOrientation">
     <div class="sh" data-sec="secOrientation">
-      <div class="sh-left"><span class="st">Orientation</span></div>
-      <span class="sb" id="orientBadge">N↑</span>
+      <div class="sh-left"><span class="st">Orientation</span><span class="landscape-badge" id="orientBadge">N↑</span></div>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
@@ -468,7 +464,6 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <div class="section" id="secSettings">
     <div class="sh" data-sec="secSettings">
       <div class="sh-left"><span class="st">Settings</span></div>
-      <span class="sb">Preview colour scheme</span>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
@@ -577,6 +572,8 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 
 </div><!-- end layout -->
 <script>
+const TOOL_VERSION='1.06-beta01';
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // COLOUR HELPERS — all colours in this file use hex strings for easy VS Code editing
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -1038,7 +1035,10 @@ function setActiveLandscape(id,source){
   document.getElementById('landscapeSelect').value=id;
   const badge=document.getElementById('lsBadge');
   badge.style.display='inline-block';badge.textContent=LS_NAMES[id];
-  document.getElementById('lsBadgeNote').textContent={auto:'Auto-detected',scenario:'From scenario.json',manual:''}[source]||'';
+  const noteEl=document.getElementById('lsBadgeNote');
+  const noteText={auto:'Auto-detected',scenario:'From scenario.json',manual:''}[source]||'';
+  noteEl.textContent=noteText;
+  noteEl.style.display=noteText?'inline-flex':'none';
   rebuildTerrainSelects();rebuildEdgeSelects();
   const curVal=document.getElementById('terrainSelect').value;
   if(curVal!==''){
@@ -1729,7 +1729,7 @@ document.getElementById('btnExportMap').addEventListener('click',()=>{
   const data=buildTiles();if(!data)return;
   if(document.getElementById('chkEmbedDebug').checked){
     data._STTCTT={
-      exportedAt:new Date().toISOString(),toolVersion:'1.05',
+      exportedAt:new Date().toISOString(),toolVersion:TOOL_VERSION,
       source:{type:activeSource,tiles:tileData?tileData.length:0,
         ...(activeSource==='gen'?{
           noiseType:document.querySelector('input[name="noiseType"]:checked')?.value,
@@ -1908,6 +1908,7 @@ function updateLvlRangeUI(){
 setActiveLandscape(0,'manual');
 updateTHint();
 applyScheme('default');
+document.getElementById('versionDisplay').textContent='v'+TOOL_VERSION;
 </script>
 </body>
 </html>
