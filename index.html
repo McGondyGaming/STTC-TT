@@ -232,8 +232,8 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         </div>
       </div>
       <div class="tp" id="tab-src-map">
-        <div class="dz" id="dzMap"><div class="dl"><strong>Drop map.json here</strong></div><div class="dl">Loads levels and terrain - auto-detects landscape</div><input type="file" id="fiMap" accept=".json,application/json" style="display:none"></div>
-        <div class="msg" id="msgMap"></div>
+        <div class="dz" id="dzMap"><div class="dl"><strong>Drop map.json here</strong></div><div class="dl" id="dzMapSub">Loads levels and terrain - auto-detects landscape</div><input type="file" id="fiMap" accept=".json,application/json" style="display:none"></div>
+        <div class="msg" id="msgMap" style="display:none"></div>
       </div>
       <div class="tp" id="tab-src-gen">
         <div class="note" style="margin-bottom:8px;">Generates a procedural heightmap using fractal noise. Output is deterministic - same seed and settings always produce the same map.</div>
@@ -572,7 +572,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 
 </div><!-- end layout -->
 <script>
-const TOOL_VERSION='1.06-beta01';
+const TOOL_VERSION='1.06-beta02';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // COLOUR HELPERS — all colours in this file use hex strings for easy VS Code editing
@@ -1144,13 +1144,30 @@ makeDrop('dzMap','fiMap',file=>{
         historyCursor=history.length-1;
       }
       updateUndoButtons();
-      const fname=(file.name||'map.json').replace(/^.*[\\/]/,'');
-      msg.textContent=`${fname} - ${data.Tiles.length.toLocaleString()} tiles`;msg.className='msg ok';
+      const fname=(file.name||'map.json').replace(/^.*[\/]/,'');
+      // webkitRelativePath gives folder/file.json when dragged from explorer on some browsers
+      const folderHint=file.webkitRelativePath?file.webkitRelativePath.split('/').slice(-2,-1)[0]:null;
+      const tileCount=data.Tiles.length.toLocaleString();
+      // Update drop zone to confirm filename loaded
+      const subEl=document.getElementById('dzMapSub');
+      if(subEl)subEl.textContent=fname;
       document.getElementById('dzMap').classList.add('loaded');
-      document.getElementById('srcBadge').textContent=`${data.Tiles.length.toLocaleString()} tiles`;
+      // Source header pill: tile count
+      document.getElementById('srcBadge').textContent=tileCount+' tiles';
+      // Folder pill: only shown when webkitRelativePath available
+      let folderPill=document.getElementById('srcFolderPill');
+      if(!folderPill){
+        folderPill=document.createElement('span');
+        folderPill.id='srcFolderPill';
+        folderPill.className='landscape-badge';
+        const srcEl=document.getElementById('srcBadge');
+        srcEl.parentNode.insertBefore(folderPill,srcEl.nextSibling);
+      }
+      folderPill.textContent=folderHint||'';
+      folderPill.style.display=folderHint?'inline-flex':'none';
       activeSource='map';setActiveLandscape(detectLandscape(srcTiles),'auto');
       updatePreview();enableTools();resetCompass();
-    }catch(err){msg.textContent='Error: '+err.message;msg.className='msg err';}
+    }catch(err){msg.textContent='Error: '+err.message;msg.className='msg err';msg.style.display='block';}
   };
   reader.readAsText(file);
 });
