@@ -188,14 +188,20 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 .cp-box input[type=color]{width:44px;height:32px;padding:2px;border:1px solid var(--border2);border-radius:5px;cursor:pointer;background:var(--bg);}
 .scheme-preview-strip{height:14px;border-radius:4px;border:1px solid var(--border);margin-top:8px;display:block;width:100%;}
 /* Dual-range level slider */
-.dual-range-wrap{position:relative;height:20px;margin:0;}
-.dual-range-wrap input[type=range]{position:absolute;width:100%;height:100%;top:0;left:0;margin:0;padding:0;pointer-events:none;appearance:none;-webkit-appearance:none;background:transparent;}
-.dual-range-wrap input[type=range]::-webkit-slider-thumb{pointer-events:all;appearance:none;-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--bg3);cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.3);margin-top:-5px;}
-.dual-range-wrap input[type=range]::-moz-range-thumb{pointer-events:all;width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--bg3);cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.3);}
-.dual-range-wrap input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:transparent;}
-.dual-range-wrap input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:transparent;}
-.dual-range-track{position:relative;height:4px;border-radius:2px;background:var(--border2);margin:8px 0;}
-.dual-range-fill{position:absolute;height:100%;border-radius:2px;background:var(--accent);opacity:0.5;}
+/* Dual-range slider — track and thumbs visually match the standard .rr sliders */
+.dual-range-outer{position:relative;height:22px;}
+/* Custom track div - sits between the two stacked inputs via z-index */
+.dual-range-track{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:6px;border-radius:3px;background:var(--border2);border:1px solid var(--border2);outline:1px solid rgba(255,255,255,0.12);z-index:0;pointer-events:none;}
+.dual-range-fill{position:absolute;top:0;bottom:0;border-radius:2px;background:var(--accent);opacity:0.7;}
+.dual-range-wrap{position:absolute;inset:0;}
+/* Both inputs stacked, appearance:none kills all native chrome */
+.dual-range-wrap input[type=range]{position:absolute;width:100%;height:100%;top:0;left:0;margin:0;padding:0;pointer-events:none;appearance:none;-webkit-appearance:none;accent-color:transparent;background:transparent;z-index:1;}
+/* Fully transparent tracks so our custom track div shows through */
+.dual-range-wrap input[type=range]::-webkit-slider-runnable-track{appearance:none;height:6px;background:transparent;border:none;box-shadow:none;}
+.dual-range-wrap input[type=range]::-moz-range-track{appearance:none;height:6px;background:transparent;border:none;box-shadow:none;}
+/* Thumbs styled to match native slider size and accent colour */
+.dual-range-wrap input[type=range]::-webkit-slider-thumb{pointer-events:all;appearance:none;-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid var(--bg3);cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.4);margin-top:-5px;position:relative;z-index:2;}
+.dual-range-wrap input[type=range]::-moz-range-thumb{pointer-events:all;width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid var(--bg3);cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.4);}
 .lvl-range-hint{font-size:10px;color:var(--text3);margin-top:4px;line-height:1.4;padding:4px 6px;background:var(--bg2);border-radius:4px;}
 </style>
 </head>
@@ -210,7 +216,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   </svg>
   <h1>Starship Troopers Terran Command Terrain Tool</h1>
 </div>
-<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · <span id="versionDisplay"></span> · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
+<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · <span id="versionDisplay">v1.06</span> · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
 
 <div class="layout">
 <div class="left-col">
@@ -242,7 +248,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <div class="msg" id="msgMap" style="display:none"></div>
       </div>
       <div class="tp" id="tab-src-dir">
-        <div class="dz" id="dzDir"><div class="dl"><strong>Click to choose a scenario folder</strong></div><div class="dl" id="dzDirSub">Loads map.json, scenario.json, header.json and text_*.csv</div><input type="file" id="fiScenarioDir" webkitdirectory style="display:none"></div>
+        <div class="dz" id="dzDir"><div class="dl"><strong>Click to choose a scenario folder</strong></div><div class="dl" id="dzDirSub">Loads map.json, scenario.json, header.json and text_*.csv</div><div class="dl" id="dzDirTitle" style="display:none;font-style:italic;color:var(--text3);font-size:11px;"></div><input type="file" id="fiScenarioDir" webkitdirectory style="display:none"></div>
         <div class="msg" id="msgDir"></div>
       </div>
       <div class="tp" id="tab-src-gen">
@@ -268,11 +274,13 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <div class="field">
           <label class="fl">Output level range <span style="font-size:11px;color:var(--text3)" id="lvlRangeDisplay">editor −1 → 13</span></label>
           <div class="rr" style="align-items:center;gap:8px;">
-            <div style="flex:1;position:relative;">
-              <div class="dual-range-track"><div class="dual-range-fill" id="lvlRangeFill"></div></div>
-              <div class="dual-range-wrap">
-                <input type="range" id="lvlMin" min="0" max="14" value="0" step="1">
-                <input type="range" id="lvlMax" min="0" max="14" value="14" step="1">
+            <div style="flex:1;">
+              <div class="dual-range-outer">
+                <div class="dual-range-track"><div class="dual-range-fill" id="lvlRangeFill"></div></div>
+                <div class="dual-range-wrap">
+                  <input type="range" id="lvlMin" min="0" max="14" value="0" step="1">
+                  <input type="range" id="lvlMax" min="0" max="14" value="14" step="1">
+                </div>
               </div>
             </div>
             <span class="rv" id="lvlRangeOut">−1–13</span>
@@ -331,7 +339,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <!-- DLC -->
   <div class="section" id="secDLC">
     <div class="sh" data-sec="secDLC">
-      <div class="sh-left"><span class="st">DLCs</span><span class="landscape-badge" id="dlcBadge" style="display:none"></span></div>
+      <div class="sh-left"><span class="st">DLCs</span><span class="landscape-badge">Base Game</span><span class="landscape-badge" id="dlcBadge" style="display:none"></span></div>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
@@ -339,7 +347,6 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div id="dlcNotLoaded" style="font-size:11px;color:var(--text3);padding:4px 0 8px;">Load a scenario folder or drop header.json to edit DLCs.</div>
       <div id="dlcControls" style="display:none;">
         <div class="field">
-          <label class="ck-row" style="margin-bottom:5px;"><input type="checkbox" id="dlc1" value="1"> Base Game</label>
           <label class="ck-row" style="margin-bottom:5px;"><input type="checkbox" id="dlc2" value="2"> Raising Hell</label>
           <label class="ck-row"><input type="checkbox" id="dlc4" value="4"> Urban Onslaught</label>
         </div>
@@ -524,7 +531,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <!-- HISTORY -->
   <div class="section" id="secHistory">
     <div class="sh" data-sec="secHistory">
-      <div class="sh-left"><span class="st">History</span></div>
+      <div class="sh-left"><span class="st">History</span><span class="landscape-badge" id="historyBadge" style="display:none;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span></div>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
@@ -536,7 +543,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <!-- EXPORT -->
   <div class="export-box">
     <div class="export-title">Export</div>
-    <div class="note" style="margin-bottom:10px;">Buttons are highlighted when the file has unsaved changes. Files export individually or all at once.</div>
+    <div class="note" style="margin-bottom:10px;">Buttons are highlighted when the file has unsaved changes. Individual files export directly; ZIP bundles everything into one download.</div>
     <div class="export-file-row" id="exportRowMap">
       <div class="export-file-info"><span class="export-file-name">map.json</span><span class="export-file-status" id="statusMap"></span></div>
       <button class="sm" id="btnExportMap" disabled>↓ Export</button>
@@ -550,7 +557,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <button class="sm" id="btnExportHeader" disabled>↓ Export</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
-      <button class="primary" id="btnExportAll" disabled>↓ Export all</button>
+      <button class="primary" id="btnExportAll" disabled>↓ Export as ZIP</button>
       <button id="btnPreview" disabled>Preview map JSON</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:8px;">
@@ -561,8 +568,8 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
     </div>
     <div style="font-size:11px;color:var(--text3);margin-top:4px;" id="undoBadge"></div>
     <div class="field" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
-      <label class="ck-row" style="margin-bottom:5px;"><input type="checkbox" id="chkBackup"> Download .bak copy before each export <span style="color:var(--text3);font-size:10px;">(save alongside originals manually)</span></label>
-      <label class="ck-row"><input type="checkbox" id="chkDebugFile"> Write STTC-TT.json alongside exports <span style="color:var(--text3);font-size:10px;">(separate file, not embedded in game files)</span></label>
+      <label class="ck-row" style="margin-bottom:5px;align-items:flex-start;"><input type="checkbox" id="chkBackup" style="margin-top:2px;"><span><span>Download .bak copy before each export</span><span style="display:block;color:var(--text3);font-size:10px;margin-top:1px;">(save alongside originals manually)</span></span></label>
+      <label class="ck-row" style="align-items:flex-start;"><input type="checkbox" id="chkDebugFile" style="margin-top:2px;"><span><span>Write STTC-TT.json alongside exports</span><span style="display:block;color:var(--text3);font-size:10px;margin-top:1px;">(separate file, not embedded in game files)</span></span></label>
     </div>
     <div class="msg" id="msgExport"></div>
     <div class="path-note" id="pathNote"></div>
@@ -622,7 +629,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 
 </div><!-- end layout -->
 <script>
-const TOOL_VERSION='1.06-beta03';
+const TOOL_VERSION='1.06';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // COLOUR HELPERS - all colours in this file use hex strings for easy VS Code editing
@@ -679,6 +686,7 @@ function applyScheme(name){
     default: LV_COL=buildPaletteFromCss('lv-default'); break;
   }
   if(tileData) updatePreview();
+  logSession('colourScheme',name);
 }
 
 function updateSchemeStrip(){
@@ -871,6 +879,7 @@ const LS_GROUPS={
   7:['Metropolis','Metropolis Blends','Special'],8:['Jungle','Jungle Blends'],
 };
 const LS_NAMES={0:'Desert',1:'Chemical/Underground',2:'Desert City',3:'Lava',4:'Lava Underground',5:'Space Station',6:'Metropolis',7:'Metro Underground',8:'Jungle'};
+const DLC_NAMES={1:'Base Game',2:'Raising Hell',4:'Urban Onslaught'};
 
 const EDGES=[
   {id:0,    key:'cliffs_a',              name:'Cliffs_A',              dlc:'Base',   noEditor:false, remap:{base:2,  rubble:12,flat:0,  rocks:4,  cracks:8,  pave:3,  tiles:7,  platform:11,default:2}},
@@ -933,11 +942,18 @@ function remapTerrain(tid,edgeKey){
 
 // ── State ──────────────────────────────────────────────────────────────────────
 let imgGray=null,tileData=null,origTileData=null,srcTiles=null,srcByIndex={},srcEdgeGroups=null,scenarioData=null,headerData=null;
-let scenarioName=null,dlcHistory=[];
+let genPreDragSnapshot=null,genPreDragSliderId=null;
+let _heatCache=null,_heatCacheStamp=null;
+let orientAngle=0,orientFlippedH=false,orientHistory=[];
+let scenarioName=null,dirName=null,dlcHistory=[],sessionLog=[];
 // Dirty tracking - snapshot JSON of each file at load time
 let _snapMap=null,_snapScenario=null,_snapHeader=null;
 
 function snapMap(){return tileData?JSON.stringify(buildTiles()):null;}
+
+function logSession(action,detail){
+  sessionLog.push({at:new Date().toISOString(),action,detail});
+}
 function snapScenario(){if(!scenarioData)return null;const s={...scenarioData,LandscapeId:activeLandscape};return JSON.stringify(s);}
 function snapHeader(){return headerData?JSON.stringify(headerData):null;}
 
@@ -1011,8 +1027,8 @@ wireTabs('srcBar',()=>{
     else{activeSource='gen';}
   }
 });
-wireTabs('tBar',updatePreview);
-wireTabs('eBar',updatePreview);
+wireTabs('tBar',()=>{updatePreview();logSession('terrainTab',activeTerrainTab());});
+wireTabs('eBar',()=>{updatePreview();logSession('edgeTab',activeEdgeTab());});
 
 // ── Edge select builder ────────────────────────────────────────────────────────
 const LS_EDGE_DLCS={
@@ -1141,6 +1157,7 @@ function setActiveLandscape(id,source){
   }
   updateTHint();
   updateExportUI();
+  if(source==='manual') logSession('landscape',LS_NAMES[id]);
 }
 
 document.getElementById('landscapeSelect').addEventListener('change',()=>setActiveLandscape(parseInt(document.getElementById('landscapeSelect').value),'manual'));
@@ -1211,7 +1228,7 @@ makeDrop('dzImg','fiImg',file=>{
     msg.textContent=`${file.name} (${img.naturalWidth}×${img.naturalHeight} → 128×128)`;msg.className='msg ok';
     document.getElementById('dzImg').classList.add('loaded');
     document.getElementById('srcBadge').textContent='Image loaded';
-    activeSource='image';srcTiles=null;srcByIndex={};srcEdgeGroups=null;
+    activeSource='image';srcTiles=null;srcByIndex={};srcEdgeGroups=null;dirName=null;
     recompute();enableTools();resetCompass();
   };
   img.onerror=()=>{msg.textContent='Could not read image.';msg.className='msg err';};
@@ -1230,7 +1247,7 @@ makeDrop('dzMap','fiMap',file=>{
       srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)srcByIndex[t.Index]=t;});
       tileData=new Int16Array(W*H);
       srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)tileData[t.Index]=Math.max(0,Math.min(MAX_LEVEL,t.Level));});
-      origTileData=tileData.slice();history=[];historyCursor=-1;
+      origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];
       if(data._STTCTT?.undoHistory?.length){
         data._STTCTT.undoHistory.forEach(label=>history.push({data:null,label:`[prev] ${label}`,genState:null,readOnly:true}));
         historyCursor=history.length-1;
@@ -1306,29 +1323,52 @@ function applyHeaderData(d){
   headerData=d;
   const dlcs=Array.isArray(d.DLCs)?d.DLCs:[];
   // Set checkboxes without triggering the change listener (which would mutate headerData)
-  [1,2,4].forEach(id=>{const el=document.getElementById('dlc'+id);if(el)el.checked=dlcs.includes(id);});
+  // DLC 1 (Base Game) is always required - only toggle optional DLCs
+  [2,4].forEach(id=>{const el=document.getElementById('dlc'+id);if(el)el.checked=dlcs.includes(id);});
+  // Ensure DLC 1 is always present in data
+  if(!dlcs.includes(1))headerData.DLCs=[1,...dlcs];
   document.getElementById('dlcControls').style.display='block';
   document.getElementById('dlcNotLoaded').style.display='none';
   const badge=document.getElementById('dlcBadge');
-  const DLC_NAMES={1:'Base Game',2:'Raising Hell',4:'Urban Onslaught'};
-  badge.textContent=dlcs.length?dlcs.map(id=>DLC_NAMES[id]||'DLC '+id).join(', '):'None';
-  badge.style.display='inline-flex';
+    const optionalDlcs=dlcs.filter(id=>id!==1);
+  badge.textContent=optionalDlcs.length?optionalDlcs.map(id=>DLC_NAMES[id]||'DLC '+id).join(', '):'';
+  badge.style.display=optionalDlcs.length?'inline-flex':'none';
   // Snapshot AFTER all UI is set - checkboxes are now settled
   _snapHeader=snapHeader();
   updateExportUI();
 }
 
+// ── Language-to-filename mapping ──────────────────────────────────────────────
+// Maps BCP-47 primary language subtags to the suffix used in text_*.csv filenames.
+const LANG_TO_TEXT={
+  en:'english',fr:'french',de:'german',es:'spanish',
+  pt:'portuguese',ru:'russian',zh:'chinese',pl:'polish',
+};
+function preferredTextSuffix(){
+  // navigator.language gives e.g. "en-US", "fr-FR", "zh-CN"
+  const lang=(navigator.language||'en').split('-')[0].toLowerCase();
+  return LANG_TO_TEXT[lang]||'english';
+}
+
 function loadScenarioDir(files){
   const fileArr=[...files];
-  let mapFile=null,scenFile=null,headerFile=null,textFile=null,dirName=null;
+  let mapFile=null,scenFile=null,headerFile=null;
+  dirName=null;
+  const textFiles={};  // suffix -> file object, e.g. {english: File, french: File}
   fileArr.forEach(f=>{
     const n=f.name.toLowerCase();
     if(!dirName&&f.webkitRelativePath)dirName=f.webkitRelativePath.split('/')[0];
     if(n==='map.json')mapFile=f;
     else if(n==='scenario.json')scenFile=f;
     else if(n==='header.json')headerFile=f;
-    else if(/^text_.*\.csv$/.test(n)&&!textFile)textFile=f;
+    else{
+      const m=n.match(/^text_(.+)\.csv$/);
+      if(m)textFiles[m[1]]=f;
+    }
   });
+  // Pick text file: browser language > english > first available > none
+  const pref=preferredTextSuffix();
+  const textFile=textFiles[pref]||textFiles['english']||Object.values(textFiles)[0]||null;
   const promises=[];
   if(scenFile)promises.push(readJSON(scenFile).then(d=>{scenarioData=d;}));
   if(headerFile)promises.push(readJSON(headerFile).then(d=>{applyHeaderData(d);}));
@@ -1337,7 +1377,7 @@ function loadScenarioDir(files){
     srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)srcByIndex[t.Index]=t;});
     tileData=new Int16Array(W*H);
     srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)tileData[t.Index]=Math.max(0,Math.min(MAX_LEVEL,t.Level));});
-    origTileData=tileData.slice();history=[];historyCursor=-1;
+    origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];
     if(d._STTCTT?.undoHistory?.length){
       d._STTCTT.undoHistory.forEach(label=>history.push({data:null,label:'[prev] '+label,genState:null,readOnly:true}));
       historyCursor=history.length-1;
@@ -1367,6 +1407,11 @@ function loadScenarioDir(files){
       if(mapFile)loaded.push('map.json');if(scenFile)loaded.push('scenario.json');
       if(headerFile)loaded.push('header.json');if(textFile)loaded.push(textFile.name);
       subEl.textContent=loaded.length?loaded.join(' · '):'No recognised files found';
+    }
+    const titleEl=document.getElementById('dzDirTitle');
+    if(titleEl){
+      if(scenarioName){titleEl.textContent='“'+scenarioName+'”';titleEl.style.display='block';}
+      else{titleEl.style.display='none';}
     }
     document.getElementById('dzDir')?.classList.add('loaded');
     if(scenarioData){applyScenarioData(scenarioData.LandscapeId??0);}
@@ -1433,22 +1478,27 @@ document.getElementById('fiScenarioDir').addEventListener('change',e=>{
 
 // DLC checkbox handler + header.json drop
 (()=>{
-  const DLC_NAMES={1:'Base Game',2:'Raising Hell',4:'Urban Onslaught'};
-  function applyDLCChange(){
+    function applyDLCChange(){
     if(!headerData)return;
     const prev=[...(headerData.DLCs||[])];
-    headerData.DLCs=[1,2,4].filter(id=>document.getElementById('dlc'+id)?.checked);
-    if(document.getElementById('chkDebugFile')?.checked){
-      dlcHistory.push({at:new Date().toISOString(),from:prev,to:[...headerData.DLCs]});
-    }
+    headerData.DLCs=[1,...[2,4].filter(id=>document.getElementById('dlc'+id)?.checked)];
+    const DLC_LABEL=id=>({1:'Base Game',2:'Raising Hell',4:'Urban Onslaught'}[id]||'DLC '+id);
+    dlcHistory.push({
+      at:new Date().toISOString(),
+      from:prev.map(DLC_LABEL).join(', ')||'none',
+      to:headerData.DLCs.map(DLC_LABEL).join(', ')||'none',
+    });
     const badge=document.getElementById('dlcBadge');
-    badge.textContent=headerData.DLCs.length?headerData.DLCs.map(id=>DLC_NAMES[id]||'DLC '+id).join(', '):'None';
+    const optDlcs=headerData.DLCs.filter(id=>id!==1);
+    badge.textContent=optDlcs.length?optDlcs.map(id=>DLC_NAMES[id]||'DLC '+id).join(', '):'';
+    badge.style.display=optDlcs.length?'inline-flex':'none';
     const m=document.getElementById('msgDLC');
-    m.textContent='DLCs updated - export header.json to save.';m.className='msg ok';
-    setTimeout(()=>{if(m.textContent.startsWith('DLCs updated'))m.textContent='';},4000);
+    const dirty=isDirtyHeader();
+    m.textContent=dirty?'DLCs changed - export header.json to save.':'';
+    m.className=dirty?'msg ok':'msg';
     updateExportUI();
   }
-  [1,2,4].forEach(id=>{const el=document.getElementById('dlc'+id);if(el)el.addEventListener('change',applyDLCChange);});
+  [2,4].forEach(id=>{const el=document.getElementById('dlc'+id);if(el)el.addEventListener('change',applyDLCChange);});
   makeDrop('dzHeader','fiHeader',file=>{
     readJSON(file).then(d=>applyHeaderData(d)).catch(err=>{
       const m=document.getElementById('msgDLC');m.textContent='Error: '+err.message;m.className='msg err';
@@ -1468,7 +1518,7 @@ function recompute(){
   const lo2=Math.min(lo,hi),hi2=Math.max(lo,hi);
   tileData=new Int16Array(W*H);
   for(let i=0;i<W*H;i++)tileData[i]=quantize(imgGray[i],q,lo2,hi2);
-  origTileData=tileData.slice();history=[];historyCursor=-1;updateUndoButtons();updatePreview();
+  origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];updateUndoButtons();updatePreview();
 }
 
 // ── Noise generator ────────────────────────────────────────────────────────────
@@ -1516,7 +1566,7 @@ function runNoiseGen(){
   const seed32=hashSeed(rawSeed);
   const type=document.querySelector('input[name="noiseType"]:checked')?.value||'perlin';
   const scale=Math.max(1,parseInt(document.getElementById('genScale').value)||60);
-  const waterPct=parseInt(document.getElementById('genWater').value)||20;
+  const waterPct=parseInt(document.getElementById('genWater').value??'20');
   const octaves=Math.max(1,Math.min(8,parseInt(document.getElementById('genOctaves').value)||4));
   const persistence=(parseInt(document.getElementById('genPersist').value)||50)/100;
   const lacunarity=(parseInt(document.getElementById('genLacun').value)||170)/100;
@@ -1565,7 +1615,7 @@ function recomputeGen(commitUndo=false){
   if(commitUndo&&!firstLoad)pushUndo('generate');
   const{data,seed,type}=runNoiseGen();tileData=data;
   if(firstLoad){
-    origTileData=tileData.slice();history=[];historyCursor=-1;
+    origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];
     history.push({data:tileData.slice(),label:'initial generate',genState:captureGenState()});
     historyCursor=0;updateUndoButtons();
   }
@@ -1590,7 +1640,6 @@ function genDragLabel(sliderId,preState){
   return before===after?`Generate - ${meta.name}`:`Generate - ${meta.name} (${before} -> ${after})`;
 }
 
-let genPreDragSnapshot=null,genPreDragSliderId=null;
 function mkGenSlider(id,outId,displayFn){
   const s=document.getElementById(id),o=document.getElementById(outId);
   if(!s||!o)return;
@@ -1729,7 +1778,6 @@ function heatmapColour(r,isSlope){
   const pos=t*si,lo=Math.floor(pos),hi=Math.min(si,lo+1),f=pos-lo,s0=stops[lo],s1=stops[hi];
   return[Math.round(s0[0]+(s1[0]-s0[0])*f),Math.round(s0[1]+(s1[1]-s0[1])*f),Math.round(s0[2]+(s1[2]-s0[2])*f)];
 }
-let _heatCache=null,_heatCacheStamp=null;
 function invalidateHeatCache(){_heatCache=null;_heatCacheStamp=null;}
 
 // ── Preview render ─────────────────────────────────────────────────────────────
@@ -1866,6 +1914,12 @@ function updateUndoButtons(){
   document.getElementById('btnRedo').disabled=!canRedo;
   const badge=document.getElementById('undoBadge'),cur=history[historyCursor];
   if(badge)badge.textContent=canUndo?(historyCursor+1)+' undoable - last: '+(cur?.label??''):'';
+  const hBadge=document.getElementById('historyBadge');
+  if(hBadge){
+    const label=cur?.label??'';
+    hBadge.textContent=label;
+    hBadge.style.display=label?'inline-flex':'none';
+  }
   const list=document.getElementById('historyList');if(!list)return;
   list.innerHTML='';
   for(let i=history.length-1;i>=0;i--){
@@ -1933,7 +1987,6 @@ document.getElementById('btnReset').addEventListener('click',()=>{
 });
 
 // ── Orientation ────────────────────────────────────────────────────────────────
-let orientAngle=0,orientFlippedH=false,orientHistory=[];
 function orientMsg(txt){const m=document.getElementById('msgOrient');m.textContent=txt;m.className='msg ok';setTimeout(()=>{if(m.textContent===txt)m.textContent='';},4000);}
 const ORIENT_BADGE_DIRS=['N↑','W←','S↓','E→'];
 function drawOrientIndicator(){
@@ -2008,11 +2061,117 @@ function dl(name,text){
 }
 function dlWithBackup(name,text,origSnap){
   if(document.getElementById('chkBackup')?.checked&&origSnap){
-    // Download backup first with .bak inserted before .json
     const bakName=name.replace(/\.json$/,'.bak.json');
     dl(bakName,origSnap);
   }
   dl(name,text);
+}
+
+// ── Minimal ZIP builder (store only, no compression) ─────────────────────────
+// Implements just enough of the ZIP spec (PKWARE APPNOTE 6.3) to produce a
+// valid archive of UTF-8 text files. No dependencies required.
+function buildZip(files){
+  // files: [{name:string, text:string}]
+  const enc=new TextEncoder();
+  const localHeaders=[];
+  const centralDir=[];
+  let offset=0;
+
+  function u16(n){const b=new Uint8Array(2);new DataView(b.buffer).setUint16(0,n,true);return b;}
+  function u32(n){const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,n,true);return b;}
+
+  // CRC-32 table
+  const crcTable=new Uint32Array(256);
+  for(let i=0;i<256;i++){
+    let c=i;
+    for(let j=0;j<8;j++)c=c&1?(0xEDB88320^(c>>>1)):(c>>>1);
+    crcTable[i]=c;
+  }
+  function crc32(data){
+    let crc=0xFFFFFFFF;
+    for(let i=0;i<data.length;i++)crc=crcTable[(crc^data[i])&0xFF]^(crc>>>8);
+    return(crc^0xFFFFFFFF)>>>0;
+  }
+
+  function concat(...arrays){
+    const total=arrays.reduce((s,a)=>s+a.length,0);
+    const out=new Uint8Array(total);
+    let pos=0;
+    for(const a of arrays){out.set(a,pos);pos+=a.length;}
+    return out;
+  }
+
+  const now=new Date();
+  const dosTime=((now.getSeconds()>>1)|(now.getMinutes()<<5)|(now.getHours()<<11));
+  const dosDate=((now.getDate())|(now.getMonth()+1)<<5)|((now.getFullYear()-1980)<<9);
+
+  for(const{name,text}of files){
+    const nameBytes=enc.encode(name);
+    const dataBytes=enc.encode(text);
+    const crc=crc32(dataBytes);
+    const size=dataBytes.length;
+
+    // Local file header
+    const local=concat(
+      new Uint8Array([0x50,0x4B,0x03,0x04]), // signature
+      u16(20),          // version needed
+      u16(0),           // flags
+      u16(0),           // compression: store
+      u16(dosTime),u16(dosDate),
+      u32(crc),
+      u32(size),        // compressed size (same as uncompressed for store)
+      u32(size),        // uncompressed size
+      u16(nameBytes.length),
+      u16(0),           // extra field length
+      nameBytes,
+      dataBytes,
+    );
+
+    // Central directory entry
+    const central=concat(
+      new Uint8Array([0x50,0x4B,0x01,0x02]), // signature
+      u16(20),u16(20),  // version made by, version needed
+      u16(0),           // flags
+      u16(0),           // compression: store
+      u16(dosTime),u16(dosDate),
+      u32(crc),
+      u32(size),u32(size),
+      u16(nameBytes.length),
+      u16(0),u16(0),    // extra, comment lengths
+      u16(0),           // disk number start
+      u16(0),u32(0),    // internal/external attrs
+      u32(offset),      // local header offset
+      nameBytes,
+    );
+
+    localHeaders.push(local);
+    centralDir.push(central);
+    offset+=local.length;
+  }
+
+  const centralDirData=concat(...centralDir);
+  const centralDirSize=centralDirData.length;
+
+  // End of central directory record
+  const eocd=concat(
+    new Uint8Array([0x50,0x4B,0x05,0x06]), // signature
+    u16(0),u16(0),      // disk numbers
+    u16(files.length),u16(files.length),
+    u32(centralDirSize),
+    u32(offset),
+    u16(0),             // comment length
+  );
+
+  return concat(...localHeaders,centralDirData,eocd);
+}
+
+function dlZip(zipName,files){
+  const zipData=buildZip(files);
+  const blob=new Blob([zipData],{type:'application/zip'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=zipName;a.click();
+  URL.revokeObjectURL(url);
 }
 document.getElementById('btnPreview').addEventListener('click',()=>{
   const data=buildTiles();if(!data)return;
@@ -2056,6 +2215,7 @@ function buildDebugJSON(){
   return JSON.stringify({
     exportedAt:new Date().toISOString(),
     toolVersion:TOOL_VERSION,
+    scenarioName:scenarioName||null,
     source:{type:activeSource,tiles:tileData?tileData.length:0,
       ...(activeSource==='gen'?{
         noiseType:document.querySelector('input[name="noiseType"]:checked')?.value,
@@ -2073,12 +2233,12 @@ function buildDebugJSON(){
     colourScheme:activeScheme,
     terrain:{tab:activeTerrainTab(),defaultValue:document.getElementById('terrainSelect').value,lockToLandscape:document.getElementById('lockLandscape').checked,lowOverride:document.getElementById('lowTerrain').value,highOverride:document.getElementById('highTerrain').value},
     edges:{tab:activeEdgeTab(),globalRemap:document.getElementById('edgeRemap').value,lowRemap:document.getElementById('edgeRemapLow').value,highRemap:document.getElementById('edgeRemapHigh').value,lockToLandscape:document.getElementById('lockEdgeLandscape').checked},
-    output:{tileCount:tileData?tileData.length:0,levelRange:tileData?{min:Math.min(...tileData),max:Math.max(...tileData)}:null},
+    output:{tileCount:tileData?tileData.length:0,levelRange:tileData?{minEditor:toEditor(Math.min(...tileData)),maxEditor:toEditor(Math.max(...tileData))}:null},
     undoHistoryDepth:historyCursor+1,
     undoHistory:history.slice(0,historyCursor+1).map(e=>e.label),
     orientation:{angleCW:orientAngle,flippedH:orientFlippedH,history:orientHistory},
     dlcs:{current:headerData?[...(headerData.DLCs||[])]:null,history:dlcHistory},
-    scenarioName:scenarioName,
+    sessionLog:sessionLog,
   },null,2);
 }
 
@@ -2103,11 +2263,46 @@ document.getElementById('btnExportHeader').addEventListener('click',()=>{
   if(exportHeader())exportMsg(['header.json']);
 });
 document.getElementById('btnExportAll').addEventListener('click',()=>{
+  const zipFiles=[];
+  const wantsBackup=document.getElementById('chkBackup')?.checked;
+  const wantsDebug=document.getElementById('chkDebugFile')?.checked;
   const exported=[];
-  if(tileData&&exportMap())exported.push('map.json');
-  if(scenarioData&&exportScenario())exported.push('scenario.json');
-  if(headerData&&exportHeader())exported.push('header.json');
-  if(exported.length)exportMsg(exported);
+
+  if(tileData){
+    const json=buildMapJSON();if(json){
+      if(wantsBackup&&_snapMap)zipFiles.push({name:'map.bak.json',text:_snapMap});
+      zipFiles.push({name:'map.json',text:json});
+      _snapMap=json;exported.push('map.json');
+    }
+  }
+  if(scenarioData){
+    scenarioData.LandscapeId=activeLandscape;
+    const json=JSON.stringify(scenarioData,null,2);
+    if(wantsBackup&&_snapScenario)zipFiles.push({name:'scenario.bak.json',text:_snapScenario});
+    zipFiles.push({name:'scenario.json',text:json});
+    _snapScenario=json;exported.push('scenario.json');
+  }
+  if(headerData){
+    const json=JSON.stringify(headerData,null,2);
+    if(wantsBackup&&_snapHeader)zipFiles.push({name:'header.bak.json',text:_snapHeader});
+    zipFiles.push({name:'header.json',text:json});
+    _snapHeader=json;exported.push('header.json');
+  }
+  if(wantsDebug){
+    zipFiles.push({name:'STTC-TT.json',text:buildDebugJSON()});
+    exported.push('STTC-TT.json');
+  }
+
+  if(!zipFiles.length)return;
+
+  // Name the ZIP after the scenario if we have one
+  const zipBase=(scenarioName||dirName||'sttc-tt-export').replace(/[^a-zA-Z0-9_\-. ]/g,'-');
+  dlZip(zipBase+'.zip',zipFiles);
+
+  const m=document.getElementById('msgExport');
+  m.textContent='ZIP downloaded: '+exported.join(', ')+(scenarioData?' (LandscapeId: '+activeLandscape+' - '+LS_NAMES[activeLandscape]+')':'');
+  m.className='msg ok';
+  updateExportUI();
 });
 
 // ── Change listeners ───────────────────────────────────────────────────────────
@@ -2240,6 +2435,7 @@ function updateLvlRangeUI(){
     r.addEventListener('change',()=>{
       rangeMode=r.value;
       updateLvlRangeUI();
+      logSession('rangeMode',rangeMode);
       if(activeSource==='gen') recomputeGen(true);
     });
   });

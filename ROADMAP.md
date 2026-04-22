@@ -49,6 +49,7 @@ A living document for tracking ideas, improvements, and future direction for the
 
 Completed items
 
+- [x] Browser language detected to pull scenario name from best guessed text_<language>.csv 
 - [x] File backups before export
 - [x] Load and export entire scenario folders
 - [x] Colourblind accessibility options

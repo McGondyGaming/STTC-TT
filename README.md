@@ -125,6 +125,8 @@ Option: Embed `STTC-TT.json` for diagnositc purposes. The following data is capt
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
+ - Import entire scenario folders
+ - Export multiple files as zip 
  - Generator level limiter added
  - Preview mode selector now separate buttons
  - Slopes now calculate heat in the correct direction, and with greater penalties uphill
