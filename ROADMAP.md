@@ -13,6 +13,8 @@ A living document for tracking ideas, improvements, and future direction for the
 
 ## Ideas
 
+- [ ] OpenStreetMap/MapBox import to correct scale
+
 ### Exports
 
 - [ ] Export greyscale heightmap
@@ -47,6 +49,8 @@ A living document for tracking ideas, improvements, and future direction for the
 
 Completed items
 
+- [x] File backups before export
+- [x] Load and export entire scenario folders
 - [x] Colourblind accessibility options
 - [x] Selectable colours (high, medium, low + interpolated levels)
 - [x] Show tile coordinates on hover
