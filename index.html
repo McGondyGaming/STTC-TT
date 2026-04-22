@@ -14,7 +14,7 @@
   --ok:#2a7a3b;--err:#c0392b;--warn:#7a5a00;
 
   /* ── Height level palettes (map level 0=editor -1 … 14=editor 13) ── */
-  /* Default — deep navy → green → amber → grey peaks               */
+  /* Default - deep navy → green → amber → grey peaks               */
   --lv-default-0:#0d0d1a;
   --lv-default-1:#0f2a45;
   --lv-default-2:#1a4a70;
@@ -31,7 +31,7 @@
   --lv-default-13:#c8c8c8;
   --lv-default-14:#f0f0f0;
 
-  /* Deuteranopia — blue → gold → white (avoids red/green)           */
+  /* Deuteranopia - blue → gold → white (avoids red/green)           */
   --lv-deut-0:#0d0d2a;
   --lv-deut-1:#0a2060;
   --lv-deut-2:#1040a0;
@@ -48,7 +48,7 @@
   --lv-deut-13:#d8d8d8;
   --lv-deut-14:#f8f8f8;
 
-  /* High Contrast — black → cyan → yellow → white                   */
+  /* High Contrast - black → cyan → yellow → white                   */
   --lv-hc-0:#000000;
   --lv-hc-1:#001840;
   --lv-hc-2:#003880;
@@ -157,6 +157,12 @@ button.sm{padding:5px 10px;font-size:12px;border-radius:5px;}
 .tsw{width:11px;height:11px;border-radius:3px;display:inline-block;flex-shrink:0;}
 .landscape-badge{font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;background:var(--bg2);border:1px solid var(--border);color:var(--text);}
 .export-box{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 15px;}
+.export-file-row{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-radius:7px;margin-bottom:4px;background:var(--bg2);border:1px solid var(--border);transition:border-color .15s;}
+.export-file-row.dirty{border-color:var(--ok);}
+.export-file-info{display:flex;align-items:center;gap:8px;}
+.export-file-name{font-size:12px;font-weight:600;color:var(--text);font-family:monospace;}
+.export-file-status{font-size:10px;color:var(--text3);}
+.export-file-row.dirty .export-file-status{color:var(--ok);}
 .export-title{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px;}
 .path-note{font-size:10px;color:var(--text3);margin-top:6px;line-height:1.5;}
 pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-space:pre-wrap;display:none;max-height:160px;overflow:auto;margin-top:8px;border:1px solid var(--border);color:var(--text2);font-family:monospace;}
@@ -182,15 +188,20 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 .cp-box input[type=color]{width:44px;height:32px;padding:2px;border:1px solid var(--border2);border-radius:5px;cursor:pointer;background:var(--bg);}
 .scheme-preview-strip{height:14px;border-radius:4px;border:1px solid var(--border);margin-top:8px;display:block;width:100%;}
 /* Dual-range level slider */
-.dual-range-wrap{position:relative;height:20px;margin:4px 0;}
-.dual-range-wrap input[type=range]{position:absolute;width:100%;height:100%;top:0;left:0;pointer-events:none;appearance:none;-webkit-appearance:none;background:transparent;margin:0;}
-.dual-range-wrap input[type=range]::-webkit-slider-thumb{pointer-events:all;appearance:none;-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--bg3);cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.3);}
-.dual-range-wrap input[type=range]::-moz-range-thumb{pointer-events:all;width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--bg3);cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.3);}
-.dual-range-wrap input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:transparent;}
-.dual-range-wrap input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:transparent;}
-.dual-range-track{position:relative;height:4px;border-radius:2px;background:var(--border2);margin:8px 0 4px;}
-.dual-range-fill{position:absolute;height:100%;border-radius:2px;background:var(--accent);opacity:0.6;}
-.lvl-range-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-top:2px;}
+/* Dual-range slider — track and thumbs visually match the standard .rr sliders */
+.dual-range-outer{position:relative;height:22px;}
+/* Custom track div - sits between the two stacked inputs via z-index */
+.dual-range-track{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:6px;border-radius:3px;background:var(--border2);border:1px solid var(--border2);outline:1px solid rgba(255,255,255,0.12);z-index:0;pointer-events:none;}
+.dual-range-fill{position:absolute;top:0;bottom:0;border-radius:2px;background:var(--accent);opacity:0.7;}
+.dual-range-wrap{position:absolute;inset:0;}
+/* Both inputs stacked, appearance:none kills all native chrome */
+.dual-range-wrap input[type=range]{position:absolute;width:100%;height:100%;top:0;left:0;margin:0;padding:0;pointer-events:none;appearance:none;-webkit-appearance:none;accent-color:transparent;background:transparent;z-index:1;}
+/* Fully transparent tracks so our custom track div shows through */
+.dual-range-wrap input[type=range]::-webkit-slider-runnable-track{appearance:none;height:6px;background:transparent;border:none;box-shadow:none;}
+.dual-range-wrap input[type=range]::-moz-range-track{appearance:none;height:6px;background:transparent;border:none;box-shadow:none;}
+/* Thumbs styled to match native slider size and accent colour */
+.dual-range-wrap input[type=range]::-webkit-slider-thumb{pointer-events:all;appearance:none;-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid var(--bg3);cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.4);margin-top:-5px;position:relative;z-index:2;}
+.dual-range-wrap input[type=range]::-moz-range-thumb{pointer-events:all;width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid var(--bg3);cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.4);}
 .lvl-range-hint{font-size:10px;color:var(--text3);margin-top:4px;line-height:1.4;padding:4px 6px;background:var(--bg2);border-radius:4px;}
 </style>
 </head>
@@ -205,7 +216,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   </svg>
   <h1>Starship Troopers Terran Command Terrain Tool</h1>
 </div>
-<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · v1.05 · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
+<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · <span id="versionDisplay">v1.06</span> · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
 
 <div class="layout">
 <div class="left-col">
@@ -213,13 +224,14 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <!-- SOURCE -->
   <div class="section open" id="secSource">
     <div class="sh" data-sec="secSource">
-      <div class="sh-left"><span class="st">Source</span><span class="sb" id="srcBadge">No source loaded</span></div>
+      <div class="sh-left"><span class="st">Source</span><span class="landscape-badge" id="srcBadge">No source loaded</span></div>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
       <div class="tab-bar" id="srcBar">
         <div class="tab active" data-tab="src-image">From image</div>
         <div class="tab" data-tab="src-map">Load map.json</div>
+        <div class="tab" data-tab="src-dir">Load scenario folder</div>
         <div class="tab" data-tab="src-gen">Generate</div>
       </div>
       <div class="tp active" id="tab-src-image">
@@ -232,8 +244,12 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         </div>
       </div>
       <div class="tp" id="tab-src-map">
-        <div class="dz" id="dzMap"><div class="dl"><strong>Drop map.json here</strong></div><div class="dl">Loads levels and terrain - auto-detects landscape</div><input type="file" id="fiMap" accept=".json,application/json" style="display:none"></div>
-        <div class="msg" id="msgMap"></div>
+        <div class="dz" id="dzMap"><div class="dl"><strong>Drop map.json here</strong></div><div class="dl" id="dzMapSub">Loads levels and terrain - auto-detects landscape</div><input type="file" id="fiMap" accept=".json,application/json" style="display:none"></div>
+        <div class="msg" id="msgMap" style="display:none"></div>
+      </div>
+      <div class="tp" id="tab-src-dir">
+        <div class="dz" id="dzDir"><div class="dl"><strong>Click to choose a scenario folder</strong></div><div class="dl" id="dzDirSub">Loads map.json, scenario.json, header.json and text_*.csv</div><div class="dl" id="dzDirTitle" style="display:none;font-style:italic;color:var(--text3);font-size:11px;"></div><input type="file" id="fiScenarioDir" webkitdirectory style="display:none"></div>
+        <div class="msg" id="msgDir"></div>
       </div>
       <div class="tp" id="tab-src-gen">
         <div class="note" style="margin-bottom:8px;">Generates a procedural heightmap using fractal noise. Output is deterministic - same seed and settings always produce the same map.</div>
@@ -257,12 +273,19 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <!-- Level range control -->
         <div class="field">
           <label class="fl">Output level range <span style="font-size:11px;color:var(--text3)" id="lvlRangeDisplay">editor −1 → 13</span></label>
-          <div class="dual-range-track"><div class="dual-range-fill" id="lvlRangeFill"></div></div>
-          <div class="dual-range-wrap">
-            <input type="range" id="lvlMin" min="0" max="14" value="0" step="1">
-            <input type="range" id="lvlMax" min="0" max="14" value="14" step="1">
+          <div class="rr" style="align-items:center;gap:8px;">
+            <div style="flex:1;">
+              <div class="dual-range-outer">
+                <div class="dual-range-track"><div class="dual-range-fill" id="lvlRangeFill"></div></div>
+                <div class="dual-range-wrap">
+                  <input type="range" id="lvlMin" min="0" max="14" value="0" step="1">
+                  <input type="range" id="lvlMax" min="0" max="14" value="14" step="1">
+                </div>
+              </div>
+            </div>
+            <span class="rv" id="lvlRangeOut">−1–13</span>
+            <button class="sm" id="btnLvlRangeReset" title="Reset to full range">↺</button>
           </div>
-          <div class="lvl-range-labels"><span id="lvlMinLabel">−1</span><span id="lvlMaxLabel">13</span></div>
           <div style="display:flex;gap:12px;margin-top:6px;">
             <label class="ck-row"><input type="radio" name="rangeMode" value="scale" checked> Scale to range</label>
             <label class="ck-row"><input type="radio" name="rangeMode" value="clamp"> Clamp to range</label>
@@ -289,13 +312,12 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <!-- LANDSCAPE -->
   <div class="section" id="secLandscape">
     <div class="sh" data-sec="secLandscape">
-      <div class="sh-left"><span class="st">Landscape</span><span id="lsBadge" class="landscape-badge" style="display:none"></span></div>
-      <span class="sb" id="lsBadgeNote"></span>
+      <div class="sh-left"><span class="st">Landscape</span><span id="lsBadge" class="landscape-badge" style="display:none"></span><span class="landscape-badge" id="lsBadgeNote" style="display:none"></span></div>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
       <div class="note">Controls <code>LandscapeId</code> in scenario.json - sets which cliff and terrain assets the engine uses.</div>
-      <div class="dz" id="dzScenario" style="padding:11px 10px;"><div class="dl"><strong>Drop scenario.json here</strong></div><div class="dl">Reads LandscapeId, included in export</div><input type="file" id="fiScenario" accept=".json,application/json" style="display:none"></div>
+      <div class="dz" id="dzScenario" style="padding:11px 10px;"><div class="dl"><strong>Drop scenario.json here</strong></div><div class="dl" id="dzScenarioSub">Reads LandscapeId, included in export</div><input type="file" id="fiScenario" accept=".json,application/json" style="display:none"></div>
       <div class="msg" id="msgScenario"></div>
       <div class="field" style="margin-top:10px;">
         <label class="fl">Landscape</label>
@@ -314,11 +336,30 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
     </div>
   </div>
 
+  <!-- DLC -->
+  <div class="section" id="secDLC">
+    <div class="sh" data-sec="secDLC">
+      <div class="sh-left"><span class="st">DLCs</span><span class="landscape-badge">Base Game</span><span class="landscape-badge" id="dlcBadge" style="display:none"></span></div>
+      <span class="sv-chev">▾</span>
+    </div>
+    <div class="section-body">
+      <div class="note">Controls the <code>DLCs</code> array in header.json. Removing a DLC that provides assets used in the map will likely break it in-game - verify after changes.</div>
+      <div id="dlcNotLoaded" style="font-size:11px;color:var(--text3);padding:4px 0 8px;">Load a scenario folder or drop header.json to edit DLCs.</div>
+      <div id="dlcControls" style="display:none;">
+        <div class="field">
+          <label class="ck-row" style="margin-bottom:5px;"><input type="checkbox" id="dlc2" value="2"> Raising Hell</label>
+          <label class="ck-row"><input type="checkbox" id="dlc4" value="4"> Urban Onslaught</label>
+        </div>
+        <div class="msg" id="msgDLC"></div>
+      </div>
+      <div class="dz" id="dzHeader" style="padding:9px 10px;margin-top:8px;"><div class="dl"><strong>Drop header.json here</strong></div><input type="file" id="fiHeader" accept=".json,application/json" style="display:none"></div>
+    </div>
+  </div>
+
   <!-- TERRAIN -->
   <div class="section" id="secTerrain">
     <div class="sh" data-sec="secTerrain">
-      <div class="sh-left"><span class="st">Terrain</span></div>
-      <span class="sb">Default: no change</span>
+      <div class="sh-left"><span class="st">Terrain</span><span class="landscape-badge" id="terrainBadge">No change</span></div>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
@@ -353,8 +394,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <!-- EDGES -->
   <div class="section" id="secEdges">
     <div class="sh" data-sec="secEdges">
-      <div class="sh-left"><span class="st">Edges</span></div>
-      <span class="sb">Default: no change</span>
+      <div class="sh-left"><span class="st">Edges</span><span class="landscape-badge" id="edgesBadge">No change</span></div>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
@@ -405,8 +445,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <!-- ORIENTATION -->
   <div class="section" id="secOrientation">
     <div class="sh" data-sec="secOrientation">
-      <div class="sh-left"><span class="st">Orientation</span></div>
-      <span class="sb" id="orientBadge">N↑</span>
+      <div class="sh-left"><span class="st">Orientation</span><span class="landscape-badge" id="orientBadge">N↑</span></div>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
@@ -468,7 +507,6 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <div class="section" id="secSettings">
     <div class="sh" data-sec="secSettings">
       <div class="sh-left"><span class="st">Settings</span></div>
-      <span class="sb">Preview colour scheme</span>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
@@ -493,7 +531,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <!-- HISTORY -->
   <div class="section" id="secHistory">
     <div class="sh" data-sec="secHistory">
-      <div class="sh-left"><span class="st">History</span></div>
+      <div class="sh-left"><span class="st">History</span><span class="landscape-badge" id="historyBadge" style="display:none;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span></div>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
@@ -505,19 +543,33 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <!-- EXPORT -->
   <div class="export-box">
     <div class="export-title">Export</div>
-    <div class="b2">
-      <button class="primary" id="btnExportMap" disabled>Export map.json ↓</button>
-      <button id="btnExportScenario" disabled>Export scenario.json ↓</button>
+    <div class="note" style="margin-bottom:10px;">Buttons are highlighted when the file has unsaved changes. Individual files export directly; ZIP bundles everything into one download.</div>
+    <div class="export-file-row" id="exportRowMap">
+      <div class="export-file-info"><span class="export-file-name">map.json</span><span class="export-file-status" id="statusMap"></span></div>
+      <button class="sm" id="btnExportMap" disabled>↓ Export</button>
     </div>
-    <div class="b4">
-      <button id="btnPreview" disabled>Preview JSON</button>
+    <div class="export-file-row" id="exportRowScenario">
+      <div class="export-file-info"><span class="export-file-name">scenario.json</span><span class="export-file-status" id="statusScenario"></span></div>
+      <button class="sm" id="btnExportScenario" disabled>↓ Export</button>
+    </div>
+    <div class="export-file-row" id="exportRowHeader">
+      <div class="export-file-info"><span class="export-file-name">header.json</span><span class="export-file-status" id="statusHeader"></span></div>
+      <button class="sm" id="btnExportHeader" disabled>↓ Export</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
+      <button class="primary" id="btnExportAll" disabled>↓ Export as ZIP</button>
+      <button id="btnPreview" disabled>Preview map JSON</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:8px;">
       <button id="btnUndo" disabled>↩ Undo</button>
       <button id="btnRedo" disabled>↪ Redo</button>
       <button id="btnReset" disabled>⟳ Reset</button>
+      <button id="btnClearPre" style="display:none;">✕ Hide</button>
     </div>
     <div style="font-size:11px;color:var(--text3);margin-top:4px;" id="undoBadge"></div>
-    <div class="field" style="margin-top:8px;">
-      <label class="ck-row"><input type="checkbox" id="chkEmbedDebug"> Embed STTC-TT debug info in map.json <span style="color:var(--text3);font-size:10px;">(unknown fields are ignored by the game)</span></label>
+    <div class="field" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+      <label class="ck-row" style="margin-bottom:5px;align-items:flex-start;"><input type="checkbox" id="chkBackup" style="margin-top:2px;"><span><span>Download .bak copy before each export</span><span style="display:block;color:var(--text3);font-size:10px;margin-top:1px;">(save alongside originals manually)</span></span></label>
+      <label class="ck-row" style="align-items:flex-start;"><input type="checkbox" id="chkDebugFile" style="margin-top:2px;"><span><span>Write STTC-TT.json alongside exports</span><span style="display:block;color:var(--text3);font-size:10px;margin-top:1px;">(separate file, not embedded in game files)</span></span></label>
     </div>
     <div class="msg" id="msgExport"></div>
     <div class="path-note" id="pathNote"></div>
@@ -577,8 +629,10 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 
 </div><!-- end layout -->
 <script>
+const TOOL_VERSION='1.06';
+
 // ═══════════════════════════════════════════════════════════════════════════════
-// COLOUR HELPERS — all colours in this file use hex strings for easy VS Code editing
+// COLOUR HELPERS - all colours in this file use hex strings for easy VS Code editing
 // ═══════════════════════════════════════════════════════════════════════════════
 function hexToRgb(hex){
   const h=hex.replace('#','');
@@ -632,6 +686,7 @@ function applyScheme(name){
     default: LV_COL=buildPaletteFromCss('lv-default'); break;
   }
   if(tileData) updatePreview();
+  logSession('colourScheme',name);
 }
 
 function updateSchemeStrip(){
@@ -685,7 +740,7 @@ const TERRAINS=[
   {id:4,  name:'Rocks',                     hex:'#5a3c22', edge:'Cliffs_A',      group:'Desert'},
   {id:7,  name:'Tiles',                     hex:'#6e6e6e', edge:'Building_A',    group:'Desert'},
   {id:11, name:'Platform',                  hex:'#545454', edge:'Outpost',       group:'Desert'},
-  // Desert blends — interpolated between parents, distinct shades
+  // Desert blends - interpolated between parents, distinct shades
   {id:13, name:'Sandy_Dunes',               hex:'#ceac60', edge:'Cliffs_A',      group:'Desert Blends'},
   {id:26, name:'Sandy_Pebbles',             hex:'#b49460', edge:'Cliffs_A',      group:'Desert Blends'},
   {id:25, name:'Pebble_Dunes',              hex:'#bca05c', edge:'Cliffs_A',      group:'Desert Blends'},
@@ -707,7 +762,7 @@ const TERRAINS=[
   {id:10, name:'Beach',                     hex:'#c8a870', edge:'Cliffs_A',      group:'Humid'},
   // Special
   {id:20, name:'Black',                     hex:'#141414', edge:'Cliffs_A',      group:'Special'},
-  // Chemical — sickly yellow-greens, each a distinct value
+  // Chemical - sickly yellow-greens, each a distinct value
   {id:47, name:'Chemical_Pebbles',          hex:'#8a9448', edge:'Cliffs_Storm',  group:'Chemical'},
   {id:49, name:'Chemical_Dunes',            hex:'#a0a050', edge:'Cliffs_Storm',  group:'Chemical'},
   {id:48, name:'Chemical_Sand',             hex:'#282818', edge:'Cliffs_Storm',  group:'Chemical'},
@@ -723,7 +778,7 @@ const TERRAINS=[
   {id:65, name:'Chemical_Cliffs_Pebbles',   hex:'#685e38', edge:'Cliffs_Storm',  group:'Chemical Blends'},
   {id:66, name:'Chemical_Sandy_Dunes',      hex:'#a8a450', edge:'Cliffs_Storm',  group:'Chemical Blends'},
   {id:67, name:'Chemical_Sandy_Platform',   hex:'#8a8860', edge:'Outpost',       group:'Chemical Blends'},
-  // Lava — dark ashy greys to vivid orange-reds
+  // Lava - dark ashy greys to vivid orange-reds
   {id:80, name:'Ash_Flat',                  hex:'#706050', edge:'Cliffs_Lava',   group:'Lava'},
   {id:94, name:'Ash_Bumps',                 hex:'#5a4c3c', edge:'Cliffs_Lava',   group:'Lava'},
   {id:82, name:'Ash_Soft_Bumps',            hex:'#847060', edge:'Cliffs_Lava',   group:'Lava'},
@@ -739,7 +794,7 @@ const TERRAINS=[
   {id:91, name:'Dry_Lava_Platform',        hex:'#6a5a3c', edge:'Cliffs_Lava',   group:'Lava'},
   {id:92, name:'Veined_Rocks',             hex:'#5a3c20', edge:'Cliffs_Lava',   group:'Lava'},
   {id:93, name:'Ashy_Rocks',              hex:'#483618', edge:'Cliffs_Lava',   group:'Lava'},
-  // Space Station — dark blues through steels, each clearly distinct
+  // Space Station - dark blues through steels, each clearly distinct
   {id:100,name:'Station_Platform',         hex:'#14141e', edge:'Spacestation_A', group:'Space Station'},
   {id:101,name:'Station1',                 hex:'#1e2e50', edge:'Spacestation_A', group:'Space Station'},
   {id:102,name:'Station2',                 hex:'#2c4068', edge:'Spacestation_A', group:'Space Station'},
@@ -748,7 +803,7 @@ const TERRAINS=[
   {id:105,name:'Station5',                 hex:'#2e2418', edge:'Spacestation_A', group:'Space Station'},
   {id:106,name:'Station6',                 hex:'#5878a8', edge:'Spacestation_A', group:'Space Station'},
   {id:107,name:'Station_Sand',             hex:'#8c7c5c', edge:'Spacestation_A', group:'Space Station'},
-  // Metropolis — cool blue-greys, clear step between each
+  // Metropolis - cool blue-greys, clear step between each
   {id:120,name:'Metropolis_Pavement',      hex:'#505058', edge:'Cliffs_Storm',  group:'Metropolis'},
   {id:121,name:'Metropolis_Sidewalk',      hex:'#747280', edge:'Cliffs_Storm',  group:'Metropolis'},
   {id:122,name:'Metropolis_2',             hex:'#5e5c6a', edge:'Cliffs_Storm',  group:'Metropolis'},
@@ -767,7 +822,7 @@ const TERRAINS=[
   {id:134,name:'Metropolis_Grid_Rocks',          hex:'#484038', edge:'Cliffs_Storm', group:'Metropolis Blends'},
   {id:135,name:'Metropolis_Grid_Sand',           hex:'#a89060', edge:'Cliffs_Storm', group:'Metropolis Blends'},
   {id:136,name:'Metropolis_Tiles_Rocks',         hex:'#585250', edge:'Cliffs_Storm', group:'Metropolis Blends'},
-  // Jungle — rich greens and earthy browns, clearly distinct
+  // Jungle - rich greens and earthy browns, clearly distinct
   {id:170,name:'Jungle_Grass',                   hex:'#486428', edge:'Jungle_Cliff',      group:'Jungle'},
   {id:171,name:'Jungle_Grassy_Sand',             hex:'#8a8440', edge:'Jungle_Cliff',      group:'Jungle'},
   {id:172,name:'Jungle_Ground',                  hex:'#6e5430', edge:'Jungle_Cliff',      group:'Jungle'},
@@ -790,7 +845,7 @@ const TERRAINS=[
   {id:188,name:'Jungle_Underground_Soil',        hex:'#564838', edge:'Jungle_Underground', group:'Jungle Blends'},
   {id:189,name:'Jungle_Metal_Grid',              hex:'#585e64', edge:'Jungle_Cliff',      group:'Jungle Blends'},
   {id:190,name:'Jungle_Shallow_Water',           hex:'#3a7890', edge:'Jungle_Cliff',      group:'Jungle Blends'},
-  // Legacy Purple — slightly purple-shifted desert variants
+  // Legacy Purple - slightly purple-shifted desert variants
   {id:28, name:'Sand2 (Legacy)',                 hex:'#c0a080', edge:'Cliffs_A',      group:'Legacy'},
   {id:29, name:'Pebbles2 (Legacy)',              hex:'#9c8870', edge:'Cliffs_A',      group:'Legacy'},
   {id:30, name:'Dunes2 (Legacy)',                hex:'#ccaa70', edge:'Cliffs_A',      group:'Legacy'},
@@ -824,6 +879,7 @@ const LS_GROUPS={
   7:['Metropolis','Metropolis Blends','Special'],8:['Jungle','Jungle Blends'],
 };
 const LS_NAMES={0:'Desert',1:'Chemical/Underground',2:'Desert City',3:'Lava',4:'Lava Underground',5:'Space Station',6:'Metropolis',7:'Metro Underground',8:'Jungle'};
+const DLC_NAMES={1:'Base Game',2:'Raising Hell',4:'Urban Onslaught'};
 
 const EDGES=[
   {id:0,    key:'cliffs_a',              name:'Cliffs_A',              dlc:'Base',   noEditor:false, remap:{base:2,  rubble:12,flat:0,  rocks:4,  cracks:8,  pave:3,  tiles:7,  platform:11,default:2}},
@@ -885,7 +941,55 @@ function remapTerrain(tid,edgeKey){
 }
 
 // ── State ──────────────────────────────────────────────────────────────────────
-let imgGray=null,tileData=null,origTileData=null,srcTiles=null,srcByIndex={},srcEdgeGroups=null,scenarioData=null;
+let imgGray=null,tileData=null,origTileData=null,srcTiles=null,srcByIndex={},srcEdgeGroups=null,scenarioData=null,headerData=null;
+let genPreDragSnapshot=null,genPreDragSliderId=null;
+let _heatCache=null,_heatCacheStamp=null;
+let orientAngle=0,orientFlippedH=false,orientHistory=[];
+let scenarioName=null,dirName=null,dlcHistory=[],sessionLog=[];
+// Dirty tracking - snapshot JSON of each file at load time
+let _snapMap=null,_snapScenario=null,_snapHeader=null;
+
+function snapMap(){return tileData?JSON.stringify(buildTiles()):null;}
+
+function logSession(action,detail){
+  sessionLog.push({at:new Date().toISOString(),action,detail});
+}
+function snapScenario(){if(!scenarioData)return null;const s={...scenarioData,LandscapeId:activeLandscape};return JSON.stringify(s);}
+function snapHeader(){return headerData?JSON.stringify(headerData):null;}
+
+function isDirtyMap(){return !!tileData&&snapMap()!==_snapMap;}
+function isDirtyScenario(){return !!scenarioData&&snapScenario()!==_snapScenario;}
+function isDirtyHeader(){return !!headerData&&snapHeader()!==_snapHeader;}
+
+function updateExportUI(){
+  const hasMap=!!tileData,hasScen=!!scenarioData,hasHdr=!!headerData;
+  const dirtyMap=isDirtyMap(),dirtyScen=isDirtyScenario(),dirtyHdr=isDirtyHeader();
+
+  const rowMap=document.getElementById('exportRowMap');
+  const rowScen=document.getElementById('exportRowScenario');
+  const rowHdr=document.getElementById('exportRowHeader');
+  const stMap=document.getElementById('statusMap');
+  const stScen=document.getElementById('statusScenario');
+  const stHdr=document.getElementById('statusHeader');
+
+  // map.json row
+  document.getElementById('btnExportMap').disabled=!hasMap;
+  if(rowMap)rowMap.classList.toggle('dirty',dirtyMap);
+  if(stMap)stMap.textContent=hasMap?(dirtyMap?'unsaved changes':'no changes'):'not loaded';
+
+  // scenario.json row
+  document.getElementById('btnExportScenario').disabled=!hasScen;
+  if(rowScen)rowScen.classList.toggle('dirty',dirtyScen);
+  if(stScen)stScen.textContent=hasScen?(dirtyScen?'unsaved changes':'no changes'):'not loaded';
+
+  // header.json row
+  document.getElementById('btnExportHeader').disabled=!hasHdr;
+  if(rowHdr)rowHdr.classList.toggle('dirty',dirtyHdr);
+  if(stHdr)stHdr.textContent=hasHdr?(dirtyHdr?'unsaved changes':'no changes'):'not loaded';
+
+  // Export all: enabled if any file is loaded
+  document.getElementById('btnExportAll').disabled=!hasMap&&!hasScen&&!hasHdr;
+}
 let activeSource='image',activeLandscape=0,previewMode='height';
 let levelMin=0,levelMax=14,rangeMode='scale';
 const UNDO_MAX=30;
@@ -923,8 +1027,8 @@ wireTabs('srcBar',()=>{
     else{activeSource='gen';}
   }
 });
-wireTabs('tBar',updatePreview);
-wireTabs('eBar',updatePreview);
+wireTabs('tBar',()=>{updatePreview();logSession('terrainTab',activeTerrainTab());});
+wireTabs('eBar',()=>{updatePreview();logSession('edgeTab',activeEdgeTab());});
 
 // ── Edge select builder ────────────────────────────────────────────────────────
 const LS_EDGE_DLCS={
@@ -1038,7 +1142,10 @@ function setActiveLandscape(id,source){
   document.getElementById('landscapeSelect').value=id;
   const badge=document.getElementById('lsBadge');
   badge.style.display='inline-block';badge.textContent=LS_NAMES[id];
-  document.getElementById('lsBadgeNote').textContent={auto:'Auto-detected',scenario:'From scenario.json',manual:''}[source]||'';
+  const noteEl=document.getElementById('lsBadgeNote');
+  const noteText={auto:'Auto-detected',scenario:'From scenario.json',manual:''}[source]||'';
+  noteEl.textContent=noteText;
+  noteEl.style.display=noteText?'inline-flex':'none';
   rebuildTerrainSelects();rebuildEdgeSelects();
   const curVal=document.getElementById('terrainSelect').value;
   if(curVal!==''){
@@ -1049,6 +1156,8 @@ function setActiveLandscape(id,source){
     }
   }
   updateTHint();
+  updateExportUI();
+  if(source==='manual') logSession('landscape',LS_NAMES[id]);
 }
 
 document.getElementById('landscapeSelect').addEventListener('change',()=>setActiveLandscape(parseInt(document.getElementById('landscapeSelect').value),'manual'));
@@ -1119,7 +1228,7 @@ makeDrop('dzImg','fiImg',file=>{
     msg.textContent=`${file.name} (${img.naturalWidth}×${img.naturalHeight} → 128×128)`;msg.className='msg ok';
     document.getElementById('dzImg').classList.add('loaded');
     document.getElementById('srcBadge').textContent='Image loaded';
-    activeSource='image';srcTiles=null;srcByIndex={};srcEdgeGroups=null;
+    activeSource='image';srcTiles=null;srcByIndex={};srcEdgeGroups=null;dirName=null;
     recompute();enableTools();resetCompass();
   };
   img.onerror=()=>{msg.textContent='Could not read image.';msg.className='msg err';};
@@ -1138,40 +1247,264 @@ makeDrop('dzMap','fiMap',file=>{
       srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)srcByIndex[t.Index]=t;});
       tileData=new Int16Array(W*H);
       srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)tileData[t.Index]=Math.max(0,Math.min(MAX_LEVEL,t.Level));});
-      origTileData=tileData.slice();history=[];historyCursor=-1;
+      origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];
       if(data._STTCTT?.undoHistory?.length){
         data._STTCTT.undoHistory.forEach(label=>history.push({data:null,label:`[prev] ${label}`,genState:null,readOnly:true}));
         historyCursor=history.length-1;
       }
       updateUndoButtons();
-      const fname=(file.name||'map.json').replace(/^.*[\\/]/,'');
-      msg.textContent=`${fname} - ${data.Tiles.length.toLocaleString()} tiles`;msg.className='msg ok';
+      const fname=(file.name||'map.json').replace(/^.*[\/]/,'');
+      // webkitRelativePath gives folder/file.json when dragged from explorer on some browsers
+      const folderHint=file.webkitRelativePath?file.webkitRelativePath.split('/').slice(-2,-1)[0]:null;
+      const tileCount=data.Tiles.length.toLocaleString();
+      // Update drop zone to confirm filename loaded
+      const subEl=document.getElementById('dzMapSub');
+      if(subEl)subEl.textContent=fname;
       document.getElementById('dzMap').classList.add('loaded');
-      document.getElementById('srcBadge').textContent=`${data.Tiles.length.toLocaleString()} tiles`;
+      // Source header pill: tile count
+      document.getElementById('srcBadge').textContent=tileCount+' tiles';
+      // Folder pill: only shown when webkitRelativePath available
+      let folderPill=document.getElementById('srcFolderPill');
+      if(!folderPill){
+        folderPill=document.createElement('span');
+        folderPill.id='srcFolderPill';
+        folderPill.className='landscape-badge';
+        const srcEl=document.getElementById('srcBadge');
+        srcEl.parentNode.insertBefore(folderPill,srcEl.nextSibling);
+      }
+      folderPill.textContent=folderHint||'';
+      folderPill.style.display=folderHint?'inline-flex':'none';
       activeSource='map';setActiveLandscape(detectLandscape(srcTiles),'auto');
       updatePreview();enableTools();resetCompass();
-    }catch(err){msg.textContent='Error: '+err.message;msg.className='msg err';}
+    }catch(err){msg.textContent='Error: '+err.message;msg.className='msg err';msg.style.display='block';}
   };
   reader.readAsText(file);
 });
 
-makeDrop('dzScenario','fiScenario',file=>{
-  if(!file)return;
-  const msg=document.getElementById('msgScenario');
-  const reader=new FileReader();
-  reader.onload=e=>{
-    try{
-      scenarioData=JSON.parse(e.target.result);
-      const lid=scenarioData.LandscapeId??0;
-      msg.textContent=`${file.name} - LandscapeId ${lid} (${LS_NAMES[lid]??'unknown'})`;msg.className='msg ok';
-      document.getElementById('dzScenario').classList.add('loaded');
-      setActiveLandscape(lid,'scenario');
-      document.getElementById('btnExportScenario').disabled=false;
-      document.getElementById('pathNote').textContent='Default save location: %USERPROFILE%\\Documents\\My Games\\Starship Troopers\\Scenarios  (may differ if OneDrive is active)';
-    }catch(err){msg.textContent='Error: '+err.message;msg.className='msg err';}
-  };
-  reader.readAsText(file);
+// ── Scenario / folder loading ─────────────────────────────────────────────────
+function readJSON(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=e=>{try{res(JSON.parse(e.target.result));}catch(ex){rej(ex);}};
+    r.onerror=()=>rej(new Error('Read error'));
+    r.readAsText(file);
+  });
+}
+function readText(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=e=>res(e.target.result);
+    r.onerror=()=>rej(new Error('Read error'));
+    r.readAsText(file);
+  });
+}
+
+function applyScenarioData(lid){
+  setActiveLandscape(lid,'scenario');
+  _snapScenario=snapScenario();
+  document.getElementById('msgScenario').textContent='LandscapeId '+lid+' ('+( LS_NAMES[lid]??'unknown')+')';
+  document.getElementById('msgScenario').className='msg ok';
+  document.getElementById('pathNote').textContent='Default save location: %USERPROFILE%\\Documents\\My Games\\Starship Troopers\\Scenarios';
+  updateExportUI();
+}
+
+function handleScenarioFile(file){
+  readJSON(file).then(d=>{
+    scenarioData=d;
+    document.getElementById('dzScenario').classList.add('loaded');
+    applyScenarioData(scenarioData.LandscapeId??0);
+  }).catch(err=>{
+    document.getElementById('msgScenario').textContent='Error: '+err.message;
+    document.getElementById('msgScenario').className='msg err';
+  });
+}
+
+function applyHeaderData(d){
+  headerData=d;
+  const dlcs=Array.isArray(d.DLCs)?d.DLCs:[];
+  // Set checkboxes without triggering the change listener (which would mutate headerData)
+  // DLC 1 (Base Game) is always required - only toggle optional DLCs
+  [2,4].forEach(id=>{const el=document.getElementById('dlc'+id);if(el)el.checked=dlcs.includes(id);});
+  // Ensure DLC 1 is always present in data
+  if(!dlcs.includes(1))headerData.DLCs=[1,...dlcs];
+  document.getElementById('dlcControls').style.display='block';
+  document.getElementById('dlcNotLoaded').style.display='none';
+  const badge=document.getElementById('dlcBadge');
+    const optionalDlcs=dlcs.filter(id=>id!==1);
+  badge.textContent=optionalDlcs.length?optionalDlcs.map(id=>DLC_NAMES[id]||'DLC '+id).join(', '):'';
+  badge.style.display=optionalDlcs.length?'inline-flex':'none';
+  // Snapshot AFTER all UI is set - checkboxes are now settled
+  _snapHeader=snapHeader();
+  updateExportUI();
+}
+
+// ── Language-to-filename mapping ──────────────────────────────────────────────
+// Maps BCP-47 primary language subtags to the suffix used in text_*.csv filenames.
+const LANG_TO_TEXT={
+  en:'english',fr:'french',de:'german',es:'spanish',
+  pt:'portuguese',ru:'russian',zh:'chinese',pl:'polish',
+};
+function preferredTextSuffix(){
+  // navigator.language gives e.g. "en-US", "fr-FR", "zh-CN"
+  const lang=(navigator.language||'en').split('-')[0].toLowerCase();
+  return LANG_TO_TEXT[lang]||'english';
+}
+
+function loadScenarioDir(files){
+  const fileArr=[...files];
+  let mapFile=null,scenFile=null,headerFile=null;
+  dirName=null;
+  const textFiles={};  // suffix -> file object, e.g. {english: File, french: File}
+  fileArr.forEach(f=>{
+    const n=f.name.toLowerCase();
+    if(!dirName&&f.webkitRelativePath)dirName=f.webkitRelativePath.split('/')[0];
+    if(n==='map.json')mapFile=f;
+    else if(n==='scenario.json')scenFile=f;
+    else if(n==='header.json')headerFile=f;
+    else{
+      const m=n.match(/^text_(.+)\.csv$/);
+      if(m)textFiles[m[1]]=f;
+    }
+  });
+  // Pick text file: browser language > english > first available > none
+  const pref=preferredTextSuffix();
+  const textFile=textFiles[pref]||textFiles['english']||Object.values(textFiles)[0]||null;
+  const promises=[];
+  if(scenFile)promises.push(readJSON(scenFile).then(d=>{scenarioData=d;}));
+  if(headerFile)promises.push(readJSON(headerFile).then(d=>{applyHeaderData(d);}));
+  if(mapFile)promises.push(readJSON(mapFile).then(d=>{
+    srcTiles=d.Tiles;srcEdgeGroups=Array.isArray(d.EdgeGroups)?d.EdgeGroups:null;srcByIndex={};
+    srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)srcByIndex[t.Index]=t;});
+    tileData=new Int16Array(W*H);
+    srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)tileData[t.Index]=Math.max(0,Math.min(MAX_LEVEL,t.Level));});
+    origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];
+    if(d._STTCTT?.undoHistory?.length){
+      d._STTCTT.undoHistory.forEach(label=>history.push({data:null,label:'[prev] '+label,genState:null,readOnly:true}));
+      historyCursor=history.length-1;
+    }
+  }));
+  if(textFile)promises.push(readText(textFile).then(txt=>{
+    const m=txt.match(/^scenario_name,(.+)$/m);
+    if(m)scenarioName=m[1].trim();
+  }));
+  Promise.all(promises).then(()=>{
+    const displayName=dirName||scenarioName||(scenFile?scenFile.name:'Scenario');
+    // Source pill
+    const tileCount=tileData?tileData.length.toLocaleString():'0';
+    document.getElementById('srcBadge').textContent=tileCount+' tiles';
+    let folderPill=document.getElementById('srcFolderPill');
+    if(!folderPill){
+      folderPill=document.createElement('span');folderPill.id='srcFolderPill';
+      folderPill.className='landscape-badge';
+      const srcEl=document.getElementById('srcBadge');
+      srcEl.parentNode.insertBefore(folderPill,srcEl.nextSibling);
+    }
+    folderPill.textContent=displayName;folderPill.style.display='inline-flex';
+    // Drop zone subtitle
+    const subEl=document.getElementById('dzDirSub');
+    if(subEl){
+      const loaded=[];
+      if(mapFile)loaded.push('map.json');if(scenFile)loaded.push('scenario.json');
+      if(headerFile)loaded.push('header.json');if(textFile)loaded.push(textFile.name);
+      subEl.textContent=loaded.length?loaded.join(' · '):'No recognised files found';
+    }
+    const titleEl=document.getElementById('dzDirTitle');
+    if(titleEl){
+      if(scenarioName){titleEl.textContent='“'+scenarioName+'”';titleEl.style.display='block';}
+      else{titleEl.style.display='none';}
+    }
+    document.getElementById('dzDir')?.classList.add('loaded');
+    if(scenarioData){applyScenarioData(scenarioData.LandscapeId??0);}
+    if(mapFile){
+      activeSource='map';updateUndoButtons();
+      setActiveLandscape(detectLandscape(srcTiles),'auto');
+      updatePreview();enableTools();resetCompass();
+    }
+  }).catch(err=>{
+    document.getElementById('msgScenario').textContent='Error loading folder: '+err.message;
+    document.getElementById('msgScenario').className='msg err';
+  });
+}
+
+// Single scenario.json file pick
+document.getElementById('fiScenario').addEventListener('change',e=>{
+  const file=e.target.files[0];if(!file)return;e.target.value='';handleScenarioFile(file);
 });
+
+// Folder pick via input (src-dir tab)
+document.getElementById('fiScenarioDir').addEventListener('change',e=>{
+  if(e.target.files.length){
+    document.getElementById('dzDir')?.classList.add('loaded');
+    loadScenarioDir(e.target.files);
+  }
+  e.target.value='';
+});
+
+// scenario.json drop zone - file only
+(()=>{
+  const dz=document.getElementById('dzScenario');
+  dz.addEventListener('click',()=>document.getElementById('fiScenario').click());
+  dz.addEventListener('dragover',ev=>ev.preventDefault());
+  dz.addEventListener('drop',ev=>{
+    ev.preventDefault();dz.classList.remove('over');
+    const file=ev.dataTransfer.files[0];if(file)handleScenarioFile(file);
+  });
+})();
+
+// Scenario folder tab drop zone - directory only
+(()=>{
+  const dz=document.getElementById('dzDir');
+  if(!dz)return;
+  dz.addEventListener('click',()=>document.getElementById('fiScenarioDir').click());
+  dz.addEventListener('dragover',ev=>{ev.preventDefault();dz.classList.add('over');});
+  dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
+  dz.addEventListener('drop',ev=>{
+    ev.preventDefault();dz.classList.remove('over');
+    const items=[...ev.dataTransfer.items];
+    const entries=items.map(i=>i.webkitGetAsEntry?.()).filter(Boolean);
+    if(entries.some(e=>e.isDirectory)){
+      const dirEntry=entries.find(e=>e.isDirectory);
+      const reader=dirEntry.createReader();
+      reader.readEntries(fEntries=>{
+        Promise.all(fEntries.map(fe=>new Promise(res=>{fe.file(f=>res(f),()=>res(null));}))).then(files=>{
+          loadScenarioDir(files.filter(Boolean));
+        });
+      });
+    }else{
+      loadScenarioDir(ev.dataTransfer.files);
+    }
+  });
+})();
+
+// DLC checkbox handler + header.json drop
+(()=>{
+    function applyDLCChange(){
+    if(!headerData)return;
+    const prev=[...(headerData.DLCs||[])];
+    headerData.DLCs=[1,...[2,4].filter(id=>document.getElementById('dlc'+id)?.checked)];
+    const DLC_LABEL=id=>({1:'Base Game',2:'Raising Hell',4:'Urban Onslaught'}[id]||'DLC '+id);
+    dlcHistory.push({
+      at:new Date().toISOString(),
+      from:prev.map(DLC_LABEL).join(', ')||'none',
+      to:headerData.DLCs.map(DLC_LABEL).join(', ')||'none',
+    });
+    const badge=document.getElementById('dlcBadge');
+    const optDlcs=headerData.DLCs.filter(id=>id!==1);
+    badge.textContent=optDlcs.length?optDlcs.map(id=>DLC_NAMES[id]||'DLC '+id).join(', '):'';
+    badge.style.display=optDlcs.length?'inline-flex':'none';
+    const m=document.getElementById('msgDLC');
+    const dirty=isDirtyHeader();
+    m.textContent=dirty?'DLCs changed - export header.json to save.':'';
+    m.className=dirty?'msg ok':'msg';
+    updateExportUI();
+  }
+  [2,4].forEach(id=>{const el=document.getElementById('dlc'+id);if(el)el.addEventListener('change',applyDLCChange);});
+  makeDrop('dzHeader','fiHeader',file=>{
+    readJSON(file).then(d=>applyHeaderData(d)).catch(err=>{
+      const m=document.getElementById('msgDLC');m.textContent='Error: '+err.message;m.className='msg err';
+    });
+  });
+})();
 
 // ── Image quantize ─────────────────────────────────────────────────────────────
 function quantize(gray,q,lo,hi){
@@ -1185,7 +1518,7 @@ function recompute(){
   const lo2=Math.min(lo,hi),hi2=Math.max(lo,hi);
   tileData=new Int16Array(W*H);
   for(let i=0;i<W*H;i++)tileData[i]=quantize(imgGray[i],q,lo2,hi2);
-  origTileData=tileData.slice();history=[];historyCursor=-1;updateUndoButtons();updatePreview();
+  origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];updateUndoButtons();updatePreview();
 }
 
 // ── Noise generator ────────────────────────────────────────────────────────────
@@ -1233,7 +1566,7 @@ function runNoiseGen(){
   const seed32=hashSeed(rawSeed);
   const type=document.querySelector('input[name="noiseType"]:checked')?.value||'perlin';
   const scale=Math.max(1,parseInt(document.getElementById('genScale').value)||60);
-  const waterPct=parseInt(document.getElementById('genWater').value)||20;
+  const waterPct=parseInt(document.getElementById('genWater').value??'20');
   const octaves=Math.max(1,Math.min(8,parseInt(document.getElementById('genOctaves').value)||4));
   const persistence=(parseInt(document.getElementById('genPersist').value)||50)/100;
   const lacunarity=(parseInt(document.getElementById('genLacun').value)||170)/100;
@@ -1282,7 +1615,7 @@ function recomputeGen(commitUndo=false){
   if(commitUndo&&!firstLoad)pushUndo('generate');
   const{data,seed,type}=runNoiseGen();tileData=data;
   if(firstLoad){
-    origTileData=tileData.slice();history=[];historyCursor=-1;
+    origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];
     history.push({data:tileData.slice(),label:'initial generate',genState:captureGenState()});
     historyCursor=0;updateUndoButtons();
   }
@@ -1307,7 +1640,6 @@ function genDragLabel(sliderId,preState){
   return before===after?`Generate - ${meta.name}`:`Generate - ${meta.name} (${before} -> ${after})`;
 }
 
-let genPreDragSnapshot=null,genPreDragSliderId=null;
 function mkGenSlider(id,outId,displayFn){
   const s=document.getElementById(id),o=document.getElementById(outId);
   if(!s||!o)return;
@@ -1446,12 +1778,12 @@ function heatmapColour(r,isSlope){
   const pos=t*si,lo=Math.floor(pos),hi=Math.min(si,lo+1),f=pos-lo,s0=stops[lo],s1=stops[hi];
   return[Math.round(s0[0]+(s1[0]-s0[0])*f),Math.round(s0[1]+(s1[1]-s0[1])*f),Math.round(s0[2]+(s1[2]-s0[2])*f)];
 }
-let _heatCache=null,_heatCacheStamp=null;
 function invalidateHeatCache(){_heatCache=null;_heatCacheStamp=null;}
 
 // ── Preview render ─────────────────────────────────────────────────────────────
 function updatePreview(){
   if(!tileData)return;
+  updateExportUI();
   invalidateHeatCache();
   const canvas=document.getElementById('cvPreview'),ctx=canvas.getContext('2d'),imgData=ctx.createImageData(W,H);
   const dist=new Array(MAX_LEVEL+1).fill(0);
@@ -1582,6 +1914,12 @@ function updateUndoButtons(){
   document.getElementById('btnRedo').disabled=!canRedo;
   const badge=document.getElementById('undoBadge'),cur=history[historyCursor];
   if(badge)badge.textContent=canUndo?(historyCursor+1)+' undoable - last: '+(cur?.label??''):'';
+  const hBadge=document.getElementById('historyBadge');
+  if(hBadge){
+    const label=cur?.label??'';
+    hBadge.textContent=label;
+    hBadge.style.display=label?'inline-flex':'none';
+  }
   const list=document.getElementById('historyList');if(!list)return;
   list.innerHTML='';
   for(let i=history.length-1;i>=0;i--){
@@ -1649,7 +1987,6 @@ document.getElementById('btnReset').addEventListener('click',()=>{
 });
 
 // ── Orientation ────────────────────────────────────────────────────────────────
-let orientAngle=0,orientFlippedH=false,orientHistory=[];
 function orientMsg(txt){const m=document.getElementById('msgOrient');m.textContent=txt;m.className='msg ok';setTimeout(()=>{if(m.textContent===txt)m.textContent='';},4000);}
 const ORIENT_BADGE_DIRS=['N↑','W←','S↓','E→'];
 function drawOrientIndicator(){
@@ -1712,54 +2049,260 @@ function buildTiles(){
   return result;
 }
 function enableTools(){
-  ['btnShiftAll','btnClamp','btnBand','btnPreview','btnExportMap','btnReset','btnRot90CW','btnRot90CCW','btnFlipH','btnFlipV']
+  ['btnShiftAll','btnClamp','btnBand','btnPreview','btnReset','btnRot90CW','btnRot90CCW','btnFlipH','btnFlipV']
     .forEach(id=>document.getElementById(id).disabled=false);
+  // Take a fresh map snapshot on first load so dirty tracking starts clean
+  if(_snapMap===null)_snapMap=snapMap();
+  updateExportUI();
 }
 function dl(name,text){
   const blob=new Blob([text],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
   a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);
+}
+function dlWithBackup(name,text,origSnap){
+  if(document.getElementById('chkBackup')?.checked&&origSnap){
+    const bakName=name.replace(/\.json$/,'.bak.json');
+    dl(bakName,origSnap);
+  }
+  dl(name,text);
+}
+
+// ── Minimal ZIP builder (store only, no compression) ─────────────────────────
+// Implements just enough of the ZIP spec (PKWARE APPNOTE 6.3) to produce a
+// valid archive of UTF-8 text files. No dependencies required.
+function buildZip(files){
+  // files: [{name:string, text:string}]
+  const enc=new TextEncoder();
+  const localHeaders=[];
+  const centralDir=[];
+  let offset=0;
+
+  function u16(n){const b=new Uint8Array(2);new DataView(b.buffer).setUint16(0,n,true);return b;}
+  function u32(n){const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,n,true);return b;}
+
+  // CRC-32 table
+  const crcTable=new Uint32Array(256);
+  for(let i=0;i<256;i++){
+    let c=i;
+    for(let j=0;j<8;j++)c=c&1?(0xEDB88320^(c>>>1)):(c>>>1);
+    crcTable[i]=c;
+  }
+  function crc32(data){
+    let crc=0xFFFFFFFF;
+    for(let i=0;i<data.length;i++)crc=crcTable[(crc^data[i])&0xFF]^(crc>>>8);
+    return(crc^0xFFFFFFFF)>>>0;
+  }
+
+  function concat(...arrays){
+    const total=arrays.reduce((s,a)=>s+a.length,0);
+    const out=new Uint8Array(total);
+    let pos=0;
+    for(const a of arrays){out.set(a,pos);pos+=a.length;}
+    return out;
+  }
+
+  const now=new Date();
+  const dosTime=((now.getSeconds()>>1)|(now.getMinutes()<<5)|(now.getHours()<<11));
+  const dosDate=((now.getDate())|(now.getMonth()+1)<<5)|((now.getFullYear()-1980)<<9);
+
+  for(const{name,text}of files){
+    const nameBytes=enc.encode(name);
+    const dataBytes=enc.encode(text);
+    const crc=crc32(dataBytes);
+    const size=dataBytes.length;
+
+    // Local file header
+    const local=concat(
+      new Uint8Array([0x50,0x4B,0x03,0x04]), // signature
+      u16(20),          // version needed
+      u16(0),           // flags
+      u16(0),           // compression: store
+      u16(dosTime),u16(dosDate),
+      u32(crc),
+      u32(size),        // compressed size (same as uncompressed for store)
+      u32(size),        // uncompressed size
+      u16(nameBytes.length),
+      u16(0),           // extra field length
+      nameBytes,
+      dataBytes,
+    );
+
+    // Central directory entry
+    const central=concat(
+      new Uint8Array([0x50,0x4B,0x01,0x02]), // signature
+      u16(20),u16(20),  // version made by, version needed
+      u16(0),           // flags
+      u16(0),           // compression: store
+      u16(dosTime),u16(dosDate),
+      u32(crc),
+      u32(size),u32(size),
+      u16(nameBytes.length),
+      u16(0),u16(0),    // extra, comment lengths
+      u16(0),           // disk number start
+      u16(0),u32(0),    // internal/external attrs
+      u32(offset),      // local header offset
+      nameBytes,
+    );
+
+    localHeaders.push(local);
+    centralDir.push(central);
+    offset+=local.length;
+  }
+
+  const centralDirData=concat(...centralDir);
+  const centralDirSize=centralDirData.length;
+
+  // End of central directory record
+  const eocd=concat(
+    new Uint8Array([0x50,0x4B,0x05,0x06]), // signature
+    u16(0),u16(0),      // disk numbers
+    u16(files.length),u16(files.length),
+    u32(centralDirSize),
+    u32(offset),
+    u16(0),             // comment length
+  );
+
+  return concat(...localHeaders,centralDirData,eocd);
+}
+
+function dlZip(zipName,files){
+  const zipData=buildZip(files);
+  const blob=new Blob([zipData],{type:'application/zip'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=zipName;a.click();
+  URL.revokeObjectURL(url);
 }
 document.getElementById('btnPreview').addEventListener('click',()=>{
   const data=buildTiles();if(!data)return;
   const pre=document.getElementById('jsonPre');
   pre.textContent=JSON.stringify({Width:data.Width,Height:data.Height,TileCount:data.Tiles.length,SampleTiles:data.Tiles.slice(0,5)},null,2);
   pre.style.display='block';
+  const clr=document.getElementById('btnClearPre');if(clr)clr.style.display='inline-block';
 });
-document.getElementById('btnExportMap').addEventListener('click',()=>{
-  const data=buildTiles();if(!data)return;
-  if(document.getElementById('chkEmbedDebug').checked){
-    data._STTCTT={
-      exportedAt:new Date().toISOString(),toolVersion:'1.05',
-      source:{type:activeSource,tiles:tileData?tileData.length:0,
-        ...(activeSource==='gen'?{
-          noiseType:document.querySelector('input[name="noiseType"]:checked')?.value,
-          seed:document.getElementById('genSeed').value,scale:document.getElementById('genScale').value,
-          waterLevel:document.getElementById('genWater').value+'%',octaves:document.getElementById('genOctaves').value,
-          persistence:(document.getElementById('genPersist').value/100).toFixed(2),
-          lacunarity:(document.getElementById('genLacun').value/100).toFixed(1),
-          power:(document.getElementById('genPower').value/100).toFixed(1),
-          gamma:(document.getElementById('genGamma').value/100).toFixed(1),
-          bias:(document.getElementById('genBias').value/100).toFixed(2),
-        }:{})},
-      landscape:{id:activeLandscape,name:LS_NAMES[activeLandscape]},
-      colourScheme:activeScheme,
-      terrain:{tab:activeTerrainTab(),defaultValue:document.getElementById('terrainSelect').value,lockToLandscape:document.getElementById('lockLandscape').checked,lowOverride:document.getElementById('lowTerrain').value,highOverride:document.getElementById('highTerrain').value},
-      edges:{tab:activeEdgeTab(),globalRemap:document.getElementById('edgeRemap').value,lowRemap:document.getElementById('edgeRemapLow').value,highRemap:document.getElementById('edgeRemapHigh').value,lockToLandscape:document.getElementById('lockEdgeLandscape').checked},
-      output:{totalTiles:data.Tiles.length,edgeGroupCount:data.EdgeGroups?data.EdgeGroups.length:0,levelRange:{min:Math.min(...data.Tiles.map(t=>t.Level)),max:Math.max(...data.Tiles.map(t=>t.Level))}},
-      undoHistoryDepth:historyCursor+1,undoHistory:history.slice(0,historyCursor+1).map(e=>e.label),
-      orientation:{angleCW:orientAngle,flippedH:orientFlippedH,history:orientHistory},
-    };
+document.getElementById('btnClearPre')?.addEventListener('click',()=>{
+  const pre=document.getElementById('jsonPre');pre.style.display='none';pre.textContent='';
+  const clr=document.getElementById('btnClearPre');if(clr)clr.style.display='none';
+});
+// ── Build map JSON (clean - no embedded debug) ────────────────────────────────
+function buildMapJSON(){
+  const data=buildTiles();if(!data)return null;
+  return JSON.stringify(data);
+}
+
+function exportMap(){
+  const json=buildMapJSON();if(!json)return false;
+  dlWithBackup('map.json',json,_snapMap);
+  _snapMap=json;
+  return true;
+}
+function exportScenario(){
+  if(!scenarioData)return false;
+  scenarioData.LandscapeId=activeLandscape;
+  const json=JSON.stringify(scenarioData,null,2);
+  dlWithBackup('scenario.json',json,_snapScenario);
+  _snapScenario=json;
+  return true;
+}
+function exportHeader(){
+  if(!headerData)return false;
+  const json=JSON.stringify(headerData,null,2);
+  dlWithBackup('header.json',json,_snapHeader);
+  _snapHeader=json;
+  return true;
+}
+function buildDebugJSON(){
+  return JSON.stringify({
+    exportedAt:new Date().toISOString(),
+    toolVersion:TOOL_VERSION,
+    scenarioName:scenarioName||null,
+    source:{type:activeSource,tiles:tileData?tileData.length:0,
+      ...(activeSource==='gen'?{
+        noiseType:document.querySelector('input[name="noiseType"]:checked')?.value,
+        seed:document.getElementById('genSeed').value,
+        scale:document.getElementById('genScale').value,
+        waterLevel:document.getElementById('genWater').value+'%',
+        octaves:document.getElementById('genOctaves').value,
+        persistence:(document.getElementById('genPersist').value/100).toFixed(2),
+        lacunarity:(document.getElementById('genLacun').value/100).toFixed(1),
+        power:(document.getElementById('genPower').value/100).toFixed(1),
+        gamma:(document.getElementById('genGamma').value/100).toFixed(1),
+        bias:(document.getElementById('genBias').value/100).toFixed(2),
+      }:{})},
+    landscape:{id:activeLandscape,name:LS_NAMES[activeLandscape]},
+    colourScheme:activeScheme,
+    terrain:{tab:activeTerrainTab(),defaultValue:document.getElementById('terrainSelect').value,lockToLandscape:document.getElementById('lockLandscape').checked,lowOverride:document.getElementById('lowTerrain').value,highOverride:document.getElementById('highTerrain').value},
+    edges:{tab:activeEdgeTab(),globalRemap:document.getElementById('edgeRemap').value,lowRemap:document.getElementById('edgeRemapLow').value,highRemap:document.getElementById('edgeRemapHigh').value,lockToLandscape:document.getElementById('lockEdgeLandscape').checked},
+    output:{tileCount:tileData?tileData.length:0,levelRange:tileData?{minEditor:toEditor(Math.min(...tileData)),maxEditor:toEditor(Math.max(...tileData))}:null},
+    undoHistoryDepth:historyCursor+1,
+    undoHistory:history.slice(0,historyCursor+1).map(e=>e.label),
+    orientation:{angleCW:orientAngle,flippedH:orientFlippedH,history:orientHistory},
+    dlcs:{current:headerData?[...(headerData.DLCs||[])]:null,history:dlcHistory},
+    sessionLog:sessionLog,
+  },null,2);
+}
+
+function exportMsg(names){
+  if(document.getElementById('chkDebugFile')?.checked){
+    dl('STTC-TT.json',buildDebugJSON());
+    names=[...names,'STTC-TT.json'];
   }
-  dl('map.json',JSON.stringify(data));
   const m=document.getElementById('msgExport');
-  if(scenarioData){scenarioData.LandscapeId=activeLandscape;dl('scenario.json',JSON.stringify(scenarioData,null,2));m.textContent=`map.json + scenario.json exported (LandscapeId: ${activeLandscape} - ${LS_NAMES[activeLandscape]})`;}
-  else{m.textContent='map.json exported. (Drop a scenario.json to also update LandscapeId on export.)';}
+  m.textContent=names.join(' + ')+' exported'+(scenarioData?' (LandscapeId: '+activeLandscape+' - '+LS_NAMES[activeLandscape]+')':'');
   m.className='msg ok';
+  updateExportUI();
+}
+
+document.getElementById('btnExportMap').addEventListener('click',()=>{
+  if(exportMap())exportMsg(['map.json']);
 });
 document.getElementById('btnExportScenario').addEventListener('click',()=>{
-  if(!scenarioData){document.getElementById('msgExport').textContent='No scenario.json loaded.';document.getElementById('msgExport').className='msg err';return;}
-  scenarioData.LandscapeId=activeLandscape;dl('scenario.json',JSON.stringify(scenarioData,null,2));
-  const m=document.getElementById('msgExport');m.textContent=`scenario.json exported - LandscapeId: ${activeLandscape} (${LS_NAMES[activeLandscape]})`;m.className='msg ok';
+  if(exportScenario())exportMsg(['scenario.json']);
+});
+document.getElementById('btnExportHeader').addEventListener('click',()=>{
+  if(exportHeader())exportMsg(['header.json']);
+});
+document.getElementById('btnExportAll').addEventListener('click',()=>{
+  const zipFiles=[];
+  const wantsBackup=document.getElementById('chkBackup')?.checked;
+  const wantsDebug=document.getElementById('chkDebugFile')?.checked;
+  const exported=[];
+
+  if(tileData){
+    const json=buildMapJSON();if(json){
+      if(wantsBackup&&_snapMap)zipFiles.push({name:'map.bak.json',text:_snapMap});
+      zipFiles.push({name:'map.json',text:json});
+      _snapMap=json;exported.push('map.json');
+    }
+  }
+  if(scenarioData){
+    scenarioData.LandscapeId=activeLandscape;
+    const json=JSON.stringify(scenarioData,null,2);
+    if(wantsBackup&&_snapScenario)zipFiles.push({name:'scenario.bak.json',text:_snapScenario});
+    zipFiles.push({name:'scenario.json',text:json});
+    _snapScenario=json;exported.push('scenario.json');
+  }
+  if(headerData){
+    const json=JSON.stringify(headerData,null,2);
+    if(wantsBackup&&_snapHeader)zipFiles.push({name:'header.bak.json',text:_snapHeader});
+    zipFiles.push({name:'header.json',text:json});
+    _snapHeader=json;exported.push('header.json');
+  }
+  if(wantsDebug){
+    zipFiles.push({name:'STTC-TT.json',text:buildDebugJSON()});
+    exported.push('STTC-TT.json');
+  }
+
+  if(!zipFiles.length)return;
+
+  // Name the ZIP after the scenario if we have one
+  const zipBase=(scenarioName||dirName||'sttc-tt-export').replace(/[^a-zA-Z0-9_\-. ]/g,'-');
+  dlZip(zipBase+'.zip',zipFiles);
+
+  const m=document.getElementById('msgExport');
+  m.textContent='ZIP downloaded: '+exported.join(', ')+(scenarioData?' (LandscapeId: '+activeLandscape+' - '+LS_NAMES[activeLandscape]+')':'');
+  m.className='msg ok';
+  updateExportUI();
 });
 
 // ── Change listeners ───────────────────────────────────────────────────────────
@@ -1777,7 +2320,7 @@ document.getElementById('edgeRemap').addEventListener('change',updateTHint);
     const ev=toEditor(mv);
     if(ev===-1)return{cls:'nav-no',label:'Non-navigable (water)',hint:'Level -1 tiles are the non-navigable base floor. Infantry cannot traverse.'};
     if(type===2)return{cls:'nav-no',label:'Non-navigable (cliff base)',hint:'This tile has a higher neighbour, generating a cliff wall upward. Non-navigable from below.'};
-    if(type===1)return{cls:'nav-yes',label:'Navigable (slope)',hint:'Type=1 is a slope — confirmed navigable by in-game testing.'};
+    if(type===1)return{cls:'nav-yes',label:'Navigable (slope)',hint:'Type=1 is a slope - confirmed navigable by in-game testing.'};
     if(ev>=10)return{cls:'nav-warn',label:'High ground',hint:'Editor level 10+ can restrict some unit types and line-of-sight.'};
     return{cls:'nav-yes',label:'Navigable',hint:'Standard navigable tile. Infantry and most ground units traverse freely.'};
   }
@@ -1828,25 +2371,20 @@ document.getElementById('edgeRemap').addEventListener('change',updateTHint);
 function updateLvlRangeUI(){
   const minEl=document.getElementById('lvlMin'),maxEl=document.getElementById('lvlMax');
   const fillEl=document.getElementById('lvlRangeFill'),displayEl=document.getElementById('lvlRangeDisplay');
-  const minLabelEl=document.getElementById('lvlMinLabel'),maxLabelEl=document.getElementById('lvlMaxLabel');
-  const hintEl=document.getElementById('lvlRangeHint');
+  const rvEl=document.getElementById('lvlRangeOut'),hintEl=document.getElementById('lvlRangeHint');
   if(!minEl||!maxEl)return;
-  // Keep constraints
   if(levelMin>levelMax)levelMin=levelMax;
   if(levelMax<levelMin)levelMax=levelMin;
   minEl.value=levelMin;maxEl.value=levelMax;
-  // Labels use editor values (map level - 1)
   const eMin=toEditor(levelMin),eMax=toEditor(levelMax);
-  if(minLabelEl)minLabelEl.textContent='editor '+(eMin>=0?eMin:('−'+Math.abs(eMin)));
-  if(maxLabelEl)maxLabelEl.textContent='editor '+eMax;
-  if(displayEl)displayEl.textContent=`editor ${eMin>=0?eMin:'−'+Math.abs(eMin)} → ${eMax}`;
-  // Fill bar
+  const eMinStr=eMin>=0?String(eMin):('−'+Math.abs(eMin));
+  if(displayEl)displayEl.textContent='editor '+eMinStr+' → '+eMax;
+  if(rvEl)rvEl.textContent=eMinStr+'–'+eMax;
   if(fillEl){
     const pct=100/14;
     fillEl.style.left=(levelMin*pct)+'%';
     fillEl.style.width=((levelMax-levelMin)*pct)+'%';
   }
-  // Hint
   if(hintEl){
     hintEl.textContent=rangeMode==='clamp'
       ?'Clamp: generates full distribution then clips levels outside the range.'
@@ -1897,17 +2435,29 @@ function updateLvlRangeUI(){
     r.addEventListener('change',()=>{
       rangeMode=r.value;
       updateLvlRangeUI();
+      logSession('rangeMode',rangeMode);
       if(activeSource==='gen') recomputeGen(true);
     });
   });
 
   updateLvlRangeUI();
+
+  const resetBtn=document.getElementById('btnLvlRangeReset');
+  if(resetBtn){
+    resetBtn.addEventListener('click',()=>{
+      if(activeSource==='gen')pushUndo('Reset level range');
+      levelMin=0;levelMax=14;
+      updateLvlRangeUI();
+      if(activeSource==='gen')recomputeGen(false);
+    });
+  }
 })();
 
 // ── Init ───────────────────────────────────────────────────────────────────────
 setActiveLandscape(0,'manual');
 updateTHint();
 applyScheme('default');
+document.getElementById('versionDisplay').textContent='v'+TOOL_VERSION;
 </script>
 </body>
 </html>

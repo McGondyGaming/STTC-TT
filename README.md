@@ -4,11 +4,11 @@
 
 This tool allows you to:
 - Convert heightmap images into playable terrain
-- Load and modify existing `map.json` and `scenario.json` files
+- Load, modify and export existing `map.json`, `scenario.json` files
+- Load, modify and export entire scenario folders
 - Generate a starter landscape using Perlin or Simplex deterministic algorithms
 - Adjust terrain orientation, types, elevation levels, and edge styles
 - Preview results in real-time with histograms and tile-based visuals
-- Export ready-to-use `map.json` and updated `scenario.json` files
 
 > This tool is not officially supported nor endorsed by The Artistocrats or Slitherine.
 
@@ -27,6 +27,7 @@ This tool allows you to:
 
 ### Map and Scenario Editing
 - Load `map.json` to modify existing landscapes
+- Load entire scenario folders to modify lanscapes, DLC dependencies, and biomes/landscapes
 - Automatic `LandscapeId` syncing when `scenario.json` is loaded
 - Support for all in-game biomes including Desert, Lava, Space Station, and Metro (plus Underground variants)
 
@@ -40,11 +41,13 @@ This tool allows you to:
 - **Modifications:** Shift entire maps up/down, clamp extremes, or adjust specific level bands
 - **History:** 30-step Undo/Redo and state reset
 
-### Export and Analysis
-- Visual tile, heigh, navigability and heatmap previews
+### Analysis and Export
+- Visualise tile, height, navigability and heatmap previews
 - Elevation distribution histogram
 - Real-time stats for total tiles and level ranges
 - Export validated `map.json` and update existing `scenario.json`
+- Backup scenario folders before export
+- Export an optional STTC-TT.json file containing debugging information
 
 ---
 
@@ -52,10 +55,10 @@ This tool allows you to:
 
 ### 0. Download
 - If downloading, choose the source code in your preferred format
-- Open `STTCTT.html` in your favourite browser (tested in Chrome)
+- Open `index.html` in your favourite browser (currently only tested in Chrome)
 
 ### 1. Select a Source
-- Drop or load a heightmap image or an existing `map.json` *or* generate a new layout
+- Drop or load a heightmap image *or* an existing `map.json` or scenario folder *or* generate a new layout
 - Optionally load a `scenario.json` to sync the `LandscapeId`.
 
 ### 2. Adjust Terrain
@@ -74,7 +77,7 @@ This tool allows you to:
 
 ## Exported Data Format
 
-Option: Embed STTC-TT data in `map.json` for diagnositc purposes. The following data is captured:
+Option: Embed `STTC-TT.json` for diagnositc purposes. The following data is captured:
  - STTC-TT version
  - Source
  - Generation data (if used)
@@ -112,9 +115,9 @@ Option: Embed STTC-TT data in `map.json` for diagnositc purposes. The following 
 
 ### Limitations:
  - Fixed map resolution: 128x128 only
- - No in-engine validation: Load your map to clean it up
- - Browser-based: no file system integration beyond downloads
- - Tested in Chrome, stavle builds will be tested in a few browsers (e.g. Firefox, Edge)
+ - No in-engine validation: Load your map to verify/clean up
+ - Browser-based: no file system integration beyond uploads/downloads
+ - Tested in Chrome, stable builds will be tested in a few browsers (e.g. Firefox, Edge)
 
 ## Known Issues:
 - Outside corner edges may not be generated
@@ -122,6 +125,8 @@ Option: Embed STTC-TT data in `map.json` for diagnositc purposes. The following 
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
+ - Import entire scenario folders
+ - Export multiple files as zip 
  - Generator level limiter added
  - Preview mode selector now separate buttons
  - Slopes now calculate heat in the correct direction, and with greater penalties uphill
