@@ -120,6 +120,7 @@ Option: Embed `STTC-TT.json` for diagnositc purposes. The following data is capt
  - Tested in Chrome, stable builds will be tested in a few browsers (e.g. Firefox, Edge)
 
 ## Known Issues:
+- Rotating a map will not rotate slopes
 - Outside corner edges may not be generated
 - All image imported maps default to desert biome 
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
