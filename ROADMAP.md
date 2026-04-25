@@ -24,6 +24,12 @@ A living document for tracking ideas, improvements, and future direction for the
 
 ### Preview
 
+- [ ] Tip of the day in dead space
+- [ ] Selection in preview
+- [ ] Drag selection
+- [ ] Fill selection
+- [ ] Navigability highlight contigious area
+- [ ] Keybaord navigation in preview
 - [ ] Terrain traversability preview (including blocking decors) overlay
 - [ ] Level -1 render as water preview overlay
     
@@ -72,6 +78,7 @@ Completed items
 - [x] Validate edge remapping behaviour across all landscapes
 - [x] Fix any inconsistencies in terrain assignment logic
 - [x] Map vertical flip (in tool and game)
+
 ---
 
 ## Notes
