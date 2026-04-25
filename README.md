@@ -47,7 +47,7 @@ This tool allows you to:
 - Real-time stats for total tiles and level ranges
 - Export validated `map.json` and update existing `scenario.json`
 - Backup scenario folders before export
-- Export an optional STTC-TT.json file containing debugging information
+- Export an optional `STTC-TT.json` file containing debugging information
 
 ---
 
@@ -69,6 +69,10 @@ This tool allows you to:
 
 ### 4. Export
 - Preview the JSON and export your files to the scenario folder.
+  - Optionally export backup files
+  - Optionally export as .zip file
+  - Optionally export STTC-TT.json debug file
+  - Optional downloads will likely prompt to Allow download of multiple files
 
 **Default scenario path:**
 `%USERPROFILE%\Documents\My Games\Starship Troopers\Scenarios`
@@ -77,7 +81,7 @@ This tool allows you to:
 
 ## Exported Data Format
 
-Option: Embed `STTC-TT.json` for diagnositc purposes. The following data is captured:
+Option: Export `STTC-TT.json` for diagnositc purposes. The following data is captured:
  - STTC-TT version
  - Source
  - Generation data (if used)
@@ -99,14 +103,25 @@ Option: Embed `STTC-TT.json` for diagnositc purposes. The following data is capt
       "TerrainTypeId": 2
     }
   ]
-}
+...}
 ```
 ### scenario.json
 ```json
-{
+{...
   "LandscapeId": 0
+...}
+```
+### header.json
+```json
+{...
+  "DLCs": [
+    1 //Base game
+    2 //Raising Hell
+    4 //Urban Onslaught
+  ]
 }
 ```
+
 
 ### Notes:
  - Internal level range is 0-14 (mapped to editor levels -1 to 13)
@@ -117,7 +132,7 @@ Option: Embed `STTC-TT.json` for diagnositc purposes. The following data is capt
  - Fixed map resolution: 128x128 only
  - No in-engine validation: Load your map to verify/clean up
  - Browser-based: no file system integration beyond uploads/downloads
- - Tested in Chrome, stable builds will be tested in a few browsers (e.g. Firefox, Edge)
+ - Tested in Chrome, future builds will be tested in a few browsers (e.g. Firefox, Edge)
 
 ## Known Issues:
 - Outside corner edges may not be generated
@@ -125,6 +140,8 @@ Option: Embed `STTC-TT.json` for diagnositc purposes. The following data is capt
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
+ - Heightmap and UI colour schemes available, custom schemes are saved to the device
+ - Rotating a map will now rotate slopes
  - Import entire scenario folders
  - Export multiple files as zip 
  - Generator level limiter added

@@ -6,72 +6,69 @@
 <title>STTC-TT</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cmask id='m'%3E%3Crect width='100' height='100' fill='white'/%3E%3Ccircle cx='50' cy='50' r='18' fill='black'/%3E%3C/mask%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='48' stroke='white' stroke-width='4' fill='none'/%3E%3Cpath mask='url(%23m)' d='M50,2 L59.2,33.5 L83.9,16.1 L66.5,40.8 L98,50 L66.5,59.2 L83.9,83.9 L59.2,66.5 L50,98 L40.8,66.5 L16.1,83.9 L33.5,59.2 L2,50 L33.5,40.8 L16.1,16.1 L40.8,33.5 Z' fill='%23e65100' stroke='white' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='18' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
 <style>
-:root{
-  --bg:#f5f4f0;--bg2:#eceae4;--bg3:#fff;
-  --border:#e0dfd8;--border2:#ccc;
-  --text:#1a1a1a;--text2:#555;--text3:#888;
-  --accent:#1a1a1a;--accent-fg:#fff;
+/* ── UI theme variables ─────────────────────────────────────────────────────── */
+/* Applied via data-theme attribute on <html>. JS sets this on load.            */
+
+:root[data-theme="light"]{
+  --bg:#f5f4f0;--bg2:#eceae4;--bg3:#ffffff;
+  --border:#d8d6ce;--border2:#c4c2ba;
+  --text:#1a1a1a;--text2:#505050;--text3:#888880;
+  --accent:#2a2a2a;--accent-fg:#ffffff;
   --ok:#2a7a3b;--err:#c0392b;--warn:#7a5a00;
-
-  /* ── Height level palettes (map level 0=editor -1 … 14=editor 13) ── */
-  /* Default - deep navy → green → amber → grey peaks               */
-  --lv-default-0:#0d0d1a;
-  --lv-default-1:#0f2a45;
-  --lv-default-2:#1a4a70;
-  --lv-default-3:#2d6e50;
-  --lv-default-4:#3d8a50;
-  --lv-default-5:#5aa858;
-  --lv-default-6:#7ec065;
-  --lv-default-7:#a8d060;
-  --lv-default-8:#ccd858;
-  --lv-default-9:#e8c838;
-  --lv-default-10:#d4a030;
-  --lv-default-11:#b07828;
-  --lv-default-12:#8a5020;
-  --lv-default-13:#c8c8c8;
-  --lv-default-14:#f0f0f0;
-
-  /* Deuteranopia - blue → gold → white (avoids red/green)           */
-  --lv-deut-0:#0d0d2a;
-  --lv-deut-1:#0a2060;
-  --lv-deut-2:#1040a0;
-  --lv-deut-3:#1860c0;
-  --lv-deut-4:#2080d0;
-  --lv-deut-5:#40a0d8;
-  --lv-deut-6:#70b8d8;
-  --lv-deut-7:#a0c8d0;
-  --lv-deut-8:#c8c080;
-  --lv-deut-9:#d8a840;
-  --lv-deut-10:#c89020;
-  --lv-deut-11:#b07010;
-  --lv-deut-12:#905008;
-  --lv-deut-13:#d8d8d8;
-  --lv-deut-14:#f8f8f8;
-
-  /* High Contrast - black → cyan → yellow → white                   */
-  --lv-hc-0:#000000;
-  --lv-hc-1:#001840;
-  --lv-hc-2:#003880;
-  --lv-hc-3:#0058c0;
-  --lv-hc-4:#0080e0;
-  --lv-hc-5:#00b8e0;
-  --lv-hc-6:#00e0c0;
-  --lv-hc-7:#00e080;
-  --lv-hc-8:#80e000;
-  --lv-hc-9:#e0c000;
-  --lv-hc-10:#e08000;
-  --lv-hc-11:#e04000;
-  --lv-hc-12:#c00020;
-  --lv-hc-13:#e0e0e0;
-  --lv-hc-14:#ffffff;
 }
-@media(prefers-color-scheme:dark){:root{
+:root[data-theme="dark"]{
   --bg:#1a1a1a;--bg2:#242424;--bg3:#2e2e2e;
   --border:#3a3a3a;--border2:#4a4a4a;
-  --text:#e8e6e0;--text2:#aaa;--text3:#666;
+  --text:#e8e6e0;--text2:#aaaaaa;--text3:#666660;
   --accent:#e8e6e0;--accent-fg:#1a1a1a;
   --ok:#4caf72;--err:#e06060;--warn:#c8a030;
-}}
+}
+:root[data-theme="custom"]{
+  --bg:#1e1e2a;--bg2:#28283a;--bg3:#32324a;
+  --border:#44445a;--border2:#55556a;
+  --text:#e0dff8;--text2:#a0a0c0;--text3:#6a6a8a;
+  --accent:#7c6af0;--accent-fg:#ffffff;
+  --ok:#4caf72;--err:#e06060;--warn:#c8a030;
+}
+/* Fallback for when JS hasn't set data-theme yet - match OS preference */
+:root:not([data-theme]){
+  --bg:#f5f4f0;--bg2:#eceae4;--bg3:#ffffff;
+  --border:#d8d6ce;--border2:#c4c2ba;
+  --text:#1a1a1a;--text2:#505050;--text3:#888880;
+  --accent:#2a2a2a;--accent-fg:#ffffff;
+  --ok:#2a7a3b;--err:#c0392b;--warn:#7a5a00;
+}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme]){
+    --bg:#1a1a1a;--bg2:#242424;--bg3:#2e2e2e;
+    --border:#3a3a3a;--border2:#4a4a4a;
+    --text:#e8e6e0;--text2:#aaaaaa;--text3:#666660;
+    --accent:#e8e6e0;--accent-fg:#1a1a1a;
+    --ok:#4caf72;--err:#e06060;--warn:#c8a030;
+  }
+}
+:root{
+  /* ── Height level palettes (map level 0=editor -1 ... 14=editor 13) ── */
+  /* Default - deep navy -> green -> amber -> grey peaks                  */
+  --lv-default-0:#0d0d1a;--lv-default-1:#0f2a45;--lv-default-2:#1a4a70;
+  --lv-default-3:#2d6e50;--lv-default-4:#3d8a50;--lv-default-5:#5aa858;
+  --lv-default-6:#7ec065;--lv-default-7:#a8d060;--lv-default-8:#ccd858;
+  --lv-default-9:#e8c838;--lv-default-10:#d4a030;--lv-default-11:#b07828;
+  --lv-default-12:#8a5020;--lv-default-13:#c8c8c8;--lv-default-14:#f0f0f0;
+  /* Deuteranopia - blue -> gold -> white (avoids red/green)              */
+  --lv-deut-0:#0d0d2a;--lv-deut-1:#0a2060;--lv-deut-2:#1040a0;
+  --lv-deut-3:#1860c0;--lv-deut-4:#2080d0;--lv-deut-5:#40a0d8;
+  --lv-deut-6:#70b8d8;--lv-deut-7:#a0c8d0;--lv-deut-8:#c8c080;
+  --lv-deut-9:#d8a840;--lv-deut-10:#c89020;--lv-deut-11:#b07010;
+  --lv-deut-12:#905008;--lv-deut-13:#d8d8d8;--lv-deut-14:#f8f8f8;
+  /* High Contrast - topographic + greyscale monotone                    */
+  /* White peaks -> blue water -> teal -> green -> amber -> dark red -> void */
+  --lv-hc-0:#ffffff;--lv-hc-1:#dbf0ff;--lv-hc-2:#b3e0ff;
+  --lv-hc-3:#7ed6ff;--lv-hc-4:#47cfff;--lv-hc-5:#33cfe9;
+  --lv-hc-6:#3dc17a;--lv-hc-7:#629f25;--lv-hc-8:#777a0c;
+  --lv-hc-9:#745d09;--lv-hc-10:#723f0b;--lv-hc-11:#67260a;
+  --lv-hc-12:#531205;--lv-hc-13:#2e0601;--lv-hc-14:#000000;
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);padding:20px;font-size:13px;line-height:1.5;}
 h1{font-size:17px;font-weight:600;margin-bottom:3px;}
@@ -82,7 +79,7 @@ h1{font-size:17px;font-weight:600;margin-bottom:3px;}
 .section{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
 .sh{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;cursor:pointer;user-select:none;gap:8px;}
 .sh:hover{background:var(--bg2);}
-.sh-left{display:flex;align-items:center;gap:8px;}
+.sh-left{display:flex;align-items:center;gap:8px;flex:1;}
 .st{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;}
 .sb{font-size:11px;color:var(--text2);}
 .sv-chev{font-size:11px;color:var(--text3);transition:transform .18s;flex-shrink:0;}
@@ -155,7 +152,7 @@ button.sm{padding:5px 10px;font-size:12px;border-radius:5px;}
 .shift-val{font-size:13px;font-weight:700;min-width:32px;text-align:center;color:var(--text);}
 .ch{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);margin-top:4px;}
 .tsw{width:11px;height:11px;border-radius:3px;display:inline-block;flex-shrink:0;}
-.landscape-badge{font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;background:var(--bg2);border:1px solid var(--border);color:var(--text);}
+.landscape-badge{font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;background:var(--bg2);border:1px solid var(--border);color:var(--text);align-self:center;}
 .export-box{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 15px;}
 .export-file-row{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-radius:7px;margin-bottom:4px;background:var(--bg2);border:1px solid var(--border);transition:border-color .15s;}
 .export-file-row.dirty{border-color:var(--ok);}
@@ -182,13 +179,15 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 .scheme-presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
 .scheme-btn{padding:4px 10px;font-size:11px;border-radius:5px;cursor:pointer;border:1px solid var(--border2);background:var(--bg2);color:var(--text);}
 .scheme-btn.active{background:var(--accent);color:var(--accent-fg);border-color:transparent;}
+.ui-theme-btn{padding:4px 10px;font-size:11px;border-radius:5px;cursor:pointer;border:1px solid var(--border2);background:var(--bg2);color:var(--text);}
+.ui-theme-btn.active{background:var(--accent);color:var(--accent-fg);border-color:transparent;}
 .colour-pickers{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:8px;}
 .cp-box{display:flex;flex-direction:column;align-items:center;gap:4px;}
 .cp-box label{font-size:11px;color:var(--text2);}
 .cp-box input[type=color]{width:44px;height:32px;padding:2px;border:1px solid var(--border2);border-radius:5px;cursor:pointer;background:var(--bg);}
 .scheme-preview-strip{height:14px;border-radius:4px;border:1px solid var(--border);margin-top:8px;display:block;width:100%;}
 /* Dual-range level slider */
-/* Dual-range slider — track and thumbs visually match the standard .rr sliders */
+/* Dual-range slider - track and thumbs visually match the standard .rr sliders */
 .dual-range-outer{position:relative;height:22px;}
 /* Custom track div - sits between the two stacked inputs via z-index */
 .dual-range-track{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:6px;border-radius:3px;background:var(--border2);border:1px solid var(--border2);outline:1px solid rgba(255,255,255,0.12);z-index:0;pointer-events:none;}
@@ -216,7 +215,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   </svg>
   <h1>Starship Troopers Terran Command Terrain Tool</h1>
 </div>
-<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · <span id="versionDisplay">v1.06</span> · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
+<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · <span id="versionDisplay">v1.07-beta1</span> · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
 
 <div class="layout">
 <div class="left-col">
@@ -510,20 +509,46 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body">
-      <div class="note">Height preview colour scheme. Terrain, navigability and heatmap previews use fixed functional colours.</div>
-      <div class="scheme-presets">
-        <button class="scheme-btn active" data-scheme="default">Default</button>
-        <button class="scheme-btn" data-scheme="deuteranopia">Deuteranopia</button>
-        <button class="scheme-btn" data-scheme="highcontrast">High Contrast</button>
-        <button class="scheme-btn" data-scheme="custom">Custom</button>
-      </div>
-      <div id="customPickerWrap" style="display:none;">
-        <div class="colour-pickers">
-          <div class="cp-box"><label>Low (editor −1)</label><input type="color" id="cpLow" value="#0d0d1a"></div>
-          <div class="cp-box"><label>Mid (editor 6)</label><input type="color" id="cpMid" value="#7ec065"></div>
-          <div class="cp-box"><label>High (editor 13)</label><input type="color" id="cpHigh" value="#f0f0f0"></div>
+      <div style="margin-bottom:12px;">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">UI Theme</div>
+        <div class="scheme-presets" id="uiThemeBar">
+          <button class="ui-theme-btn active" data-ui-theme="auto">Auto</button>
+          <button class="ui-theme-btn" data-ui-theme="light">Light</button>
+          <button class="ui-theme-btn" data-ui-theme="dark">Dark</button>
+          <button class="ui-theme-btn" data-ui-theme="custom">Custom</button>
         </div>
-        <canvas id="schemeStripCanvas" class="scheme-preview-strip" width="280" height="14"></canvas>
+        <div id="uiCustomWrap" style="display:none;">
+          <div class="colour-pickers" style="grid-template-columns:repeat(4,1fr);">
+            <div class="cp-box"><label>Background</label><input type="color" id="uiBg" value="#1e1e2a"></div>
+            <div class="cp-box"><label>Surface</label><input type="color" id="uiBg2" value="#28283a"></div>
+            <div class="cp-box"><label>Card</label><input type="color" id="uiBg3" value="#32324a"></div>
+            <div class="cp-box"><label>Accent</label><input type="color" id="uiAccent" value="#7c6af0"></div>
+          </div>
+          <div class="colour-pickers" style="grid-template-columns:repeat(4,1fr);margin-top:6px;">
+            <div class="cp-box"><label>Text</label><input type="color" id="uiText" value="#e0dff8"></div>
+            <div class="cp-box"><label>Dim text</label><input type="color" id="uiText2" value="#a0a0c0"></div>
+            <div class="cp-box"><label>Border</label><input type="color" id="uiBorder" value="#44445a"></div>
+            <div class="cp-box"><label>OK</label><input type="color" id="uiOk" value="#4caf72"></div>
+          </div>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:2px;">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">Height preview colour scheme</div>
+        <div class="note" style="margin-bottom:8px;">Terrain, navigability and heatmap previews use fixed functional colours.</div>
+        <div class="scheme-presets">
+          <button class="scheme-btn active" data-scheme="default">Default</button>
+          <button class="scheme-btn" data-scheme="deuteranopia">Deuteranopia</button>
+          <button class="scheme-btn" data-scheme="highcontrast">High Contrast</button>
+          <button class="scheme-btn" data-scheme="custom">Custom</button>
+        </div>
+        <div id="customPickerWrap" style="display:none;">
+          <div class="colour-pickers">
+            <div class="cp-box"><label>Low (editor -1)</label><input type="color" id="cpLow" value="#0d0d1a"></div>
+            <div class="cp-box"><label>Mid (editor 6)</label><input type="color" id="cpMid" value="#7ec065"></div>
+            <div class="cp-box"><label>High (editor 13)</label><input type="color" id="cpHigh" value="#f0f0f0"></div>
+          </div>
+          <canvas id="schemeStripCanvas" class="scheme-preview-strip" width="280" height="14"></canvas>
+        </div>
       </div>
     </div>
   </div>
@@ -629,7 +654,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 
 </div><!-- end layout -->
 <script>
-const TOOL_VERSION='1.06';
+const TOOL_VERSION='1.07-beta1';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // COLOUR HELPERS - all colours in this file use hex strings for easy VS Code editing
@@ -673,7 +698,7 @@ function buildCustomPalette(low,mid,high){
 
 function applyScheme(name){
   activeScheme=name;
-  document.querySelectorAll('.scheme-btn').forEach(b=>b.classList.toggle('active',b.dataset.scheme===name));
+  document.querySelectorAll('#secSettings .scheme-btn').forEach(b=>b.classList.toggle('active',b.dataset.scheme===name));
   const cpWrap=document.getElementById('customPickerWrap');
   if(cpWrap) cpWrap.style.display=name==='custom'?'block':'none';
   switch(name){
@@ -697,7 +722,7 @@ function updateSchemeStrip(){
   for(let i=0;i<=14;i++){ctx.fillStyle=LV_COL[i];ctx.fillRect(i*bw,0,bw+1,h);}
 }
 
-document.querySelectorAll('.scheme-btn').forEach(btn=>
+document.querySelectorAll('#secSettings .scheme-btn').forEach(btn=>
   btn.addEventListener('click',()=>applyScheme(btn.dataset.scheme)));
 
 ['cpLow','cpMid','cpHigh'].forEach(id=>{
@@ -722,7 +747,7 @@ const NAV_HEX={
 };
 
 // ── Heatmap colour stops (hex) ────────────────────────────────────────────────
-const HEAT_STOPS_HEX=['#dc2814','#dc8200','#b4d200','#32be46','#1482dc'];
+const HEAT_STOPS_HEX=['#630d02','#a06a20','#d1cb1c','#42b0f5','#c3d8f9'];
 const HEAT_HARD_HEX='#19191e';
 const HEAT_SLOPE_HEX='#b450b4';
 
@@ -992,7 +1017,7 @@ function updateExportUI(){
 }
 let activeSource='image',activeLandscape=0,previewMode='height';
 let levelMin=0,levelMax=14,rangeMode='scale';
-const UNDO_MAX=30;
+const UNDO_MAX=50;
 let history=[],historyCursor=-1;
 
 Object.defineProperty(window,'undoStack',{get:()=>history.slice(0,historyCursor+1)});
@@ -1352,7 +1377,7 @@ function preferredTextSuffix(){
 
 function loadScenarioDir(files){
   const fileArr=[...files];
-  let mapFile=null,scenFile=null,headerFile=null;
+  let mapFile=null,scenFile=null,headerFile=null,sttcFile=null;
   dirName=null;
   const textFiles={};  // suffix -> file object, e.g. {english: File, french: File}
   fileArr.forEach(f=>{
@@ -1361,6 +1386,7 @@ function loadScenarioDir(files){
     if(n==='map.json')mapFile=f;
     else if(n==='scenario.json')scenFile=f;
     else if(n==='header.json')headerFile=f;
+    else if(n==='sttc-tt.json')sttcFile=f;
     else{
       const m=n.match(/^text_(.+)\.csv$/);
       if(m)textFiles[m[1]]=f;
@@ -1380,6 +1406,20 @@ function loadScenarioDir(files){
     origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];
     if(d._STTCTT?.undoHistory?.length){
       d._STTCTT.undoHistory.forEach(label=>history.push({data:null,label:'[prev] '+label,genState:null,readOnly:true}));
+      historyCursor=history.length-1;
+    }
+  }));
+  if(sttcFile)promises.push(readJSON(sttcFile).then(d=>{
+    // Import previous session log and DLC history as read-only context
+    if(Array.isArray(d.sessionLog)&&d.sessionLog.length){
+      d.sessionLog.forEach(e=>sessionLog.push({...e,readOnly:true}));
+    }
+    if(Array.isArray(d.dlcs?.history)&&d.dlcs.history.length){
+      d.dlcs.history.forEach(e=>dlcHistory.push({...e,readOnly:true}));
+    }
+    // Import undo history labels as read-only entries (no tile data, just audit trail)
+    if(Array.isArray(d.undoHistory)&&d.undoHistory.length&&history.length===0){
+      d.undoHistory.forEach(label=>history.push({data:null,label:'[prev] '+label,genState:null,readOnly:true}));
       historyCursor=history.length-1;
     }
   }));
@@ -1405,7 +1445,7 @@ function loadScenarioDir(files){
     if(subEl){
       const loaded=[];
       if(mapFile)loaded.push('map.json');if(scenFile)loaded.push('scenario.json');
-      if(headerFile)loaded.push('header.json');if(textFile)loaded.push(textFile.name);
+      if(headerFile)loaded.push('header.json');if(sttcFile)loaded.push('STTC-TT.json');if(textFile)loaded.push(textFile.name);
       subEl.textContent=loaded.length?loaded.join(' · '):'No recognised files found';
     }
     const titleEl=document.getElementById('dzDirTitle');
@@ -1781,8 +1821,48 @@ function heatmapColour(r,isSlope){
 function invalidateHeatCache(){_heatCache=null;_heatCacheStamp=null;}
 
 // ── Preview render ─────────────────────────────────────────────────────────────
+function updateSectionBadges(){
+  // Terrain badge
+  const tBadge=document.getElementById('terrainBadge');
+  if(tBadge){
+    const tab=activeTerrainTab();
+    const val=document.getElementById('terrainSelect').value;
+    let label='No change';
+    if(tab==='ta-bylevel'){
+      label='Per-level';
+    }else if(tab==='ta-overrides'){
+      const lo=document.getElementById('lowTerrain').value;
+      const hi=document.getElementById('highTerrain').value;
+      if(lo||hi) label='Low/High override';
+    }else if(val){
+      const t=T_BY_ID[parseInt(val)];
+      label=t?t.name:'id '+val;
+    }
+    tBadge.textContent=label;
+  }
+  // Edges badge
+  const eBadge=document.getElementById('edgesBadge');
+  if(eBadge){
+    const tab=activeEdgeTab();
+    const val=document.getElementById('edgeRemap').value;
+    let label='No change';
+    if(tab==='ea-bylevel'){
+      label='Per-level';
+    }else if(tab==='ea-overrides'){
+      const lo=document.getElementById('edgeRemapLow').value;
+      const hi=document.getElementById('edgeRemapHigh').value;
+      if(lo||hi) label='Low/High override';
+    }else if(val){
+      const e=EDGE_BY_KEY[val];
+      label=e?e.name:val;
+    }
+    eBadge.textContent=label;
+  }
+}
+
 function updatePreview(){
   if(!tileData)return;
+  updateSectionBadges();
   updateExportUI();
   invalidateHeatCache();
   const canvas=document.getElementById('cvPreview'),ctx=canvas.getContext('2d'),imgData=ctx.createImageData(W,H);
@@ -1953,23 +2033,27 @@ function toolMsg(txt){const m=document.getElementById('msgTool');m.textContent=t
 function clampMap(v){return Math.max(0,Math.min(MAX_LEVEL,Math.round(v)));}
 document.getElementById('btnShiftAll').addEventListener('click',()=>{
   if(!tileData)return;const sh=parseInt(shiftSlider.value);if(sh===0){toolMsg('Shift is 0 - nothing to do.');return;}
-  pushUndo('shift all');for(let i=0;i<tileData.length;i++)tileData[i]=clampMap(tileData[i]+sh);
-  syncSrc();updatePreview();toolMsg(`Shifted all by ${sh>0?'+':''}${sh} (editor levels)`);shiftSlider.value=0;shiftValEl.textContent='0';
+  const shLabel=`Shift all ${sh>0?'+':''}${sh}`;
+  pushUndo(shLabel);for(let i=0;i<tileData.length;i++)tileData[i]=clampMap(tileData[i]+sh);
+  syncSrc();updatePreview();toolMsg(shLabel+' (editor levels)');shiftSlider.value=0;shiftValEl.textContent='0';
 });
 document.getElementById('btnClamp').addEventListener('click',()=>{
   if(!tileData)return;
   const loE=parseInt(document.getElementById('clampLow').value),loVE=parseInt(document.getElementById('clampLowVal').value);
   const hiE=parseInt(document.getElementById('clampHigh').value),hiVE=parseInt(document.getElementById('clampHighVal').value);
-  pushUndo('clamp');let n=0;
+  const clampLabel=`Clamp (<=editor ${loE} -> ${loVE}, >=editor ${hiE} -> ${hiVE})`;
+  pushUndo(clampLabel);let n=0;
   for(let i=0;i<tileData.length;i++){const ev=toEditor(tileData[i]);if(ev<=loE){tileData[i]=clampMap(toMap(loVE));n++;}else if(ev>=hiE){tileData[i]=clampMap(toMap(hiVE));n++;}}
-  syncSrc();updatePreview();toolMsg(`Clamped ${n.toLocaleString()} tiles`);
+  syncSrc();updatePreview();toolMsg(`Clamped ${n.toLocaleString()} tiles - `+clampLabel);
 });
 document.getElementById('btnBand').addEventListener('click',()=>{
   if(!tileData)return;
   const op=document.getElementById('bandOp').value,threshE=parseInt(document.getElementById('bandThresh').value),sh=parseInt(document.getElementById('bandShift').value)||0;
-  pushUndo('band shift');let n=0;
+  const opLabel={lte:'<=',eq:'=',gte:'>='}[op]||op;
+  const bandLabel=`Band shift (editor ${opLabel}${threshE}) ${sh>0?'+':''}${sh}`;
+  pushUndo(bandLabel);let n=0;
   for(let i=0;i<tileData.length;i++){const ev=toEditor(tileData[i]);const hit=(op==='eq'?ev===threshE:op==='lte'?ev<=threshE:ev>=threshE);if(hit){tileData[i]=clampMap(tileData[i]+sh);n++;}}
-  syncSrc();updatePreview();toolMsg(`Shifted ${n.toLocaleString()} tiles by ${sh>0?'+':''}${sh}`);
+  syncSrc();updatePreview();toolMsg(`${n.toLocaleString()} tiles shifted (editor ${opLabel}${threshE}) by ${sh>0?'+':''}${sh}`);
 });
 document.getElementById('btnUndo').addEventListener('click',()=>{
   if(historyCursor<=0)return;historyCursor--;
@@ -1997,9 +2081,31 @@ function drawOrientIndicator(){
 }
 function applyTransform(fn,label){
   if(!tileData)return;pushUndo(label);
+  // Rotate level data
   const src=tileData.slice(),dst=new Int16Array(W*H);
   for(let row=0;row<H;row++)for(let col=0;col<W;col++){const{r:nr,c:nc}=fn(row,col);dst[nr*W+nc]=src[row*W+col];}
-  tileData=dst;orientHistory.push(label);syncSrc();updatePreview();orientMsg(label);
+  tileData=dst;
+  // Rotate srcByIndex so Type (slope/cliff) and TerrainTypeId follow their tiles
+  if(Object.keys(srcByIndex).length){
+    const newByIndex={};
+    for(const [idxStr,tile] of Object.entries(srcByIndex)){
+      const idx=parseInt(idxStr);
+      const row=Math.floor(idx/W),col=idx%W;
+      const{r:nr,c:nc}=fn(row,col);
+      const newIdx=nr*W+nc;
+      newByIndex[newIdx]={...tile,Index:newIdx};
+    }
+    srcByIndex=newByIndex;
+    // Keep srcTiles array in sync
+    if(srcTiles){
+      srcTiles.forEach(t=>{
+        const row=Math.floor(t.Index/W),col=t.Index%W;
+        const{r:nr,c:nc}=fn(row,col);
+        t.Index=nr*W+nc;
+      });
+    }
+  }
+  orientHistory.push(label);syncSrc();updatePreview();orientMsg(label);
 }
 function rot90CW(row,col){return{r:W-1-col,c:row};}
 function rot90CCW(row,col){return{r:col,c:H-1-row};}
@@ -2458,6 +2564,120 @@ setActiveLandscape(0,'manual');
 updateTHint();
 applyScheme('default');
 document.getElementById('versionDisplay').textContent='v'+TOOL_VERSION;
+
+// ── UI Theme ──────────────────────────────────────────────────────────────────
+// Theme definitions: each maps to a set of CSS custom property overrides
+const UI_THEMES={
+  light:{
+    '--bg':'#f5f4f0','--bg2':'#eceae4','--bg3':'#ffffff',
+    '--border':'#d8d6ce','--border2':'#c4c2ba',
+    '--text':'#1a1a1a','--text2':'#505050','--text3':'#888880',
+    '--accent':'#2a2a2a','--accent-fg':'#ffffff',
+    '--ok':'#2a7a3b','--err':'#c0392b','--warn':'#7a5a00',
+  },
+  dark:{
+    '--bg':'#1a1a1a','--bg2':'#242424','--bg3':'#2e2e2e',
+    '--border':'#3a3a3a','--border2':'#4a4a4a',
+    '--text':'#e8e6e0','--text2':'#aaaaaa','--text3':'#666660',
+    '--accent':'#e8e6e0','--accent-fg':'#1a1a1a',
+    '--ok':'#4caf72','--err':'#e06060','--warn':'#c8a030',
+  },
+  custom:{
+    '--bg':'#1e1e2a','--bg2':'#28283a','--bg3':'#32324a',
+    '--border':'#44445a','--border2':'#55556a',
+    '--text':'#e0dff8','--text2':'#a0a0c0','--text3':'#6a6a8a',
+    '--accent':'#7c6af0','--accent-fg':'#ffffff',
+    '--ok':'#4caf72','--err':'#e06060','--warn':'#c8a030',
+  },
+};
+
+let activeUITheme='auto';
+
+function applyUITheme(name){
+  activeUITheme=name;
+  document.querySelectorAll('.ui-theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.uiTheme===name));
+  const wrap=document.getElementById('uiCustomWrap');
+  if(wrap)wrap.style.display=name==='custom'?'block':'none';
+  const root=document.documentElement;
+  // Remove data-theme to allow auto (OS) when 'auto'
+  if(name==='auto'){
+    root.removeAttribute('data-theme');
+    // Clear any inline overrides
+    Object.keys(UI_THEMES.dark).forEach(k=>root.style.removeProperty(k));
+  }else if(name==='custom'){
+    root.setAttribute('data-theme','custom');
+    syncCustomUITheme();
+  }else{
+    root.setAttribute('data-theme',name);
+    Object.keys(UI_THEMES.dark).forEach(k=>root.style.removeProperty(k));
+  }
+  try{localStorage.setItem('sttctt-ui-theme',name);}catch(e){}
+  logSession('uiTheme',name);
+}
+
+function syncCustomUITheme(){
+  const root=document.documentElement;
+  const map={
+    'uiBg':'--bg','uiBg2':'--bg2','uiBg3':'--bg3',
+    'uiAccent':'--accent','uiText':'--text','uiText2':'--text2',
+    'uiBorder':'--border','uiOk':'--ok',
+  };
+  // Derive related vars from pickers
+  const bg3=document.getElementById('uiBg3')?.value||'#32324a';
+  const border=document.getElementById('uiBorder')?.value||'#44445a';
+  const accent=document.getElementById('uiAccent')?.value||'#7c6af0';
+  const text=document.getElementById('uiText')?.value||'#e0dff8';
+  const text2=document.getElementById('uiText2')?.value||'#a0a0c0';
+  const ok=document.getElementById('uiOk')?.value||'#4caf72';
+  // Derive border2 (lighter), text3 (dimmer), accent-fg (contrast)
+  root.style.setProperty('--bg', document.getElementById('uiBg')?.value||'#1e1e2a');
+  root.style.setProperty('--bg2', document.getElementById('uiBg2')?.value||'#28283a');
+  root.style.setProperty('--bg3', bg3);
+  root.style.setProperty('--border', border);
+  root.style.setProperty('--border2', border); // same for simplicity
+  root.style.setProperty('--text', text);
+  root.style.setProperty('--text2', text2);
+  root.style.setProperty('--text3', text2); // use text2 as text3 base
+  root.style.setProperty('--accent', accent);
+  root.style.setProperty('--accent-fg', '#ffffff');
+  root.style.setProperty('--ok', ok);
+  root.style.setProperty('--err', '#e06060');
+  root.style.setProperty('--warn', '#c8a030');
+}
+
+// Wire UI theme buttons
+document.querySelectorAll('.ui-theme-btn').forEach(btn=>
+  btn.addEventListener('click',()=>applyUITheme(btn.dataset.uiTheme)));
+
+// Wire custom UI colour pickers
+['uiBg','uiBg2','uiBg3','uiAccent','uiText','uiText2','uiBorder','uiOk'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el)el.addEventListener('input',()=>{
+    try{localStorage.setItem('sttctt-ui-'+id,el.value);}catch(e){}
+    if(activeUITheme==='custom')syncCustomUITheme();
+  });
+});
+
+// Restore persisted theme preference
+(()=>{
+  // Restore custom colour picker values first
+  const UI_PICKER_DEFAULTS={
+    'uiBg':'#1e1e2a','uiBg2':'#28283a','uiBg3':'#32324a',
+    'uiAccent':'#7c6af0','uiText':'#e0dff8','uiText2':'#a0a0c0',
+    'uiBorder':'#44445a','uiOk':'#4caf72',
+  };
+  Object.entries(UI_PICKER_DEFAULTS).forEach(([id,def])=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    let val=def;
+    try{val=localStorage.getItem('sttctt-ui-'+id)||def;}catch(e){}
+    el.value=val;
+  });
+  // Now restore and apply theme (custom will use the restored picker values)
+  let saved='auto';
+  try{saved=localStorage.getItem('sttctt-ui-theme')||'auto';}catch(e){}
+  applyUITheme(saved);
+})();
 </script>
 </body>
 </html>

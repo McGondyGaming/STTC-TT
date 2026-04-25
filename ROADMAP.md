@@ -6,6 +6,7 @@ A living document for tracking ideas, improvements, and future direction for the
 
 ## Current Focus
 
+- [ ] Bugfixes
 - [ ] Selections in preview
 - [ ] Rotate preview to match game (45° CW)
 
