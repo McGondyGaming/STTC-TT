@@ -116,8 +116,9 @@ select option{background:var(--bg);color:var(--text);}
 .note:last-child{margin-bottom:0;}
 .warn-box{font-size:11px;color:var(--warn);background:color-mix(in srgb,var(--warn) 10%,var(--bg3));border:1px solid color-mix(in srgb,var(--warn) 25%,var(--bg3));border-radius:6px;padding:6px 10px;line-height:1.5;}
 .tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:12px;}
-.tab{padding:6px 12px;font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text3);margin-bottom:-1px;white-space:nowrap;}
+.tab{padding:6px 12px;font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text3);margin-bottom:-1px;white-space:nowrap;outline:none;}
 .tab.active{color:var(--text);border-bottom-color:var(--text);}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:-1px;border-radius:3px 3px 0 0;}
 .tp{display:none;}
 .tp.active{display:block;}
 .pl-grid{display:grid;grid-template-columns:46px 1fr;gap:5px 10px;align-items:center;}
@@ -259,8 +260,8 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <div class="note" style="margin-bottom:8px;">Generates a procedural heightmap using fractal noise. Output is deterministic - same seed and settings always produce the same map.</div>
         <div class="field">
           <fieldset style="border:none;padding:0;margin:0;">
-            <legend class="fl" style="float:left;width:100%;margin-bottom:3px;">Noise type</legend>
-            <div style="display:flex;gap:8px;">
+            <legend class="fl" style="display:block;width:100%;margin-bottom:5px;">Noise type</legend>
+            <div style="display:flex;flex-wrap:wrap;gap:6px 14px;">
               <label class="ck-row"><input type="radio" name="noiseType" id="noisePerlin" value="perlin" checked> Perlin</label>
               <label class="ck-row"><input type="radio" name="noiseType" id="noiseSimplex" value="simplex"> OpenSimplex</label>
             </div>
@@ -302,7 +303,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
           <div class="lvl-range-hint" id="lvlRangeHint">Scale: redistributes all terrain into the selected level range.</div>
         </div>
         <div style="margin-top:8px;">
-          <div id="genAdvToggle" style="cursor:pointer;font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;user-select:none;display:flex;align-items:center;gap:4px;">
+          <div id="genAdvToggle" tabindex="0" role="button" aria-expanded="false" style="cursor:pointer;font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;user-select:none;display:flex;align-items:center;gap:4px;outline:none;">
             <span id="genAdvChev">▶</span> Refine shape
           </div>
           <div id="genAdvBody" style="display:none;margin-top:8px;">
@@ -1126,12 +1127,23 @@ document.querySelectorAll('.sh[data-sec]').forEach(h=>{
 function wireTabs(barId,onChange){
   const bar=document.getElementById(barId);if(!bar)return;
   bar.querySelectorAll('.tab').forEach(tab=>{
-    tab.addEventListener('click',()=>{
+    tab.setAttribute('tabindex','0');
+    tab.setAttribute('role','tab');
+    const activate=()=>{
       bar.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
       tab.classList.add('active');
       bar.querySelectorAll('.tab').forEach(t=>{const p=document.getElementById('tab-'+t.dataset.tab);if(p)p.classList.remove('active');});
       const p=document.getElementById('tab-'+tab.dataset.tab);if(p)p.classList.add('active');
       if(onChange)onChange();
+    };
+    tab.addEventListener('click',activate);
+    tab.addEventListener('keydown',e=>{
+      if(e.key==='Enter'||e.key===' '){e.preventDefault();activate();}
+      // Arrow key navigation within tab bar
+      const tabs=[...bar.querySelectorAll('.tab')];
+      const idx=tabs.indexOf(tab);
+      if(e.key==='ArrowRight'&&idx<tabs.length-1){e.preventDefault();tabs[idx+1].focus();}
+      if(e.key==='ArrowLeft'&&idx>0){e.preventDefault();tabs[idx-1].focus();}
     });
   });
 }
@@ -1833,10 +1845,18 @@ document.getElementById('btnRandSeed').addEventListener('click',()=>{
     historyCursor=history.length-1;updateUndoButtons();recomputeGen(false);
   }
 });
-document.getElementById('genAdvToggle').addEventListener('click',()=>{
-  const body=document.getElementById('genAdvBody'),chev=document.getElementById('genAdvChev'),open=body.style.display==='none';
-  body.style.display=open?'block':'none';chev.textContent=open?'▼':'▶';
-});
+(()=>{
+  const tog=document.getElementById('genAdvToggle');
+  const toggleAdv=()=>{
+    const body=document.getElementById('genAdvBody'),chev=document.getElementById('genAdvChev'),open=body.style.display==='none';
+    body.style.display=open?'block':'none';chev.textContent=open?'▼':'▶';
+    tog.setAttribute('aria-expanded',open?'true':'false');
+  };
+  tog.addEventListener('click',toggleAdv);
+  tog.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleAdv();}});
+  tog.addEventListener('focus',()=>{tog.style.outline='2px solid var(--accent)';tog.style.outlineOffset='2px';tog.style.borderRadius='3px';});
+  tog.addEventListener('blur',()=>{tog.style.outline='none';});
+})();
 
 function activeTerrainTab(){const a=document.querySelector('#tBar .tab.active');return a?a.dataset.tab:'ta-simple';}
 function terrainForMapLevel(mv){
@@ -2114,13 +2134,17 @@ function updateUndoButtons(){
     el.style.color=isCurrent?'var(--ok)':isRedo?'var(--text3)':'var(--text)';
     el.textContent=(isRedo?'↪ ':'↩ ')+entry.label;
     if(!isCurrent&&!isReadOnly){
+      el.setAttribute('tabindex','0');
+      el.setAttribute('role','button');
       el.title='Click to jump to: '+entry.label;
       el.addEventListener('mouseenter',()=>{el.style.background='var(--bg3)';});
       el.addEventListener('mouseleave',()=>{el.style.background='';});
-      el.addEventListener('click',()=>{
+      const jump=()=>{
         tileData=history[i].data.slice();restoreGenState(history[i].genState);
         historyCursor=i;syncSrc();updatePreview();updateUndoButtons();
-      });
+      };
+      el.addEventListener('click',jump);
+      el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();jump();}});
     }
     list.appendChild(el);
   }
