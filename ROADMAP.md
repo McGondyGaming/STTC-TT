@@ -24,12 +24,10 @@ A living document for tracking ideas, improvements, and future direction for the
 
 ### Preview
 
-- [ ] Tip of the day in dead space
-- [ ] Selection in preview
-- [ ] Drag selection
-- [ ] Fill selection
-- [ ] Navigability highlight contigious area
-- [ ] Keybaord navigation in preview
+- [ ] Tip of the day in preview dead space
+- [ ] Selection in preview (box, flood level contiguous, flood all contiguous)
+- [ ] Keyboard driven preview selections
+- [ ] Navigability highlight level/all contigious area
 - [ ] Terrain traversability preview (including blocking decors) overlay
 - [ ] Level -1 render as water preview overlay
     
@@ -56,6 +54,9 @@ A living document for tracking ideas, improvements, and future direction for the
 
 Completed items
 
+- [x] Keyboard menu navigation
+- [x] Screenread support added
+- [x] Custom UI and preview colour scheme support added
 - [x] Browser language detected to pull scenario name from best guessed text_<language>.csv 
 - [x] File backups before export
 - [x] Load and export entire scenario folders

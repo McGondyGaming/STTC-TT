@@ -56,12 +56,6 @@
   --lv-default-6:#7ec065;--lv-default-7:#a8d060;--lv-default-8:#ccd858;
   --lv-default-9:#e8c838;--lv-default-10:#d4a030;--lv-default-11:#b07828;
   --lv-default-12:#8a5020;--lv-default-13:#c8c8c8;--lv-default-14:#f0f0f0;
-  /* Deuteranopia - blue -> gold -> white (avoids red/green)              */
-  --lv-deut-0:#0d0d2a;--lv-deut-1:#0a2060;--lv-deut-2:#1040a0;
-  --lv-deut-3:#1860c0;--lv-deut-4:#2080d0;--lv-deut-5:#40a0d8;
-  --lv-deut-6:#70b8d8;--lv-deut-7:#a0c8d0;--lv-deut-8:#c8c080;
-  --lv-deut-9:#d8a840;--lv-deut-10:#c89020;--lv-deut-11:#b07010;
-  --lv-deut-12:#905008;--lv-deut-13:#d8d8d8;--lv-deut-14:#f8f8f8;
   /* High Contrast - topographic + greyscale monotone                    */
   /* White peaks -> blue water -> teal -> green -> amber -> dark red -> void */
   --lv-hc-0:#ffffff;--lv-hc-1:#dbf0ff;--lv-hc-2:#b3e0ff;
@@ -558,10 +552,9 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       </div>
       <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:2px;">
         <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">Height preview colour scheme</div>
-        <div class="note" style="margin-bottom:8px;">Navigability and terrain previews use fixed functional colours.</div>
+        <div class="note" style="margin-bottom:8px;">Terrain preview uses fixed functional colours. Navigability colours are configurable below.</div>
         <div class="scheme-presets" id="heightSchemeBar">
           <button class="scheme-btn active" data-scheme="default">Default</button>
-          <button class="scheme-btn" data-scheme="deuteranopia">Deuteranopia</button>
           <button class="scheme-btn" data-scheme="highcontrast">High Contrast</button>
           <button class="scheme-btn" data-scheme="custom">Custom</button>
         </div>
@@ -573,6 +566,29 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
           </div>
           <canvas id="schemeStripCanvas" class="scheme-preview-strip" width="280" height="14"></canvas>
         </div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px;">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">Navigability colour scheme</div>
+        <div class="note" style="margin-bottom:8px;">Colours used in the Navigability preview mode.</div>
+        <div class="scheme-presets" id="navSchemeBar">
+          <button class="scheme-btn active" data-nav-scheme="default">Default</button>
+          <button class="scheme-btn" data-nav-scheme="highcontrast">High Contrast</button>
+          <button class="scheme-btn" data-nav-scheme="custom">Custom</button>
+        </div>
+        <div id="navCustomPickerWrap" style="display:none;">
+          <div class="colour-pickers" style="grid-template-columns:repeat(3,1fr);">
+            <div class="cp-box"><label>Water (−1)</label><input type="color" id="cpNavWater" value="#3c8fdc"><button class="sm nav-picker-reset" data-picker="cpNavWater" data-def="#3c8fdc" title="Reset">↺</button></div>
+            <div class="cp-box"><label>Cliff base</label><input type="color" id="cpNavCliff" value="#c83c0a"><button class="sm nav-picker-reset" data-picker="cpNavCliff" data-def="#c83c0a" title="Reset">↺</button></div>
+            <div class="cp-box"><label>Slope</label><input type="color" id="cpNavSlope" value="#b450b4"><button class="sm nav-picker-reset" data-picker="cpNavSlope" data-def="#b450b4" title="Reset">↺</button></div>
+            <div class="cp-box"><label>High ground</label><input type="color" id="cpNavHigh" value="#c8960a"><button class="sm nav-picker-reset" data-picker="cpNavHigh" data-def="#c8960a" title="Reset">↺</button></div>
+            <div class="cp-box"><label>Narrow pass</label><input type="color" id="cpNavNarrow" value="#4a8000"><button class="sm nav-picker-reset" data-picker="cpNavNarrow" data-def="#4a8000" title="Reset">↺</button></div>
+            <div class="cp-box"><label>Open / OK</label><input type="color" id="cpNavOk" value="#28a046"><button class="sm nav-picker-reset" data-picker="cpNavOk" data-def="#28a046" title="Reset">↺</button></div>
+          </div>
+          <div style="text-align:right;margin-top:6px;">
+            <button class="sm" id="btnResetNavCustom" title="Reset all navigability colours to defaults">↺ Reset all</button>
+          </div>
+        </div>
+        <div id="navSwatchRow" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;"></div>
       </div>
       <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px;">
         <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">Heatmap colour scheme</div>
@@ -744,7 +760,6 @@ function applyScheme(name){
   const cpWrap=document.getElementById('customPickerWrap');
   if(cpWrap) cpWrap.style.display=name==='custom'?'block':'none';
   switch(name){
-    case 'deuteranopia': LV_COL=buildPaletteFromCss('lv-deut'); break;
     case 'highcontrast': LV_COL=buildPaletteFromCss('lv-hc');   break;
     case 'custom':
       LV_COL=buildCustomPalette(customLow,customMid,customHigh);
@@ -779,14 +794,76 @@ document.querySelectorAll('#heightSchemeBar .scheme-btn').forEach(btn=>
 });
 
 // ── Nav colours (hex) ─────────────────────────────────────────────────────────
-const NAV_HEX={
-  water:  '#3c8fdc',
-  cliff:  '#c83c0a',
-  slope:  '#b450b4',
-  high:   '#c8960a',
-  narrow: '#4a8000',
-  ok:     '#28a046',
+const NAV_SCHEMES={
+  default:{water:'#3c8fdc',cliff:'#c83c0a',slope:'#b450b4',high:'#c8960a',narrow:'#4a8000',ok:'#28a046'},
+  highcontrast:{water:'#005fa3',cliff:'#ff2200',slope:'#dd00dd',high:'#cc7700',narrow:'#006600',ok:'#00cc44'},
 };
+let activeNavScheme='default';
+let NAV_HEX={...NAV_SCHEMES.default};
+
+function updateNavSwatches(){
+  const row=document.getElementById('navSwatchRow');if(!row)return;
+  row.innerHTML='';
+  const labels={water:'Water',cliff:'Cliff',slope:'Slope',high:'High',narrow:'Narrow',ok:'OK'};
+  Object.entries(NAV_HEX).forEach(([k,hex])=>{
+    const d=document.createElement('div');
+    d.className='li';
+    d.innerHTML=`<div class="lsw" style="background:${hex}"></div><span style="font-size:10px;color:var(--text2);">${labels[k]||k}</span>`;
+    row.appendChild(d);
+  });
+}
+
+function applyNavScheme(name){
+  activeNavScheme=name;
+  document.querySelectorAll('#navSchemeBar .scheme-btn').forEach(b=>b.classList.toggle('active',b.dataset.navScheme===name));
+  const wrap=document.getElementById('navCustomPickerWrap');
+  if(wrap)wrap.style.display=name==='custom'?'block':'none';
+  if(name==='custom'){
+    NAV_HEX={
+      water: document.getElementById('cpNavWater')?.value||NAV_SCHEMES.default.water,
+      cliff: document.getElementById('cpNavCliff')?.value||NAV_SCHEMES.default.cliff,
+      slope: document.getElementById('cpNavSlope')?.value||NAV_SCHEMES.default.slope,
+      high:  document.getElementById('cpNavHigh')?.value||NAV_SCHEMES.default.high,
+      narrow:document.getElementById('cpNavNarrow')?.value||NAV_SCHEMES.default.narrow,
+      ok:    document.getElementById('cpNavOk')?.value||NAV_SCHEMES.default.ok,
+    };
+  }else{
+    NAV_HEX={...(NAV_SCHEMES[name]||NAV_SCHEMES.default)};
+    // Sync custom pickers to current scheme values for reference
+    const s=NAV_HEX;
+    const map={cpNavWater:'water',cpNavCliff:'cliff',cpNavSlope:'slope',cpNavHigh:'high',cpNavNarrow:'narrow',cpNavOk:'ok'};
+    Object.entries(map).forEach(([id,k])=>{const el=document.getElementById(id);if(el)el.value=s[k];});
+  }
+  updateNavSwatches();
+  if(tileData&&previewMode==='nav')updatePreview();
+  logSession('navScheme',name);
+}
+
+document.querySelectorAll('#navSchemeBar .scheme-btn').forEach(btn=>
+  btn.addEventListener('click',()=>applyNavScheme(btn.dataset.navScheme)));
+
+['cpNavWater','cpNavCliff','cpNavSlope','cpNavHigh','cpNavNarrow','cpNavOk'].forEach(id=>{
+  const el=document.getElementById(id);if(!el)return;
+  el.addEventListener('input',()=>{
+    if(activeNavScheme==='custom')applyNavScheme('custom');
+  });
+});
+
+document.querySelectorAll('.nav-picker-reset').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const el=document.getElementById(btn.dataset.picker);
+    if(el){el.value=btn.dataset.def;}
+    if(activeNavScheme==='custom')applyNavScheme('custom');
+  });
+});
+
+document.getElementById('btnResetNavCustom')?.addEventListener('click',()=>{
+  document.querySelectorAll('.nav-picker-reset').forEach(btn=>{
+    const el=document.getElementById(btn.dataset.picker);
+    if(el)el.value=btn.dataset.def;
+  });
+  if(activeNavScheme==='custom')applyNavScheme('custom');
+});
 
 // ── Heatmap colour stops (hex) ────────────────────────────────────────────────
 // Schemes: default = red-amber-green-blue (RAG+wide); highcontrast = previous dark stops
@@ -1157,12 +1234,22 @@ function wireTabs(barId,onChange){
     });
   });
 }
+
+function updateFolderDropzoneVisibility(){
+  const isDir=document.querySelector('#srcBar .tab.active')?.dataset.tab==='src-dir';
+  const dzS=document.getElementById('dzScenario');
+  const dzH=document.getElementById('dzHeader');
+  if(dzS)dzS.style.display=isDir?'none':'flex';
+  if(dzH)dzH.style.display=isDir?'none':'flex';
+}
+
 wireTabs('srcBar',()=>{
   const tab=document.querySelector('#srcBar .tab.active')?.dataset.tab;
   if(tab==='src-gen'){
     if(!tileData){activeSource='gen';srcTiles=null;srcByIndex={};srcEdgeGroups=null;recomputeGen();enableTools();resetCompass();}
     else{activeSource='gen';}
   }
+  updateFolderDropzoneVisibility();
 });
 wireTabs('tBar',()=>{updatePreview();logSession('terrainTab',activeTerrainTab());});
 wireTabs('eBar',()=>{updatePreview();logSession('edgeTab',activeEdgeTab());});
@@ -2036,7 +2123,7 @@ function updatePreview(){
   ctx.putImageData(imgData,0,0);
   const used=dist.map((c,i)=>c>0?toEditor(i):null).filter(x=>x!==null);
   const lo=used.length?Math.min(...used):0,hi=used.length?Math.max(...used):0;
-  const modeLabel=showHeat?'heatmap (black=cliff, purple=slope, red=tight, green=open, blue=wide)':showNav?'navigability (green=ok, yellow-green=narrow, blue=slope, red=blocked, amber=high)':showTerrain?'terrain colours':'height colours (dark=low)';
+  const modeLabel=showHeat?'heatmap':showNav?'navigability':showTerrain?'terrain colours':'height colours (dark=low)';
   document.getElementById('previewLabel').textContent=`Editor levels ${lo}-${hi} · ${modeLabel}`;
 
   document.getElementById('sTiles').textContent=(W*H).toLocaleString();
@@ -2698,6 +2785,8 @@ setActiveLandscape(0,'manual');
 updateTHint();
 applyScheme('default');
 applyHeatScheme('default');
+applyNavScheme('default');
+updateFolderDropzoneVisibility();
 document.getElementById('versionDisplay').textContent='v'+TOOL_VERSION+'-beta1';
 
 // ── UI Theme ──────────────────────────────────────────────────────────────────
