@@ -84,6 +84,7 @@ h1{font-size:17px;font-weight:600;margin-bottom:3px;}
 .st{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;}
 .sb{font-size:11px;color:var(--text2);}
 .sv-chev{font-size:11px;color:var(--text3);transition:transform .18s;flex-shrink:0;}
+.sh:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;}
 .section.open>.sh>.sv-chev{transform:rotate(180deg);}
 .section-body{padding:14px 15px;border-top:1px solid var(--border);display:none;}
 .section.open>.section-body{display:block;}
@@ -93,6 +94,7 @@ h1{font-size:17px;font-weight:600;margin-bottom:3px;}
 .section.always-open>.section-body{display:block;}
 .dz{border:2px dashed var(--border2);border-radius:8px;padding:14px 10px;text-align:center;cursor:pointer;transition:background .15s,border-color .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;margin-bottom:6px;}
 .dz:hover,.dz.over{background:var(--bg2);border-color:var(--text2);}
+.dz:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-color:var(--text2);}
 .dz.loaded{border-style:solid;border-color:var(--ok);}
 .dl{font-size:12px;color:var(--text2);}
 .dl strong{color:var(--text);font-weight:600;}
@@ -282,7 +284,6 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
               <div class="dual-range-outer">
                 <div class="dual-range-track"><div class="dual-range-fill" id="lvlRangeFill"></div></div>
                 <div class="dual-range-wrap">
-                  <input type="range" id="lvlMin" min="0" max="14" value="0" step="1">
                   <input type="range" id="lvlMin" aria-label="Minimum output level" min="0" max="14" value="0" step="1">
                   <input type="range" id="lvlMax" aria-label="Maximum output level" min="0" max="14" value="14" step="1">
                 </div>
@@ -1104,10 +1105,20 @@ Object.defineProperty(window,'redoStack',{get:()=>history.slice(historyCursor+1)
 
 // ── Collapsible sections ───────────────────────────────────────────────────────
 document.querySelectorAll('.sh[data-sec]').forEach(h=>{
-  h.addEventListener('click',()=>{
-    const sec=h.closest('.section');
+  const sec=h.closest('.section');
+  if(!sec.classList.contains('always-open')){
+    h.setAttribute('tabindex','0');
+    h.setAttribute('role','button');
+    h.setAttribute('aria-expanded',sec.classList.contains('open')?'true':'false');
+  }
+  const toggle=()=>{
     if(sec.classList.contains('always-open'))return;
     sec.classList.toggle('open');
+    h.setAttribute('aria-expanded',sec.classList.contains('open')?'true':'false');
+  };
+  h.addEventListener('click',toggle);
+  h.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}
   });
 });
 
@@ -1307,7 +1318,10 @@ shiftSlider.addEventListener('input',()=>{const v=parseInt(shiftSlider.value);sh
 // ── Drop zones ─────────────────────────────────────────────────────────────────
 function makeDrop(zoneId,inputId,fn){
   const z=document.getElementById(zoneId),inp=document.getElementById(inputId);
+  z.setAttribute('tabindex','0');
+  z.setAttribute('role','button');
   z.addEventListener('click',()=>inp.click());
+  z.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();inp.click();}});
   z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('over');});
   z.addEventListener('dragleave',()=>z.classList.remove('over'));
   z.addEventListener('drop',e=>{e.preventDefault();z.classList.remove('over');fn(e.dataTransfer.files[0]);});
@@ -1562,7 +1576,10 @@ document.getElementById('fiScenarioDir').addEventListener('change',e=>{
 // scenario.json drop zone - file only
 (()=>{
   const dz=document.getElementById('dzScenario');
+  dz.setAttribute('tabindex','0');
+  dz.setAttribute('role','button');
   dz.addEventListener('click',()=>document.getElementById('fiScenario').click());
+  dz.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();document.getElementById('fiScenario').click();}});
   dz.addEventListener('dragover',ev=>ev.preventDefault());
   dz.addEventListener('drop',ev=>{
     ev.preventDefault();dz.classList.remove('over');
@@ -1574,7 +1591,10 @@ document.getElementById('fiScenarioDir').addEventListener('change',e=>{
 (()=>{
   const dz=document.getElementById('dzDir');
   if(!dz)return;
+  dz.setAttribute('tabindex','0');
+  dz.setAttribute('role','button');
   dz.addEventListener('click',()=>document.getElementById('fiScenarioDir').click());
+  dz.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();document.getElementById('fiScenarioDir').click();}});
   dz.addEventListener('dragover',ev=>{ev.preventDefault();dz.classList.add('over');});
   dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
   dz.addEventListener('drop',ev=>{
