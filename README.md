@@ -140,6 +140,9 @@ Option: Export `STTC-TT.json` for diagnositc purposes. The following data is cap
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
+ - Keyboard navigation and focus highlights added
+ - Aria sections 
+ - Heatmap colour schemes available 
  - Heightmap and UI colour schemes available, custom schemes are saved to the device
  - Rotating a map will now rotate slopes
  - Import entire scenario folders
