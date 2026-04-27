@@ -712,7 +712,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 </div><!-- end layout -->
 </main>
 <script>
-const TOOL_VERSION='1.08';
+const TOOL_VERSION='1.09';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // COLOUR HELPERS - all colours in this file use hex strings for easy VS Code editing
@@ -779,6 +779,16 @@ function updateSchemeStrip(){
   for(let i=0;i<=14;i++){ctx.fillStyle=LV_COL[i];ctx.fillRect(i*bw,0,bw+1,h);}
 }
 
+// RAF handle for throttling height colour scheme preview redraws during picker drag
+let _heightPickerRafId=null;
+function scheduleHeightPreview(){
+  if(_heightPickerRafId)return;
+  _heightPickerRafId=requestAnimationFrame(()=>{
+    _heightPickerRafId=null;
+    if(tileData)updatePreview();
+  });
+}
+
 document.querySelectorAll('#heightSchemeBar .scheme-btn').forEach(btn=>
   btn.addEventListener('click',()=>applyScheme(btn.dataset.scheme)));
 
@@ -789,7 +799,12 @@ document.querySelectorAll('#heightSchemeBar .scheme-btn').forEach(btn=>
     customLow=document.getElementById('cpLow').value;
     customMid=document.getElementById('cpMid').value;
     customHigh=document.getElementById('cpHigh').value;
-    if(activeScheme==='custom') applyScheme('custom');
+    if(activeScheme==='custom'){
+      // Rebuild palette and strip immediately (cheap), then schedule the full preview render
+      LV_COL=buildCustomPalette(customLow,customMid,customHigh);
+      updateSchemeStrip();
+      scheduleHeightPreview();
+    }
   });
 });
 
@@ -803,13 +818,32 @@ let NAV_HEX={...NAV_SCHEMES.default};
 
 function updateNavSwatches(){
   const row=document.getElementById('navSwatchRow');if(!row)return;
-  row.innerHTML='';
+  // Update colour swatch elements in-place rather than rebuilding DOM on every drag tick
   const labels={water:'Water',cliff:'Cliff',slope:'Slope',high:'High',narrow:'Narrow',ok:'OK'};
-  Object.entries(NAV_HEX).forEach(([k,hex])=>{
-    const d=document.createElement('div');
-    d.className='li';
-    d.innerHTML=`<div class="lsw" style="background:${hex}"></div><span style="font-size:10px;color:var(--text2);">${labels[k]||k}</span>`;
-    row.appendChild(d);
+  const keys=Object.keys(NAV_HEX);
+  // Build once if empty, then just update background colours
+  if(row.children.length!==keys.length){
+    row.innerHTML='';
+    keys.forEach(k=>{
+      const d=document.createElement('div');d.className='li';d.dataset.navKey=k;
+      d.innerHTML=`<div class="lsw" style="background:${NAV_HEX[k]}"></div><span style="font-size:10px;color:var(--text2);">${labels[k]||k}</span>`;
+      row.appendChild(d);
+    });
+  }else{
+    keys.forEach((k,i)=>{
+      const swatch=row.children[i]?.querySelector('.lsw');
+      if(swatch)swatch.style.background=NAV_HEX[k];
+    });
+  }
+}
+
+// RAF handle for throttling nav preview redraws during colour picker drag
+let _navPickerRafId=null;
+function scheduleNavPreview(){
+  if(_navPickerRafId)return;
+  _navPickerRafId=requestAnimationFrame(()=>{
+    _navPickerRafId=null;
+    if(tileData&&previewMode==='nav')updatePreview();
   });
 }
 
@@ -835,7 +869,7 @@ function applyNavScheme(name){
     Object.entries(map).forEach(([id,k])=>{const el=document.getElementById(id);if(el)el.value=s[k];});
   }
   updateNavSwatches();
-  if(tileData&&previewMode==='nav')updatePreview();
+  if(tileData&&previewMode==='nav')scheduleNavPreview();
   logSession('navScheme',name);
 }
 
@@ -905,6 +939,16 @@ function applyHeatScheme(name){
   logSession('heatScheme',name);
 }
 
+// RAF handle for throttling heatmap colour scheme preview redraws during picker drag
+let _heatPickerRafId=null;
+function scheduleHeatPreview(){
+  if(_heatPickerRafId)return;
+  _heatPickerRafId=requestAnimationFrame(()=>{
+    _heatPickerRafId=null;
+    if(tileData&&previewMode==='heatmap')updatePreview();
+  });
+}
+
 document.querySelectorAll('#heatSchemeBar .scheme-btn').forEach(btn=>
   btn.addEventListener('click',()=>applyHeatScheme(btn.dataset.heatScheme)));
 
@@ -915,7 +959,12 @@ document.querySelectorAll('#heatSchemeBar .scheme-btn').forEach(btn=>
     heatCustomLow=document.getElementById('cpHeatLow').value;
     heatCustomMid=document.getElementById('cpHeatMid').value;
     heatCustomHigh=document.getElementById('cpHeatHigh').value;
-    if(activeHeatScheme==='custom')applyHeatScheme('custom');
+    if(activeHeatScheme==='custom'){
+      // Rebuild stops and strip immediately (cheap), then schedule the full preview render
+      HEAT_STOPS_HEX=buildCustomHeatPalette(heatCustomLow,heatCustomMid,heatCustomHigh);
+      updateHeatStrip();
+      scheduleHeatPreview();
+    }
   });
 });
 
@@ -1140,7 +1189,14 @@ let _heatCache=null,_heatCacheStamp=null;
 let orientAngle=0,orientFlippedH=false,orientHistory=[];
 let scenarioName=null,dirName=null,dlcHistory=[],sessionLog=[];
 // Dirty tracking - snapshot JSON of each file at load time
+// ── Dirty tracking ────────────────────────────────────────────────────────────
+// Replaced JSON.stringify-based comparison (which ran buildTiles() + serialise
+// 16 k tiles on EVERY preview render) with simple boolean flags.
+// Flags are set true whenever a change is made, and cleared to false on export.
+// snapMap / snapScenario / snapHeader are kept but only called at load time and
+// on export to produce the .bak copy - never called from updateExportUI.
 let _snapMap=null,_snapScenario=null,_snapHeader=null;
+let _dirtyMap=false,_dirtyScenario=false,_dirtyHeader=false;
 
 function snapMap(){return tileData?JSON.stringify(buildTiles()):null;}
 
@@ -1150,9 +1206,13 @@ function logSession(action,detail){
 function snapScenario(){if(!scenarioData)return null;const s={...scenarioData,LandscapeId:activeLandscape};return JSON.stringify(s);}
 function snapHeader(){return headerData?JSON.stringify(headerData):null;}
 
-function isDirtyMap(){return !!tileData&&snapMap()!==_snapMap;}
-function isDirtyScenario(){return !!scenarioData&&snapScenario()!==_snapScenario;}
-function isDirtyHeader(){return !!headerData&&snapHeader()!==_snapHeader;}
+function markMapDirty(){_dirtyMap=true;}
+function markScenarioDirty(){_dirtyScenario=true;}
+function markHeaderDirty(){_dirtyHeader=true;}
+
+function isDirtyMap(){return _dirtyMap;}
+function isDirtyScenario(){return _dirtyScenario;}
+function isDirtyHeader(){return _dirtyHeader;}
 
 function updateExportUI(){
   const hasMap=!!tileData,hasScen=!!scenarioData,hasHdr=!!headerData;
@@ -1381,7 +1441,7 @@ function setActiveLandscape(id,source){
   }
   updateTHint();
   updateExportUI();
-  if(source==='manual') logSession('landscape',LS_NAMES[id]);
+  if(source==='manual'){logSession('landscape',LS_NAMES[id]);markScenarioDirty();}
 }
 
 document.getElementById('landscapeSelect').addEventListener('change',()=>setActiveLandscape(parseInt(document.getElementById('landscapeSelect').value),'manual'));
@@ -1475,6 +1535,7 @@ makeDrop('dzMap','fiMap',file=>{
       tileData=new Int16Array(W*H);
       srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)tileData[t.Index]=Math.max(0,Math.min(MAX_LEVEL,t.Level));});
       origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];
+      _snapMap=null;_dirtyMap=false;  // will be re-snapped in enableTools; fresh load is clean
       if(data._STTCTT?.undoHistory?.length){
         data._STTCTT.undoHistory.forEach(label=>history.push({data:null,label:`[prev] ${label}`,genState:null,readOnly:true}));
         historyCursor=history.length-1;
@@ -1529,6 +1590,7 @@ function readText(file){
 function applyScenarioData(lid){
   setActiveLandscape(lid,'scenario');
   _snapScenario=snapScenario();
+  _dirtyScenario=false;  // just loaded - clean
   document.getElementById('msgScenario').textContent='LandscapeId '+lid+' ('+( LS_NAMES[lid]??'unknown')+')';
   document.getElementById('msgScenario').className='msg ok';
   document.getElementById('pathNote').textContent='Default save location: %USERPROFILE%\\Documents\\My Games\\Starship Troopers\\Scenarios';
@@ -1562,6 +1624,7 @@ function applyHeaderData(d){
   badge.style.display=optionalDlcs.length?'inline-flex':'none';
   // Snapshot AFTER all UI is set - checkboxes are now settled
   _snapHeader=snapHeader();
+  _dirtyHeader=false;  // just loaded - clean
   updateExportUI();
 }
 
@@ -1606,6 +1669,7 @@ function loadScenarioDir(files){
     tileData=new Int16Array(W*H);
     srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)tileData[t.Index]=Math.max(0,Math.min(MAX_LEVEL,t.Level));});
     origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];
+    _snapMap=null;_dirtyMap=false;  // will be re-snapped in enableTools; fresh load is clean
     if(d._STTCTT?.undoHistory?.length){
       d._STTCTT.undoHistory.forEach(label=>history.push({data:null,label:'[prev] '+label,genState:null,readOnly:true}));
       historyCursor=history.length-1;
@@ -1736,6 +1800,7 @@ document.getElementById('fiScenarioDir').addEventListener('change',e=>{
       from:prev.map(DLC_LABEL).join(', ')||'none',
       to:headerData.DLCs.map(DLC_LABEL).join(', ')||'none',
     });
+    markHeaderDirty();
     const badge=document.getElementById('dlcBadge');
     const optDlcs=headerData.DLCs.filter(id=>id!==1);
     badge.textContent=optDlcs.length?optDlcs.map(id=>DLC_NAMES[id]||'DLC '+id).join(', '):'';
@@ -2086,6 +2151,12 @@ function updatePreview(){
   const NAV_WATER=hexToRgb(NAV_HEX.water),NAV_CLIFF=hexToRgb(NAV_HEX.cliff),NAV_SLOPE=hexToRgb(NAV_HEX.slope);
   const NAV_HIGH=hexToRgb(NAV_HEX.high),NAV_NARROW=hexToRgb(NAV_HEX.narrow),NAV_OK=hexToRgb(NAV_HEX.ok);
 
+  // Pre-compute per-level terrain ID lookup to avoid DOM queries inside the tile loop.
+  // terrainForMapLevel calls querySelector (activeTerrainTab) and getElementById on every call;
+  // caching once per preview call eliminates ~419 querySelector hits per frame.
+  const terrainByLevel=new Array(MAX_LEVEL+1);
+  for(let mv=0;mv<=MAX_LEVEL;mv++)terrainByLevel[mv]=terrainForMapLevel(mv);
+
   for(let i=0;i<W*H;i++){
     const mv=Math.max(0,Math.min(MAX_LEVEL,tileData[i]));dist[mv]++;
     let r,g,b;
@@ -2111,7 +2182,8 @@ function updatePreview(){
         }
       }
     }else if(showTerrain){
-      const chosen=terrainForMapLevel(mv),tid=chosen!==null?chosen:(srcByIndex[i]?srcByIndex[i].TerrainTypeId:-1);
+      // Use pre-built lookup - avoids DOM query (querySelector) per tile
+      const chosen=terrainByLevel[mv],tid=chosen!==null?chosen:(srcByIndex[i]?srcByIndex[i].TerrainTypeId:-1);
       const t=tid>=0?T_BY_ID[tid]:null;
       if(t){[r,g,b]=hexToRgb(t.hex);}else{[r,g,b]=hexToRgb(LV_COL[mv]);}
     }else{
@@ -2129,7 +2201,7 @@ function updatePreview(){
   document.getElementById('sTiles').textContent=(W*H).toLocaleString();
   document.getElementById('sRange').textContent=used.length?`${lo}-${hi}`:'-';
   document.getElementById('sNonZero').textContent=dist.slice(1).reduce((a,b)=>a+b,0).toLocaleString();
-  drawHist(dist);drawLegend(dist);drawOrientIndicator();
+  drawHist(dist);drawLegend(dist,terrainByLevel);drawOrientIndicator();
 }
 
 function buildHistLabels(){
@@ -2143,17 +2215,34 @@ function buildHistLabels(){
 }
 buildHistLabels();
 
+let _histDistKey='',_histSchemeKey='';
 function drawHist(dist){
+  const distKey=dist.join(',');
+  const schemeKey=activeScheme==='custom'?LV_COL.join(','):activeScheme;
+  if(distKey===_histDistKey&&schemeKey===_histSchemeKey)return;
+  _histDistKey=distKey;_histSchemeKey=schemeKey;
   const c=document.getElementById('cvHist'),cw=c.width,ch=c.height,ctx=c.getContext('2d');
   ctx.clearRect(0,0,cw,ch);const max=Math.max(...dist,1),bw=cw/(MAX_LEVEL+1);
   for(let mv=0;mv<=MAX_LEVEL;mv++){const bh=Math.round((dist[mv]/max)*ch);if(bh>0){ctx.fillStyle=LV_COL[mv];ctx.fillRect(mv*bw+1,ch-bh,bw-2,bh);}}
 }
-function drawLegend(dist){
+// Cache for drawLegend to avoid DOM rebuild when neither distribution nor terrain assignment changed.
+// schemeKey is included because LV_COL changes when the height colour scheme is adjusted.
+let _legendDistKey='',_legendTerrainKey='',_legendSchemeKey='';
+function drawLegend(dist,terrainByLevel){
+  // Build cheap string keys to detect change without deep comparison
+  const distKey=dist.join(',');
+  const terrainKey=terrainByLevel?terrainByLevel.join(','):'';
+  const schemeKey=activeScheme==='custom'?LV_COL.join(','):activeScheme;
+  if(distKey===_legendDistKey&&terrainKey===_legendTerrainKey&&schemeKey===_legendSchemeKey)return;
+  _legendDistKey=distKey;_legendTerrainKey=terrainKey;_legendSchemeKey=schemeKey;
+
   const el=document.getElementById('legend');el.innerHTML='';
   for(let mv=0;mv<=MAX_LEVEL;mv++){
     if(!dist[mv])continue;
     const d=document.createElement('div');d.className='li';
-    const t=T_BY_ID[terrainForMapLevel(mv)],ev=toEditor(mv);
+    // Use pre-built terrainByLevel when available (avoids querySelector per level)
+    const tid=terrainByLevel?terrainByLevel[mv]:terrainForMapLevel(mv);
+    const t=T_BY_ID[tid],ev=toEditor(mv);
     d.innerHTML=`<div class="lsw" style="background:${LV_COL[mv]}"></div>${t?t.name:'id?'} Lv${ev} (${dist[mv].toLocaleString()})`;
     el.appendChild(d);
   }
@@ -2246,7 +2335,10 @@ function updateUndoButtons(){
     list.appendChild(el);
   }
 }
-function syncSrc(){if(srcTiles)srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)t.Level=tileData[t.Index];});}
+function syncSrc(){
+  if(srcTiles)srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)t.Level=tileData[t.Index];});
+  markMapDirty();
+}
 function toolMsg(txt){const m=document.getElementById('msgTool');m.textContent=txt;m.className='msg ok';setTimeout(()=>{if(m.textContent===txt)m.textContent='';},4000);}
 
 // ── Level tools ────────────────────────────────────────────────────────────────
@@ -2377,8 +2469,13 @@ function buildTiles(){
 function enableTools(){
   ['btnShiftAll','btnClamp','btnBand','btnPreview','btnReset','btnRot90CW','btnRot90CCW','btnFlipH','btnFlipV']
     .forEach(id=>document.getElementById(id).disabled=false);
-  // Take a fresh map snapshot on first load so dirty tracking starts clean
-  if(_snapMap===null)_snapMap=snapMap();
+  // Take a fresh map snapshot on first load so .bak export works correctly.
+  // For map.json loads the snap is already set; for image/gen sources mark dirty
+  // since the tile data has never been exported.
+  if(_snapMap===null){
+    _snapMap=snapMap();
+    if(activeSource!=='map')_dirtyMap=true;
+  }
   updateExportUI();
 }
 function dl(name,text){
@@ -2519,7 +2616,7 @@ function buildMapJSON(){
 function exportMap(){
   const json=buildMapJSON();if(!json)return false;
   dlWithBackup('map.json',json,_snapMap);
-  _snapMap=json;
+  _snapMap=json;_dirtyMap=false;
   return true;
 }
 function exportScenario(){
@@ -2527,14 +2624,14 @@ function exportScenario(){
   scenarioData.LandscapeId=activeLandscape;
   const json=JSON.stringify(scenarioData,null,2);
   dlWithBackup('scenario.json',json,_snapScenario);
-  _snapScenario=json;
+  _snapScenario=json;_dirtyScenario=false;
   return true;
 }
 function exportHeader(){
   if(!headerData)return false;
   const json=JSON.stringify(headerData,null,2);
   dlWithBackup('header.json',json,_snapHeader);
-  _snapHeader=json;
+  _snapHeader=json;_dirtyHeader=false;
   return true;
 }
 function buildDebugJSON(){
@@ -2599,7 +2696,7 @@ document.getElementById('btnExportAll').addEventListener('click',()=>{
     const json=buildMapJSON();if(json){
       if(wantsBackup&&_snapMap)zipFiles.push({name:'map.bak.json',text:_snapMap});
       zipFiles.push({name:'map.json',text:json});
-      _snapMap=json;exported.push('map.json');
+      _snapMap=json;_dirtyMap=false;exported.push('map.json');
     }
   }
   if(scenarioData){
@@ -2607,13 +2704,13 @@ document.getElementById('btnExportAll').addEventListener('click',()=>{
     const json=JSON.stringify(scenarioData,null,2);
     if(wantsBackup&&_snapScenario)zipFiles.push({name:'scenario.bak.json',text:_snapScenario});
     zipFiles.push({name:'scenario.json',text:json});
-    _snapScenario=json;exported.push('scenario.json');
+    _snapScenario=json;_dirtyScenario=false;exported.push('scenario.json');
   }
   if(headerData){
     const json=JSON.stringify(headerData,null,2);
     if(wantsBackup&&_snapHeader)zipFiles.push({name:'header.bak.json',text:_snapHeader});
     zipFiles.push({name:'header.json',text:json});
-    _snapHeader=json;exported.push('header.json');
+    _snapHeader=json;_dirtyHeader=false;exported.push('header.json');
   }
   if(wantsDebug){
     zipFiles.push({name:'STTC-TT.json',text:buildDebugJSON()});
