@@ -2610,7 +2610,7 @@ document.getElementById('btnClearPre')?.addEventListener('click',()=>{
 // ── Build map JSON (clean - no embedded debug) ────────────────────────────────
 function buildMapJSON(){
   const data=buildTiles();if(!data)return null;
-  return JSON.stringify(data);
+  return JSON.stringify(data,null,2);
 }
 
 function exportMap(){
