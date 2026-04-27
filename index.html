@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
-<title>STTC-TT – Starship Troopers: Terran Command Terrain Tool</title>
+<title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cmask id='m'%3E%3Crect width='100' height='100' fill='white'/%3E%3Ccircle cx='50' cy='50' r='18' fill='black'/%3E%3C/mask%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='48' stroke='white' stroke-width='4' fill='none'/%3E%3Cpath mask='url(%23m)' d='M50,2 L59.2,33.5 L83.9,16.1 L66.5,40.8 L98,50 L66.5,59.2 L83.9,83.9 L59.2,66.5 L50,98 L40.8,66.5 L16.1,83.9 L33.5,59.2 L2,50 L33.5,40.8 L16.1,16.1 L40.8,33.5 Z' fill='%23e65100' stroke='white' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='18' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
 <style>
 /* ── UI theme variables ─────────────────────────────────────────────────────── */
@@ -28,7 +28,7 @@
   --bg:#2a241e;--bg2:#3a3128;--bg3:#4a4232;
   --border:#5a4b44;--border2:#6a6055;
   --text:#f8eedf;--text2:#c0ada0;--text3:#8a786a;
-  --accent:#f0b46a;--accent-fg:#ffffff;
+  --accent:#aa6e25;--accent-fg:#ffffff;
   --ok:#4caf72;--err:#e06060;--warn:#c8a030;
 }
 /* Fallback for when JS hasn't set data-theme yet - match OS preference */
@@ -224,7 +224,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   </svg>
   <h1>Starship Troopers Terran Command Terrain Tool</h1>
 </div>
-<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · <span id="versionDisplay">v1.08-beta1</span> · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
+<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · <span id="versionDisplay"></span> · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
 
 <main>
 <div class="layout">
@@ -283,7 +283,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <div class="field"><label class="fl" for="genWater" title="Noise values below this threshold become Level -1.">Water level <span style="font-size:11px;color:var(--text3)">% of map at floor</span></label><div class="rr"><input type="range" id="genWater" min="0" max="100" value="20" step="1"><span class="rv" id="genWaterOut">20%</span><button class="sm gen-reset" data-id="genWater" data-def="20" title="Reset to default">↺</button></div></div>
         <!-- Level range control -->
         <div class="field">
-          <span class="fl" style="display:block;margin-bottom:3px;">Output level range <span style="font-size:11px;color:var(--text3)" id="lvlRangeDisplay">editor −1 → 13</span></span>
+          <span class="fl" style="display:block;margin-bottom:3px;">Output level range <span style="font-size:11px;color:var(--text3)" id="lvlRangeDisplay">editor -1 → 13</span></span>
           <div class="rr" style="align-items:center;gap:8px;">
             <div style="flex:1;">
               <div class="dual-range-outer">
@@ -294,7 +294,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
                 </div>
               </div>
             </div>
-            <span class="rv" id="lvlRangeOut">−1–13</span>
+            <span class="rv" id="lvlRangeOut">-1-13</span>
             <button class="sm" id="btnLvlRangeReset" title="Reset to full range">↺</button>
           </div>
           <fieldset style="border:none;padding:0;margin:0;">
@@ -392,7 +392,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="tp" id="tab-ta-overrides">
         <div class="note">Mid levels (editor 3-9) use the default above.</div>
         <div class="tc">
-          <div class="field"><label class="fl" for="lowTerrain">Low (−1 to 2)</label><select id="lowTerrain"><option value="">- no change -</option></select></div>
+          <div class="field"><label class="fl" for="lowTerrain">Low (-1 to 2)</label><select id="lowTerrain"><option value="">- no change -</option></select></div>
           <div class="field"><label class="fl" for="highTerrain">High (10 to 13)</label><select id="highTerrain"><option value="">- no change -</option></select></div>
         </div>
       </div>
@@ -438,7 +438,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <div class="note">Override edge family at the extremes - mid levels (editor 3-9) keep the global remap or no change.</div>
         <div class="tc">
           <div class="field">
-            <label class="fl" for="edgeRemapLow">Low (−1 to 2) → edge family</label>
+            <label class="fl" for="edgeRemapLow">Low (-1 to 2) → edge family</label>
             <select id="edgeRemapLow"><option value="">- no change -</option><option value="desert">Desert - Cliffs_A</option><option value="underground">Underground - Cliffs_Purple</option><option value="lava">Lava - Cliffs_Lava</option><option value="storm">Metro / Storm - Cliffs_Storm</option><option value="spacestation">Space Station - Spacestation_A</option></select>
           </div>
           <div class="field">
@@ -498,7 +498,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <div class="lt-box">
           <div class="lt-title">Shift entire map</div>
           <div class="lt-row"><input type="range" id="shiftSlider" aria-label="Shift amount in editor levels" min="-14" max="14" value="0" step="1"><span class="shift-val" id="shiftVal">0</span></div>
-          <div class="lt-row" style="justify-content:space-between;"><span class="note" style="margin:0;">Clamped to −1-13</span><button class="sm" id="btnShiftAll" disabled>Apply</button></div>
+          <div class="lt-row" style="justify-content:space-between;"><span class="note" style="margin:0;">Clamped to -1-13</span><button class="sm" id="btnShiftAll" disabled>Apply</button></div>
         </div>
         <div class="lt-box">
           <div class="lt-title">Clamp extremes</div>
@@ -537,7 +537,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
             <div class="cp-box"><label>Background</label><input type="color" id="uiBg" value="#2a241e"><button class="sm ui-picker-reset" data-picker="uiBg" data-def="#2a241e" title="Reset">↺</button></div>
             <div class="cp-box"><label>Surface</label><input type="color" id="uiBg2" value="#3a3128"><button class="sm ui-picker-reset" data-picker="uiBg2" data-def="#3a3128" title="Reset">↺</button></div>
             <div class="cp-box"><label>Card</label><input type="color" id="uiBg3" value="#4a4232"><button class="sm ui-picker-reset" data-picker="uiBg3" data-def="#4a4232" title="Reset">↺</button></div>
-            <div class="cp-box"><label>Accent</label><input type="color" id="uiAccent" value="#f0b46a"><button class="sm ui-picker-reset" data-picker="uiAccent" data-def="#f0b46a" title="Reset">↺</button></div>
+            <div class="cp-box"><label>Accent</label><input type="color" id="uiAccent" value="#aa6e25"><button class="sm ui-picker-reset" data-picker="uiAccent" data-def="#aa6e25" title="Reset">↺</button></div>
           </div>
           <div class="colour-pickers" style="grid-template-columns:repeat(4,1fr);margin-top:6px;">
             <div class="cp-box"><label>Text</label><input type="color" id="uiText" value="#f8eedf"><button class="sm ui-picker-reset" data-picker="uiText" data-def="#f8eedf" title="Reset">↺</button></div>
@@ -577,7 +577,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         </div>
         <div id="navCustomPickerWrap" style="display:none;">
           <div class="colour-pickers" style="grid-template-columns:repeat(3,1fr);">
-            <div class="cp-box"><label>Water (−1)</label><input type="color" id="cpNavWater" value="#3c8fdc"><button class="sm nav-picker-reset" data-picker="cpNavWater" data-def="#3c8fdc" title="Reset">↺</button></div>
+            <div class="cp-box"><label>Water (-1)</label><input type="color" id="cpNavWater" value="#3c8fdc"><button class="sm nav-picker-reset" data-picker="cpNavWater" data-def="#3c8fdc" title="Reset">↺</button></div>
             <div class="cp-box"><label>Cliff base</label><input type="color" id="cpNavCliff" value="#c83c0a"><button class="sm nav-picker-reset" data-picker="cpNavCliff" data-def="#c83c0a" title="Reset">↺</button></div>
             <div class="cp-box"><label>Slope</label><input type="color" id="cpNavSlope" value="#b450b4"><button class="sm nav-picker-reset" data-picker="cpNavSlope" data-def="#b450b4" title="Reset">↺</button></div>
             <div class="cp-box"><label>High ground</label><input type="color" id="cpNavHigh" value="#c8960a"><button class="sm nav-picker-reset" data-picker="cpNavHigh" data-def="#c8960a" title="Reset">↺</button></div>
@@ -2704,9 +2704,9 @@ function updateLvlRangeUI(){
   if(levelMax<levelMin)levelMax=levelMin;
   minEl.value=levelMin;maxEl.value=levelMax;
   const eMin=toEditor(levelMin),eMax=toEditor(levelMax);
-  const eMinStr=eMin>=0?String(eMin):('−'+Math.abs(eMin));
+  const eMinStr=eMin>=0?String(eMin):('-'+Math.abs(eMin));
   if(displayEl)displayEl.textContent='editor '+eMinStr+' → '+eMax;
-  if(rvEl)rvEl.textContent=eMinStr+'–'+eMax;
+  if(rvEl)rvEl.textContent=eMinStr+'-'+eMax;
   if(fillEl){
     const pct=100/14;
     fillEl.style.left=(levelMin*pct)+'%';
@@ -2787,7 +2787,7 @@ applyScheme('default');
 applyHeatScheme('default');
 applyNavScheme('default');
 updateFolderDropzoneVisibility();
-document.getElementById('versionDisplay').textContent='v'+TOOL_VERSION+'-beta1';
+document.getElementById('versionDisplay').textContent='v'+TOOL_VERSION;
 
 // ── UI Theme ──────────────────────────────────────────────────────────────────
 // Theme definitions: each maps to a set of CSS custom property overrides
