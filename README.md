@@ -140,6 +140,7 @@ Option: Export `STTC-TT.json` for diagnositc purposes. The following data is cap
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
+ - Improved expoerted `map.json` formatting
  - Keyboard navigation and focus highlights added
  - Aria screenreader support added 
  - Heatmap and navigation colour schemes available 
