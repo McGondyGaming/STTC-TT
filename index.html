@@ -712,7 +712,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 </div><!-- end layout -->
 </main>
 <script>
-const TOOL_VERSION='1.09';
+const TOOL_VERSION='1.10';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // COLOUR HELPERS - all colours in this file use hex strings for easy VS Code editing
@@ -1183,7 +1183,7 @@ function remapTerrain(tid,edgeKey){
 }
 
 // ── State ──────────────────────────────────────────────────────────────────────
-let imgGray=null,tileData=null,origTileData=null,srcTiles=null,srcByIndex={},srcEdgeGroups=null,scenarioData=null,headerData=null;
+let imgGray=null,tileData=null,origTileData=null,srcTiles=null,srcByIndex={},srcEdgeGroups=null,srcMapExtra=null,scenarioData=null,headerData=null;
 let genPreDragSnapshot=null,genPreDragSliderId=null;
 let _heatCache=null,_heatCacheStamp=null;
 let orientAngle=0,orientFlippedH=false,orientHistory=[];
@@ -1306,7 +1306,7 @@ function updateFolderDropzoneVisibility(){
 wireTabs('srcBar',()=>{
   const tab=document.querySelector('#srcBar .tab.active')?.dataset.tab;
   if(tab==='src-gen'){
-    if(!tileData){activeSource='gen';srcTiles=null;srcByIndex={};srcEdgeGroups=null;recomputeGen();enableTools();resetCompass();}
+    if(!tileData){activeSource='gen';srcTiles=null;srcByIndex={};srcEdgeGroups=null;srcMapExtra=null;recomputeGen();enableTools();resetCompass();}
     else{activeSource='gen';}
   }
   updateFolderDropzoneVisibility();
@@ -1515,7 +1515,7 @@ makeDrop('dzImg','fiImg',file=>{
     msg.textContent=`${file.name} (${img.naturalWidth}×${img.naturalHeight} → 128×128)`;msg.className='msg ok';
     document.getElementById('dzImg').classList.add('loaded');
     document.getElementById('srcBadge').textContent='Image loaded';
-    activeSource='image';srcTiles=null;srcByIndex={};srcEdgeGroups=null;dirName=null;
+    activeSource='image';srcTiles=null;srcByIndex={};srcEdgeGroups=null;srcMapExtra=null;dirName=null;
     recompute();enableTools();resetCompass();
   };
   img.onerror=()=>{msg.textContent='Could not read image.';msg.className='msg err';};
@@ -1531,13 +1531,18 @@ makeDrop('dzMap','fiMap',file=>{
       const data=JSON.parse(e.target.result);
       if(!Array.isArray(data.Tiles))throw new Error('No Tiles array');
       srcTiles=data.Tiles;srcEdgeGroups=Array.isArray(data.EdgeGroups)?data.EdgeGroups:null;srcByIndex={};
+      // Capture any extra top-level keys (e.g. Decorations) so they survive export
+      const{Tiles:_t,EdgeGroups:_eg,..._rest}=data;srcMapExtra=_rest;
       srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)srcByIndex[t.Index]=t;});
       tileData=new Int16Array(W*H);
       srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)tileData[t.Index]=Math.max(0,Math.min(MAX_LEVEL,t.Level));});
       origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];
       _snapMap=null;_dirtyMap=false;  // will be re-snapped in enableTools; fresh load is clean
+      // Push loaded state as the initial undo entry so edits can be undone back to it
+      history.push({data:tileData.slice(),label:'loaded map.json',genState:null});
+      historyCursor=0;
       if(data._STTCTT?.undoHistory?.length){
-        data._STTCTT.undoHistory.forEach(label=>history.push({data:null,label:`[prev] ${label}`,genState:null,readOnly:true}));
+        data._STTCTT.undoHistory.forEach(label=>history.unshift({data:null,label:`[prev] ${label}`,genState:null,readOnly:true}));
         historyCursor=history.length-1;
       }
       updateUndoButtons();
@@ -1665,13 +1670,17 @@ function loadScenarioDir(files){
   if(headerFile)promises.push(readJSON(headerFile).then(d=>{applyHeaderData(d);}));
   if(mapFile)promises.push(readJSON(mapFile).then(d=>{
     srcTiles=d.Tiles;srcEdgeGroups=Array.isArray(d.EdgeGroups)?d.EdgeGroups:null;srcByIndex={};
+    const{Tiles:_t,EdgeGroups:_eg,..._rest}=d;srcMapExtra=_rest;
     srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)srcByIndex[t.Index]=t;});
     tileData=new Int16Array(W*H);
     srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)tileData[t.Index]=Math.max(0,Math.min(MAX_LEVEL,t.Level));});
     origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];
     _snapMap=null;_dirtyMap=false;  // will be re-snapped in enableTools; fresh load is clean
+    // Push loaded state as the initial undo entry so edits can be undone back to it
+    history.push({data:tileData.slice(),label:'loaded map.json',genState:null});
+    historyCursor=0;
     if(d._STTCTT?.undoHistory?.length){
-      d._STTCTT.undoHistory.forEach(label=>history.push({data:null,label:'[prev] '+label,genState:null,readOnly:true}));
+      d._STTCTT.undoHistory.forEach(label=>history.unshift({data:null,label:'[prev] '+label,genState:null,readOnly:true}));
       historyCursor=history.length-1;
     }
   }));
@@ -2462,7 +2471,12 @@ function buildTiles(){
       edgeGroups.push({TileIndex:i,EdgeTypeId:edgeTypeId||0,EdgeVariationsIncludeFootAndRoof:true,EdgeVariations:[-1,-1,i%3]});
     }
   }
-  const result={Width:W,Height:H,Tiles:tiles,EdgeGroups:edgeGroups};
+  // Spread any extra top-level keys from the original loaded map (e.g. Decorations)
+  // then overwrite only the keys this tool manages.
+  const extra=srcMapExtra?Object.fromEntries(
+    Object.entries(srcMapExtra).filter(([k])=>!['Width','Height','Tiles','EdgeGroups','_STTCTT'].includes(k))
+  ):{};
+  const result={...extra,Width:W,Height:H,Tiles:tiles,EdgeGroups:edgeGroups};
   if(srcEdgeGroups===null&&edgeGroups.length===0)delete result.EdgeGroups;
   return result;
 }
@@ -2616,7 +2630,9 @@ function buildMapJSON(){
 function exportMap(){
   const json=buildMapJSON();if(!json)return false;
   dlWithBackup('map.json',json,_snapMap);
-  _snapMap=json;_dirtyMap=false;
+  // Note: we intentionally do NOT clear _dirtyMap here because the browser's
+  // save dialog may be cancelled and we cannot detect that. The dirty flag is
+  // only cleared on ZIP export (where the data is packaged regardless of dialog).
   return true;
 }
 function exportScenario(){
@@ -2624,14 +2640,12 @@ function exportScenario(){
   scenarioData.LandscapeId=activeLandscape;
   const json=JSON.stringify(scenarioData,null,2);
   dlWithBackup('scenario.json',json,_snapScenario);
-  _snapScenario=json;_dirtyScenario=false;
   return true;
 }
 function exportHeader(){
   if(!headerData)return false;
   const json=JSON.stringify(headerData,null,2);
   dlWithBackup('header.json',json,_snapHeader);
-  _snapHeader=json;_dirtyHeader=false;
   return true;
 }
 function buildDebugJSON(){
