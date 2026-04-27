@@ -140,6 +140,7 @@ Option: Export `STTC-TT.json` for diagnositc purposes. The following data is cap
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
+ - Fixed `scenario.json` showing unsaved changes immediately after loading a map
  - Loading a map now appears in the undo history, so you can undo all the way back to the original loaded state
  - Exporting a single file no longer disables the export button if you cancel the save dialog
  - Decors are now preserved when exporting `map.json`
