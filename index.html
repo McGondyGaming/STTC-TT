@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
-<title>STTC-TT</title>
+<title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cmask id='m'%3E%3Crect width='100' height='100' fill='white'/%3E%3Ccircle cx='50' cy='50' r='18' fill='black'/%3E%3C/mask%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='48' stroke='white' stroke-width='4' fill='none'/%3E%3Cpath mask='url(%23m)' d='M50,2 L59.2,33.5 L83.9,16.1 L66.5,40.8 L98,50 L66.5,59.2 L83.9,83.9 L59.2,66.5 L50,98 L40.8,66.5 L16.1,83.9 L33.5,59.2 L2,50 L33.5,40.8 L16.1,16.1 L40.8,33.5 Z' fill='%23e65100' stroke='white' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='18' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
 <style>
 /* ── UI theme variables ─────────────────────────────────────────────────────── */
@@ -13,14 +13,14 @@
 :root[data-theme="light"]{
   --bg:#f5f4f0;--bg2:#eceae4;--bg3:#ffffff;
   --border:#d8d6ce;--border2:#c4c2ba;
-  --text:#1a1a1a;--text2:#505050;--text3:#888880;
+  --text:#1a1a1a;--text2:#505050;--text3:#6b6b64;
   --accent:#2a2a2a;--accent-fg:#ffffff;
   --ok:#2a7a3b;--err:#c0392b;--warn:#7a5a00;
 }
 :root[data-theme="dark"]{
   --bg:#1a1a1a;--bg2:#242424;--bg3:#2e2e2e;
   --border:#3a3a3a;--border2:#4a4a4a;
-  --text:#e7e5e2;--text2:#aaaaaa;--text3:#666660;
+  --text:#e7e5e2;--text2:#aaaaaa;--text3:#8a8a84;
   --accent:#e8e6e0;--accent-fg:#1a1a1a;
   --ok:#4caf72;--err:#e06060;--warn:#c8a030;
 }
@@ -28,14 +28,14 @@
   --bg:#2a241e;--bg2:#3a3128;--bg3:#4a4232;
   --border:#5a4b44;--border2:#6a6055;
   --text:#f8eedf;--text2:#c0ada0;--text3:#8a786a;
-  --accent:#f0b46a;--accent-fg:#ffffff;
+  --accent:#aa6e25;--accent-fg:#ffffff;
   --ok:#4caf72;--err:#e06060;--warn:#c8a030;
 }
 /* Fallback for when JS hasn't set data-theme yet - match OS preference */
 :root:not([data-theme]){
   --bg:#f5f4f0;--bg2:#eceae4;--bg3:#ffffff;
   --border:#d8d6ce;--border2:#c4c2ba;
-  --text:#1a1a1a;--text2:#505050;--text3:#888880;
+  --text:#1a1a1a;--text2:#505050;--text3:#6b6b64;
   --accent:#2a2a2a;--accent-fg:#ffffff;
   --ok:#2a7a3b;--err:#c0392b;--warn:#7a5a00;
 }
@@ -56,12 +56,6 @@
   --lv-default-6:#7ec065;--lv-default-7:#a8d060;--lv-default-8:#ccd858;
   --lv-default-9:#e8c838;--lv-default-10:#d4a030;--lv-default-11:#b07828;
   --lv-default-12:#8a5020;--lv-default-13:#c8c8c8;--lv-default-14:#f0f0f0;
-  /* Deuteranopia - blue -> gold -> white (avoids red/green)              */
-  --lv-deut-0:#0d0d2a;--lv-deut-1:#0a2060;--lv-deut-2:#1040a0;
-  --lv-deut-3:#1860c0;--lv-deut-4:#2080d0;--lv-deut-5:#40a0d8;
-  --lv-deut-6:#70b8d8;--lv-deut-7:#a0c8d0;--lv-deut-8:#c8c080;
-  --lv-deut-9:#d8a840;--lv-deut-10:#c89020;--lv-deut-11:#b07010;
-  --lv-deut-12:#905008;--lv-deut-13:#d8d8d8;--lv-deut-14:#f8f8f8;
   /* High Contrast - topographic + greyscale monotone                    */
   /* White peaks -> blue water -> teal -> green -> amber -> dark red -> void */
   --lv-hc-0:#ffffff;--lv-hc-1:#dbf0ff;--lv-hc-2:#b3e0ff;
@@ -84,6 +78,7 @@ h1{font-size:17px;font-weight:600;margin-bottom:3px;}
 .st{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;}
 .sb{font-size:11px;color:var(--text2);}
 .sv-chev{font-size:11px;color:var(--text3);transition:transform .18s;flex-shrink:0;}
+.sh:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--accent);}
 .section.open>.sh>.sv-chev{transform:rotate(180deg);}
 .section-body{padding:14px 15px;border-top:1px solid var(--border);display:none;}
 .section.open>.section-body{display:block;}
@@ -93,6 +88,7 @@ h1{font-size:17px;font-weight:600;margin-bottom:3px;}
 .section.always-open>.section-body{display:block;}
 .dz{border:2px dashed var(--border2);border-radius:8px;padding:14px 10px;text-align:center;cursor:pointer;transition:background .15s,border-color .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;margin-bottom:6px;}
 .dz:hover,.dz.over{background:var(--bg2);border-color:var(--text2);}
+.dz:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-color:var(--text2);}
 .dz.loaded{border-style:solid;border-color:var(--ok);}
 .dl{font-size:12px;color:var(--text2);}
 .dl strong{color:var(--text);font-weight:600;}
@@ -101,7 +97,8 @@ canvas{display:block;image-rendering:pixelated;}
 .field:last-child{margin-bottom:0;}
 label.fl{font-size:12px;color:var(--text2);display:block;margin-bottom:3px;}
 select,input[type=number],input[type=text]{width:100%;font-size:12px;padding:6px 8px;border:1px solid var(--border2);border-radius:6px;background:var(--bg);color:var(--text);outline:none;}
-select:focus,input:focus{border-color:var(--text2);}
+select:focus-visible,input[type=number]:focus-visible,input[type=text]:focus-visible{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 25%,transparent);}
+select:focus,input[type=number]:focus,input[type=text]:focus{border-color:var(--accent);}
 select optgroup{font-weight:700;background:var(--bg);color:var(--text);}
 select option{background:var(--bg);color:var(--text);}
 .rr{display:flex;align-items:center;gap:8px;}
@@ -109,13 +106,19 @@ select option{background:var(--bg);color:var(--text);}
 .rv{font-size:12px;font-weight:700;min-width:28px;text-align:right;color:var(--text);}
 .ck-row{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--text2);}
 .ck-row input{width:auto;margin:0;}
+input[type=checkbox]:focus-visible,input[type=radio]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+input[type=range]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px;}
+input[type=color]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:5px;}
+div[role=button]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px;}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px;}
 .tc{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .note{font-size:11px;color:var(--text3);line-height:1.5;margin-bottom:8px;}
 .note:last-child{margin-bottom:0;}
 .warn-box{font-size:11px;color:var(--warn);background:color-mix(in srgb,var(--warn) 10%,var(--bg3));border:1px solid color-mix(in srgb,var(--warn) 25%,var(--bg3));border-radius:6px;padding:6px 10px;line-height:1.5;}
 .tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:12px;}
-.tab{padding:6px 12px;font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text3);margin-bottom:-1px;white-space:nowrap;}
+.tab{padding:6px 12px;font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text3);margin-bottom:-1px;white-space:nowrap;outline:none;}
 .tab.active{color:var(--text);border-bottom-color:var(--text);}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:-1px;border-radius:3px 3px 0 0;}
 .tp{display:none;}
 .tp.active{display:block;}
 .pl-grid{display:grid;grid-template-columns:46px 1fr;gap:5px 10px;align-items:center;}
@@ -123,8 +126,10 @@ select option{background:var(--bg);color:var(--text);}
 .lbadge{display:inline-flex;align-items:center;justify-content:center;width:38px;height:26px;border-radius:5px;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;text-shadow:0 1px 2px rgba(0,0,0,.4);}
 button{padding:8px 14px;font-size:13px;font-weight:500;border-radius:7px;cursor:pointer;transition:all .12s;border:1px solid var(--border2);background:var(--bg3);color:var(--text);}
 button:hover{background:var(--bg2);}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 button.primary{background:var(--accent);color:var(--accent-fg);border-color:transparent;}
 button.primary:hover{opacity:.85;}
+button.primary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 25%,transparent);}
 button:disabled{opacity:.35;cursor:not-allowed;}
 button.sm{padding:5px 10px;font-size:12px;border-radius:5px;}
 .b2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
@@ -180,8 +185,10 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 .scheme-presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
 .scheme-btn{padding:4px 10px;font-size:11px;border-radius:5px;cursor:pointer;border:1px solid var(--border2);background:var(--bg2);color:var(--text);}
 .scheme-btn.active{background:var(--accent);color:var(--accent-fg);border-color:transparent;}
+.scheme-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 .ui-theme-btn{padding:4px 10px;font-size:11px;border-radius:5px;cursor:pointer;border:1px solid var(--border2);background:var(--bg2);color:var(--text);}
 .ui-theme-btn.active{background:var(--accent);color:var(--accent-fg);border-color:transparent;}
+.ui-theme-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 .colour-pickers{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:8px;}
 .cp-box{display:flex;flex-direction:column;align-items:center;gap:4px;}
 .cp-box .ui-picker-reset{padding:2px 5px;font-size:10px;border-radius:4px;}
@@ -217,8 +224,9 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   </svg>
   <h1>Starship Troopers Terran Command Terrain Tool</h1>
 </div>
-<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · <span id="versionDisplay">v1.07-beta1</span> · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
+<div class="subtitle"><a href="https://github.com/McGondyGaming/STTC-TT/tree/main" target="_blank" style="color:inherit;">github.com/McGondyGaming/STTC-TT</a> · <span id="versionDisplay"></span> · MIT licence · Not officially sanctioned · <strong>Back up your scenario folder before use</strong></div>
 
+<main>
 <div class="layout">
 <div class="left-col">
 
@@ -239,9 +247,9 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <div class="dz" id="dzImg"><div class="dl"><strong>Drop heightmap image here</strong></div><div class="dl">PNG / BMP / JPEG - resampled to 128×128</div><input type="file" id="fiImg" accept="image/*" style="display:none"></div>
         <div class="msg" id="msgImg"></div>
         <div style="margin-top:11px;">
-          <div class="field"><label class="fl">Quantization steps</label><div class="rr"><input type="range" id="levels" min="2" max="15" value="15" step="1"><span class="rv" id="levelsOut">15</span></div></div>
-          <div class="field"><label class="fl">Black (dark) → editor level <span style="font-size:11px;color:var(--text3)">lowest</span></label><div class="rr"><input type="range" id="minLevel" min="-1" max="13" value="-1" step="1"><span class="rv" id="minLevelOut">-1</span></div></div>
-          <div class="field"><label class="fl">White (bright) → editor level <span style="font-size:11px;color:var(--text3)">highest</span></label><div class="rr"><input type="range" id="maxLevel" min="-1" max="13" value="13" step="1"><span class="rv" id="maxLevelOut">13</span></div></div>
+          <div class="field"><label class="fl" for="levels">Quantization steps</label><div class="rr"><input type="range" id="levels" min="2" max="15" value="15" step="1"><span class="rv" id="levelsOut">15</span></div></div>
+          <div class="field"><label class="fl" for="minLevel">Black (dark) → editor level <span style="font-size:11px;color:var(--text3)">lowest</span></label><div class="rr"><input type="range" id="minLevel" min="-1" max="13" value="-1" step="1"><span class="rv" id="minLevelOut">-1</span></div></div>
+          <div class="field"><label class="fl" for="maxLevel">White (bright) → editor level <span style="font-size:11px;color:var(--text3)">highest</span></label><div class="rr"><input type="range" id="maxLevel" min="-1" max="13" value="13" step="1"><span class="rv" id="maxLevelOut">13</span></div></div>
         </div>
       </div>
       <div class="tp" id="tab-src-map">
@@ -255,54 +263,59 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="tp" id="tab-src-gen">
         <div class="note" style="margin-bottom:8px;">Generates a procedural heightmap using fractal noise. Output is deterministic - same seed and settings always produce the same map.</div>
         <div class="field">
-          <label class="fl">Noise type</label>
-          <div style="display:flex;gap:8px;">
-            <label class="ck-row"><input type="radio" name="noiseType" id="noisePerlin" value="perlin" checked> Perlin</label>
-            <label class="ck-row"><input type="radio" name="noiseType" id="noiseSimplex" value="simplex"> OpenSimplex</label>
-          </div>
+          <fieldset style="border:none;padding:0;margin:0;">
+            <legend class="fl" style="display:block;width:100%;margin-bottom:5px;">Noise type</legend>
+            <div style="display:flex;flex-wrap:wrap;gap:6px 14px;">
+              <label class="ck-row"><input type="radio" name="noiseType" id="noisePerlin" value="perlin" checked> Perlin</label>
+              <label class="ck-row"><input type="radio" name="noiseType" id="noiseSimplex" value="simplex"> OpenSimplex</label>
+            </div>
+          </fieldset>
         </div>
         <div class="field">
-          <label class="fl">Seed</label>
+          <label class="fl" for="genSeed">Seed</label>
           <div style="display:flex;gap:6px;align-items:center;">
             <input type="text" id="genSeed" value="sttc-tt" maxlength="64" style="flex:1;min-width:0;">
             <button class="sm" id="btnRandSeed">Randomize</button>
           </div>
         </div>
-        <div class="field"><label class="fl" title="Controls feature size. Higher = larger landmasses.">Scale <span style="font-size:11px;color:var(--text3)">feature size</span></label><div class="rr"><input type="range" id="genScale" min="1" max="200" value="60" step="1"><span class="rv" id="genScaleOut">60</span><button class="sm gen-reset" data-id="genScale" data-def="60" title="Reset to default">↺</button></div></div>
-        <div class="field"><label class="fl" title="How quickly frequency increases between octaves.">Lacunarity <span style="font-size:11px;color:var(--text3)">shape coarseness</span></label><div class="rr"><input type="range" id="genLacun" min="100" max="400" value="170" step="10"><span class="rv" id="genLacunOut">1.7</span><button class="sm gen-reset" data-id="genLacun" data-def="170" title="Reset to default">↺</button></div></div>
-        <div class="field"><label class="fl" title="Noise values below this threshold become Level -1.">Water level <span style="font-size:11px;color:var(--text3)">% of map at floor</span></label><div class="rr"><input type="range" id="genWater" min="0" max="100" value="20" step="1"><span class="rv" id="genWaterOut">20%</span><button class="sm gen-reset" data-id="genWater" data-def="20" title="Reset to default">↺</button></div></div>
+        <div class="field"><label class="fl" for="genScale" title="Controls feature size. Higher = larger landmasses.">Scale <span style="font-size:11px;color:var(--text3)">feature size</span></label><div class="rr"><input type="range" id="genScale" min="1" max="200" value="60" step="1"><span class="rv" id="genScaleOut">60</span><button class="sm gen-reset" data-id="genScale" data-def="60" title="Reset to default">↺</button></div></div>
+        <div class="field"><label class="fl" for="genLacun" title="How quickly frequency increases between octaves.">Lacunarity <span style="font-size:11px;color:var(--text3)">shape coarseness</span></label><div class="rr"><input type="range" id="genLacun" min="100" max="400" value="170" step="10"><span class="rv" id="genLacunOut">1.7</span><button class="sm gen-reset" data-id="genLacun" data-def="170" title="Reset to default">↺</button></div></div>
+        <div class="field"><label class="fl" for="genWater" title="Noise values below this threshold become Level -1.">Water level <span style="font-size:11px;color:var(--text3)">% of map at floor</span></label><div class="rr"><input type="range" id="genWater" min="0" max="100" value="20" step="1"><span class="rv" id="genWaterOut">20%</span><button class="sm gen-reset" data-id="genWater" data-def="20" title="Reset to default">↺</button></div></div>
         <!-- Level range control -->
         <div class="field">
-          <label class="fl">Output level range <span style="font-size:11px;color:var(--text3)" id="lvlRangeDisplay">editor −1 → 13</span></label>
+          <span class="fl" style="display:block;margin-bottom:3px;">Output level range <span style="font-size:11px;color:var(--text3)" id="lvlRangeDisplay">editor -1 → 13</span></span>
           <div class="rr" style="align-items:center;gap:8px;">
             <div style="flex:1;">
               <div class="dual-range-outer">
                 <div class="dual-range-track"><div class="dual-range-fill" id="lvlRangeFill"></div></div>
                 <div class="dual-range-wrap">
-                  <input type="range" id="lvlMin" min="0" max="14" value="0" step="1">
-                  <input type="range" id="lvlMax" min="0" max="14" value="14" step="1">
+                  <input type="range" id="lvlMin" aria-label="Minimum output level" min="0" max="14" value="0" step="1">
+                  <input type="range" id="lvlMax" aria-label="Maximum output level" min="0" max="14" value="14" step="1">
                 </div>
               </div>
             </div>
-            <span class="rv" id="lvlRangeOut">−1–13</span>
+            <span class="rv" id="lvlRangeOut">-1-13</span>
             <button class="sm" id="btnLvlRangeReset" title="Reset to full range">↺</button>
           </div>
-          <div style="display:flex;gap:12px;margin-top:6px;">
-            <label class="ck-row"><input type="radio" name="rangeMode" value="scale" checked> Scale to range</label>
-            <label class="ck-row"><input type="radio" name="rangeMode" value="clamp"> Clamp to range</label>
-          </div>
+          <fieldset style="border:none;padding:0;margin:0;">
+            <legend style="display:none;">Range mode</legend>
+            <div style="display:flex;gap:12px;margin-top:6px;">
+              <label class="ck-row"><input type="radio" name="rangeMode" value="scale" checked> Scale to range</label>
+              <label class="ck-row"><input type="radio" name="rangeMode" value="clamp"> Clamp to range</label>
+            </div>
+          </fieldset>
           <div class="lvl-range-hint" id="lvlRangeHint">Scale: redistributes all terrain into the selected level range.</div>
         </div>
         <div style="margin-top:8px;">
-          <div id="genAdvToggle" style="cursor:pointer;font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;user-select:none;display:flex;align-items:center;gap:4px;">
+          <div id="genAdvToggle" tabindex="0" role="button" aria-expanded="false" style="cursor:pointer;font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;user-select:none;display:flex;align-items:center;gap:4px;border-radius:3px;">
             <span id="genAdvChev">▶</span> Refine shape
           </div>
           <div id="genAdvBody" style="display:none;margin-top:8px;">
-            <div class="field"><label class="fl" title="Number of noise layers summed together.">Octaves <span style="font-size:11px;color:var(--text3)">layers of detail</span></label><div class="rr"><input type="range" id="genOctaves" min="1" max="8" value="4" step="1"><span class="rv" id="genOctavesOut">4</span><button class="sm gen-reset" data-id="genOctaves" data-def="4" title="Reset to default">↺</button></div></div>
-            <div class="field"><label class="fl" title="How much each successive octave contributes.">Persistence <span style="font-size:11px;color:var(--text3)">detail strength</span></label><div class="rr"><input type="range" id="genPersist" min="10" max="100" value="50" step="1"><span class="rv" id="genPersistOut">0.50</span><button class="sm gen-reset" data-id="genPersist" data-def="50" title="Reset to default">↺</button></div></div>
-            <div class="field"><label class="fl" title="Raises normalised noise to this power before mapping.">Power <span style="font-size:11px;color:var(--text3)">slope redistribution</span></label><div class="rr"><input type="range" id="genPower" min="10" max="400" value="100" step="10"><span class="rv" id="genPowerOut">1.0</span><button class="sm gen-reset" data-id="genPower" data-def="100" title="Reset to default">↺</button></div></div>
-            <div class="field"><label class="fl" title="Applies a gamma curve to the noise before level mapping.">Gamma <span style="font-size:11px;color:var(--text3)">level distribution curve</span></label><div class="rr"><input type="range" id="genGamma" min="10" max="400" value="100" step="10"><span class="rv" id="genGammaOut">1.0</span><button class="sm gen-reset" data-id="genGamma" data-def="100" title="Reset to default">↺</button></div></div>
-            <div class="field"><label class="fl" title="Shifts the entire noise field up or down.">Bias <span style="font-size:11px;color:var(--text3)">raise/lower noise field</span></label><div class="rr"><input type="range" id="genBias" min="-50" max="50" value="0" step="1"><span class="rv" id="genBiasOut">0</span><button class="sm gen-reset" data-id="genBias" data-def="0" title="Reset to default">↺</button></div></div>
+            <div class="field"><label class="fl" for="genOctaves" title="Number of noise layers summed together.">Octaves <span style="font-size:11px;color:var(--text3)">layers of detail</span></label><div class="rr"><input type="range" id="genOctaves" min="1" max="8" value="4" step="1"><span class="rv" id="genOctavesOut">4</span><button class="sm gen-reset" data-id="genOctaves" data-def="4" title="Reset to default">↺</button></div></div>
+            <div class="field"><label class="fl" for="genPersist" title="How much each successive octave contributes.">Persistence <span style="font-size:11px;color:var(--text3)">detail strength</span></label><div class="rr"><input type="range" id="genPersist" min="10" max="100" value="50" step="1"><span class="rv" id="genPersistOut">0.50</span><button class="sm gen-reset" data-id="genPersist" data-def="50" title="Reset to default">↺</button></div></div>
+            <div class="field"><label class="fl" for="genPower" title="Raises normalised noise to this power before mapping.">Power <span style="font-size:11px;color:var(--text3)">slope redistribution</span></label><div class="rr"><input type="range" id="genPower" min="10" max="400" value="100" step="10"><span class="rv" id="genPowerOut">1.0</span><button class="sm gen-reset" data-id="genPower" data-def="100" title="Reset to default">↺</button></div></div>
+            <div class="field"><label class="fl" for="genGamma" title="Applies a gamma curve to the noise before level mapping.">Gamma <span style="font-size:11px;color:var(--text3)">level distribution curve</span></label><div class="rr"><input type="range" id="genGamma" min="10" max="400" value="100" step="10"><span class="rv" id="genGammaOut">1.0</span><button class="sm gen-reset" data-id="genGamma" data-def="100" title="Reset to default">↺</button></div></div>
+            <div class="field"><label class="fl" for="genBias" title="Shifts the entire noise field up or down.">Bias <span style="font-size:11px;color:var(--text3)">raise/lower noise field</span></label><div class="rr"><input type="range" id="genBias" min="-50" max="50" value="0" step="1"><span class="rv" id="genBiasOut">0</span><button class="sm gen-reset" data-id="genBias" data-def="0" title="Reset to default">↺</button></div></div>
           </div>
         </div>
         <div class="msg" id="msgGen" style="margin-top:6px;"></div>
@@ -321,7 +334,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="dz" id="dzScenario" style="padding:11px 10px;"><div class="dl"><strong>Drop scenario.json here</strong></div><div class="dl" id="dzScenarioSub">Reads LandscapeId, included in export</div><input type="file" id="fiScenario" accept=".json,application/json" style="display:none"></div>
       <div class="msg" id="msgScenario"></div>
       <div class="field" style="margin-top:10px;">
-        <label class="fl">Landscape</label>
+        <label class="fl" for="landscapeSelect">Landscape</label>
         <select id="landscapeSelect">
           <option value="0">0 - Desert</option>
           <option value="1">1 - Chemical / Underground</option>
@@ -373,14 +386,14 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       </div>
       <div class="tp active" id="tab-ta-simple">
         <div class="tc">
-          <div class="field"><label class="fl">Default TerrainTypeId</label><select id="terrainSelect"></select></div>
+          <div class="field"><label class="fl" for="terrainSelect">Default TerrainTypeId</label><select id="terrainSelect"></select></div>
         </div>
       </div>
       <div class="tp" id="tab-ta-overrides">
         <div class="note">Mid levels (editor 3-9) use the default above.</div>
         <div class="tc">
-          <div class="field"><label class="fl">Low (−1 to 2)</label><select id="lowTerrain"><option value="">- no change -</option></select></div>
-          <div class="field"><label class="fl">High (10 to 13)</label><select id="highTerrain"><option value="">- no change -</option></select></div>
+          <div class="field"><label class="fl" for="lowTerrain">Low (-1 to 2)</label><select id="lowTerrain"><option value="">- no change -</option></select></div>
+          <div class="field"><label class="fl" for="highTerrain">High (10 to 13)</label><select id="highTerrain"><option value="">- no change -</option></select></div>
         </div>
       </div>
       <div class="tp" id="tab-ta-bylevel">
@@ -409,7 +422,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       </div>
       <div class="tp active" id="tab-ea-simple">
         <div class="field">
-          <label class="fl">Remap all terrain to edge family</label>
+          <label class="fl" for="edgeRemap">Remap all terrain to edge family</label>
           <select id="edgeRemap">
             <option value="">- no change -</option>
             <option value="desert">Desert - Cliffs_A</option>
@@ -425,11 +438,11 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <div class="note">Override edge family at the extremes - mid levels (editor 3-9) keep the global remap or no change.</div>
         <div class="tc">
           <div class="field">
-            <label class="fl">Low (−1 to 2) → edge family</label>
+            <label class="fl" for="edgeRemapLow">Low (-1 to 2) → edge family</label>
             <select id="edgeRemapLow"><option value="">- no change -</option><option value="desert">Desert - Cliffs_A</option><option value="underground">Underground - Cliffs_Purple</option><option value="lava">Lava - Cliffs_Lava</option><option value="storm">Metro / Storm - Cliffs_Storm</option><option value="spacestation">Space Station - Spacestation_A</option></select>
           </div>
           <div class="field">
-            <label class="fl">High (10 to 13) → edge family</label>
+            <label class="fl" for="edgeRemapHigh">High (10 to 13) → edge family</label>
             <select id="edgeRemapHigh"><option value="">- no change -</option><option value="desert">Desert - Cliffs_A</option><option value="underground">Underground - Cliffs_Purple</option><option value="lava">Lava - Cliffs_Lava</option><option value="storm">Metro / Storm - Cliffs_Storm</option><option value="spacestation">Space Station - Spacestation_A</option></select>
           </div>
         </div>
@@ -484,19 +497,19 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="lt-grid">
         <div class="lt-box">
           <div class="lt-title">Shift entire map</div>
-          <div class="lt-row"><input type="range" id="shiftSlider" min="-14" max="14" value="0" step="1"><span class="shift-val" id="shiftVal">0</span></div>
-          <div class="lt-row" style="justify-content:space-between;"><span class="note" style="margin:0;">Clamped to −1-13</span><button class="sm" id="btnShiftAll" disabled>Apply</button></div>
+          <div class="lt-row"><input type="range" id="shiftSlider" aria-label="Shift amount in editor levels" min="-14" max="14" value="0" step="1"><span class="shift-val" id="shiftVal">0</span></div>
+          <div class="lt-row" style="justify-content:space-between;"><span class="note" style="margin:0;">Clamped to -1-13</span><button class="sm" id="btnShiftAll" disabled>Apply</button></div>
         </div>
         <div class="lt-box">
           <div class="lt-title">Clamp extremes</div>
-          <div class="lt-row"><label>Level ≤</label><input type="number" id="clampLow" value="1" min="-1" max="13" style="width:46px;"><label>→</label><input type="number" id="clampLowVal" value="-1" min="-1" max="13" style="width:46px;"></div>
-          <div class="lt-row"><label>Level ≥</label><input type="number" id="clampHigh" value="10" min="-1" max="13" style="width:46px;"><label>→</label><input type="number" id="clampHighVal" value="13" min="-1" max="13" style="width:46px;"></div>
+          <div class="lt-row"><label for="clampLow">Level ≤</label><input type="number" id="clampLow" value="1" min="-1" max="13" style="width:46px;"><label for="clampLowVal">→</label><input type="number" id="clampLowVal" value="-1" min="-1" max="13" style="width:46px;"></div>
+          <div class="lt-row"><label for="clampHigh">Level ≥</label><input type="number" id="clampHigh" value="10" min="-1" max="13" style="width:46px;"><label for="clampHighVal">→</label><input type="number" id="clampHighVal" value="13" min="-1" max="13" style="width:46px;"></div>
           <button class="sm" id="btnClamp" disabled>Apply clamps</button>
         </div>
         <div class="lt-box">
           <div class="lt-title">Shift a band</div>
-          <div class="lt-row"><label>Level</label><select id="bandOp" style="width:auto;padding:4px 6px;font-size:12px;"><option value="lte">≤</option><option value="eq">=</option><option value="gte">≥</option></select><input type="number" id="bandThresh" value="3" min="-1" max="13" style="width:46px;"></div>
-          <div class="lt-row"><label>Shift by</label><input type="number" id="bandShift" value="1" min="-14" max="14" style="width:52px;"></div>
+          <div class="lt-row"><label for="bandThresh">Level</label><select id="bandOp" aria-label="Band operator" style="width:auto;padding:4px 6px;font-size:12px;"><option value="lte">≤</option><option value="eq">=</option><option value="gte">≥</option></select><input type="number" id="bandThresh" value="3" min="-1" max="13" style="width:46px;"></div>
+          <div class="lt-row"><label for="bandShift">Shift by</label><input type="number" id="bandShift" value="1" min="-14" max="14" style="width:52px;"></div>
           <button class="sm" id="btnBand" disabled>Apply band shift</button>
         </div>
       </div>
@@ -524,7 +537,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
             <div class="cp-box"><label>Background</label><input type="color" id="uiBg" value="#2a241e"><button class="sm ui-picker-reset" data-picker="uiBg" data-def="#2a241e" title="Reset">↺</button></div>
             <div class="cp-box"><label>Surface</label><input type="color" id="uiBg2" value="#3a3128"><button class="sm ui-picker-reset" data-picker="uiBg2" data-def="#3a3128" title="Reset">↺</button></div>
             <div class="cp-box"><label>Card</label><input type="color" id="uiBg3" value="#4a4232"><button class="sm ui-picker-reset" data-picker="uiBg3" data-def="#4a4232" title="Reset">↺</button></div>
-            <div class="cp-box"><label>Accent</label><input type="color" id="uiAccent" value="#f0b46a"><button class="sm ui-picker-reset" data-picker="uiAccent" data-def="#f0b46a" title="Reset">↺</button></div>
+            <div class="cp-box"><label>Accent</label><input type="color" id="uiAccent" value="#aa6e25"><button class="sm ui-picker-reset" data-picker="uiAccent" data-def="#aa6e25" title="Reset">↺</button></div>
           </div>
           <div class="colour-pickers" style="grid-template-columns:repeat(4,1fr);margin-top:6px;">
             <div class="cp-box"><label>Text</label><input type="color" id="uiText" value="#f8eedf"><button class="sm ui-picker-reset" data-picker="uiText" data-def="#f8eedf" title="Reset">↺</button></div>
@@ -539,10 +552,9 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       </div>
       <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:2px;">
         <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">Height preview colour scheme</div>
-        <div class="note" style="margin-bottom:8px;">Terrain, navigability and heatmap previews use fixed functional colours.</div>
-        <div class="scheme-presets">
+        <div class="note" style="margin-bottom:8px;">Terrain preview uses fixed functional colours. Navigability colours are configurable below.</div>
+        <div class="scheme-presets" id="heightSchemeBar">
           <button class="scheme-btn active" data-scheme="default">Default</button>
-          <button class="scheme-btn" data-scheme="deuteranopia">Deuteranopia</button>
           <button class="scheme-btn" data-scheme="highcontrast">High Contrast</button>
           <button class="scheme-btn" data-scheme="custom">Custom</button>
         </div>
@@ -553,6 +565,46 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
             <div class="cp-box"><label>High (editor 13)</label><input type="color" id="cpHigh" value="#f0f0f0"></div>
           </div>
           <canvas id="schemeStripCanvas" class="scheme-preview-strip" width="280" height="14"></canvas>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px;">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">Navigability colour scheme</div>
+        <div class="note" style="margin-bottom:8px;">Colours used in the Navigability preview mode.</div>
+        <div class="scheme-presets" id="navSchemeBar">
+          <button class="scheme-btn active" data-nav-scheme="default">Default</button>
+          <button class="scheme-btn" data-nav-scheme="highcontrast">High Contrast</button>
+          <button class="scheme-btn" data-nav-scheme="custom">Custom</button>
+        </div>
+        <div id="navCustomPickerWrap" style="display:none;">
+          <div class="colour-pickers" style="grid-template-columns:repeat(3,1fr);">
+            <div class="cp-box"><label>Water (-1)</label><input type="color" id="cpNavWater" value="#3c8fdc"><button class="sm nav-picker-reset" data-picker="cpNavWater" data-def="#3c8fdc" title="Reset">↺</button></div>
+            <div class="cp-box"><label>Cliff base</label><input type="color" id="cpNavCliff" value="#c83c0a"><button class="sm nav-picker-reset" data-picker="cpNavCliff" data-def="#c83c0a" title="Reset">↺</button></div>
+            <div class="cp-box"><label>Slope</label><input type="color" id="cpNavSlope" value="#b450b4"><button class="sm nav-picker-reset" data-picker="cpNavSlope" data-def="#b450b4" title="Reset">↺</button></div>
+            <div class="cp-box"><label>High ground</label><input type="color" id="cpNavHigh" value="#c8960a"><button class="sm nav-picker-reset" data-picker="cpNavHigh" data-def="#c8960a" title="Reset">↺</button></div>
+            <div class="cp-box"><label>Narrow pass</label><input type="color" id="cpNavNarrow" value="#4a8000"><button class="sm nav-picker-reset" data-picker="cpNavNarrow" data-def="#4a8000" title="Reset">↺</button></div>
+            <div class="cp-box"><label>Open / OK</label><input type="color" id="cpNavOk" value="#28a046"><button class="sm nav-picker-reset" data-picker="cpNavOk" data-def="#28a046" title="Reset">↺</button></div>
+          </div>
+          <div style="text-align:right;margin-top:6px;">
+            <button class="sm" id="btnResetNavCustom" title="Reset all navigability colours to defaults">↺ Reset all</button>
+          </div>
+        </div>
+        <div id="navSwatchRow" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;"></div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px;">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">Heatmap colour scheme</div>
+        <div class="note" style="margin-bottom:8px;">Colours used in the Heatmap preview mode. Hard/cliff tiles always use the fixed dark colour.</div>
+        <div class="scheme-presets" id="heatSchemeBar">
+          <button class="scheme-btn active" data-heat-scheme="default">Default</button>
+          <button class="scheme-btn" data-heat-scheme="highcontrast">High Contrast</button>
+          <button class="scheme-btn" data-heat-scheme="custom">Custom</button>
+        </div>
+        <div id="heatCustomPickerWrap" style="display:none;">
+          <div class="colour-pickers">
+            <div class="cp-box"><label>Tight (low radius)</label><input type="color" id="cpHeatLow" value="#c8200a"></div>
+            <div class="cp-box"><label>Mid</label><input type="color" id="cpHeatMid" value="#42b0f5"></div>
+            <div class="cp-box"><label>Open (high radius)</label><input type="color" id="cpHeatHigh" value="#c3d8f9"></div>
+          </div>
+          <canvas id="heatStripCanvas" class="scheme-preview-strip" width="280" height="14"></canvas>
         </div>
       </div>
     </div>
@@ -566,7 +618,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
     </div>
     <div class="section-body">
       <div class="note" style="margin-bottom:6px;">Most recent action at top. Click an entry to undo/redo to that point.</div>
-      <div id="historyList" style="font-size:11px;font-family:monospace;max-height:160px;overflow-y:auto;border:1px solid var(--border);border-radius:3px;background:var(--bg2);"></div>
+      <div id="historyList" style="font-size:11px;font-family:monospace;max-height:160px;overflow-y:auto;border:1px solid var(--border);border-radius:3px;background:var(--bg2);padding:2px 0;"></div>
     </div>
   </div>
 
@@ -633,7 +685,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div id="heatScaleWrap" style="display:none;margin-top:6px;">
         <div style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;">Heat scale</span>
-          <input type="range" id="heatScaleSlider" min="4" max="24" value="14" step="1" style="flex:1;accent-color:var(--accent);">
+          <input type="range" id="heatScaleSlider" aria-label="Heatmap scale (max navigability radius)" min="4" max="24" value="14" step="1" style="flex:1;accent-color:var(--accent);">
           <span style="font-size:11px;font-weight:700;min-width:24px;text-align:right;color:var(--text);" id="heatScaleOut">14</span>
         </div>
       </div>
@@ -658,8 +710,9 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 </div>
 
 </div><!-- end layout -->
+</main>
 <script>
-const TOOL_VERSION='1.07';
+const TOOL_VERSION='1.08';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // COLOUR HELPERS - all colours in this file use hex strings for easy VS Code editing
@@ -703,11 +756,10 @@ function buildCustomPalette(low,mid,high){
 
 function applyScheme(name){
   activeScheme=name;
-  document.querySelectorAll('#secSettings .scheme-btn').forEach(b=>b.classList.toggle('active',b.dataset.scheme===name));
+  document.querySelectorAll('#heightSchemeBar .scheme-btn').forEach(b=>b.classList.toggle('active',b.dataset.scheme===name));
   const cpWrap=document.getElementById('customPickerWrap');
   if(cpWrap) cpWrap.style.display=name==='custom'?'block':'none';
   switch(name){
-    case 'deuteranopia': LV_COL=buildPaletteFromCss('lv-deut'); break;
     case 'highcontrast': LV_COL=buildPaletteFromCss('lv-hc');   break;
     case 'custom':
       LV_COL=buildCustomPalette(customLow,customMid,customHigh);
@@ -727,7 +779,7 @@ function updateSchemeStrip(){
   for(let i=0;i<=14;i++){ctx.fillStyle=LV_COL[i];ctx.fillRect(i*bw,0,bw+1,h);}
 }
 
-document.querySelectorAll('#secSettings .scheme-btn').forEach(btn=>
+document.querySelectorAll('#heightSchemeBar .scheme-btn').forEach(btn=>
   btn.addEventListener('click',()=>applyScheme(btn.dataset.scheme)));
 
 ['cpLow','cpMid','cpHigh'].forEach(id=>{
@@ -742,19 +794,130 @@ document.querySelectorAll('#secSettings .scheme-btn').forEach(btn=>
 });
 
 // ── Nav colours (hex) ─────────────────────────────────────────────────────────
-const NAV_HEX={
-  water:  '#3c8fdc',
-  cliff:  '#c83c0a',
-  slope:  '#b450b4',
-  high:   '#c8960a',
-  narrow: '#4a8000',
-  ok:     '#28a046',
+const NAV_SCHEMES={
+  default:{water:'#3c8fdc',cliff:'#c83c0a',slope:'#b450b4',high:'#c8960a',narrow:'#4a8000',ok:'#28a046'},
+  highcontrast:{water:'#005fa3',cliff:'#ff2200',slope:'#dd00dd',high:'#cc7700',narrow:'#006600',ok:'#00cc44'},
 };
+let activeNavScheme='default';
+let NAV_HEX={...NAV_SCHEMES.default};
+
+function updateNavSwatches(){
+  const row=document.getElementById('navSwatchRow');if(!row)return;
+  row.innerHTML='';
+  const labels={water:'Water',cliff:'Cliff',slope:'Slope',high:'High',narrow:'Narrow',ok:'OK'};
+  Object.entries(NAV_HEX).forEach(([k,hex])=>{
+    const d=document.createElement('div');
+    d.className='li';
+    d.innerHTML=`<div class="lsw" style="background:${hex}"></div><span style="font-size:10px;color:var(--text2);">${labels[k]||k}</span>`;
+    row.appendChild(d);
+  });
+}
+
+function applyNavScheme(name){
+  activeNavScheme=name;
+  document.querySelectorAll('#navSchemeBar .scheme-btn').forEach(b=>b.classList.toggle('active',b.dataset.navScheme===name));
+  const wrap=document.getElementById('navCustomPickerWrap');
+  if(wrap)wrap.style.display=name==='custom'?'block':'none';
+  if(name==='custom'){
+    NAV_HEX={
+      water: document.getElementById('cpNavWater')?.value||NAV_SCHEMES.default.water,
+      cliff: document.getElementById('cpNavCliff')?.value||NAV_SCHEMES.default.cliff,
+      slope: document.getElementById('cpNavSlope')?.value||NAV_SCHEMES.default.slope,
+      high:  document.getElementById('cpNavHigh')?.value||NAV_SCHEMES.default.high,
+      narrow:document.getElementById('cpNavNarrow')?.value||NAV_SCHEMES.default.narrow,
+      ok:    document.getElementById('cpNavOk')?.value||NAV_SCHEMES.default.ok,
+    };
+  }else{
+    NAV_HEX={...(NAV_SCHEMES[name]||NAV_SCHEMES.default)};
+    // Sync custom pickers to current scheme values for reference
+    const s=NAV_HEX;
+    const map={cpNavWater:'water',cpNavCliff:'cliff',cpNavSlope:'slope',cpNavHigh:'high',cpNavNarrow:'narrow',cpNavOk:'ok'};
+    Object.entries(map).forEach(([id,k])=>{const el=document.getElementById(id);if(el)el.value=s[k];});
+  }
+  updateNavSwatches();
+  if(tileData&&previewMode==='nav')updatePreview();
+  logSession('navScheme',name);
+}
+
+document.querySelectorAll('#navSchemeBar .scheme-btn').forEach(btn=>
+  btn.addEventListener('click',()=>applyNavScheme(btn.dataset.navScheme)));
+
+['cpNavWater','cpNavCliff','cpNavSlope','cpNavHigh','cpNavNarrow','cpNavOk'].forEach(id=>{
+  const el=document.getElementById(id);if(!el)return;
+  el.addEventListener('input',()=>{
+    if(activeNavScheme==='custom')applyNavScheme('custom');
+  });
+});
+
+document.querySelectorAll('.nav-picker-reset').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const el=document.getElementById(btn.dataset.picker);
+    if(el){el.value=btn.dataset.def;}
+    if(activeNavScheme==='custom')applyNavScheme('custom');
+  });
+});
+
+document.getElementById('btnResetNavCustom')?.addEventListener('click',()=>{
+  document.querySelectorAll('.nav-picker-reset').forEach(btn=>{
+    const el=document.getElementById(btn.dataset.picker);
+    if(el)el.value=btn.dataset.def;
+  });
+  if(activeNavScheme==='custom')applyNavScheme('custom');
+});
 
 // ── Heatmap colour stops (hex) ────────────────────────────────────────────────
-const HEAT_STOPS_HEX=['#630d02','#a06a20','#d1cb1c','#42b0f5','#c3d8f9'];
+// Schemes: default = red-amber-green-blue (RAG+wide); highcontrast = previous dark stops
+const HEAT_SCHEMES={
+  default:['#c8200a','#e07c10','#2da840','#42b0f5','#c3d8f9'],
+  highcontrast:['#630d02','#a06a20','#d1cb1c','#42b0f5','#c3d8f9'],
+};
+let activeHeatScheme='default';
+let heatCustomLow='#c8200a',heatCustomMid='#42b0f5',heatCustomHigh='#c3d8f9';
+let HEAT_STOPS_HEX=[...HEAT_SCHEMES.default];
 const HEAT_HARD_HEX='#19191e';
 const HEAT_SLOPE_HEX='#b450b4';
+
+function buildCustomHeatPalette(low,mid,high){
+  return[low,lerpHex(low,mid,0.5),mid,lerpHex(mid,high,0.5),high];
+}
+
+function updateHeatStrip(){
+  const canvas=document.getElementById('heatStripCanvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height,stops=HEAT_STOPS_HEX;
+  const grad=ctx.createLinearGradient(0,0,w,0);
+  stops.forEach((hex,i)=>grad.addColorStop(i/(stops.length-1),hex));
+  ctx.fillStyle=grad;ctx.fillRect(0,0,w,h);
+}
+
+function applyHeatScheme(name){
+  activeHeatScheme=name;
+  document.querySelectorAll('#heatSchemeBar .scheme-btn').forEach(b=>b.classList.toggle('active',b.dataset.heatScheme===name));
+  const wrap=document.getElementById('heatCustomPickerWrap');
+  if(wrap)wrap.style.display=name==='custom'?'block':'none';
+  if(name==='custom'){
+    HEAT_STOPS_HEX=buildCustomHeatPalette(heatCustomLow,heatCustomMid,heatCustomHigh);
+  }else{
+    HEAT_STOPS_HEX=[...(HEAT_SCHEMES[name]||HEAT_SCHEMES.default)];
+  }
+  updateHeatStrip();
+  if(tileData&&previewMode==='heatmap')updatePreview();
+  logSession('heatScheme',name);
+}
+
+document.querySelectorAll('#heatSchemeBar .scheme-btn').forEach(btn=>
+  btn.addEventListener('click',()=>applyHeatScheme(btn.dataset.heatScheme)));
+
+['cpHeatLow','cpHeatMid','cpHeatHigh'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.addEventListener('input',()=>{
+    heatCustomLow=document.getElementById('cpHeatLow').value;
+    heatCustomMid=document.getElementById('cpHeatMid').value;
+    heatCustomHigh=document.getElementById('cpHeatHigh').value;
+    if(activeHeatScheme==='custom')applyHeatScheme('custom');
+  });
+});
 
 // ── Terrain colours (hex) ─────────────────────────────────────────────────────
 // Each type has a distinct hue representative of its name.
@@ -1030,10 +1193,20 @@ Object.defineProperty(window,'redoStack',{get:()=>history.slice(historyCursor+1)
 
 // ── Collapsible sections ───────────────────────────────────────────────────────
 document.querySelectorAll('.sh[data-sec]').forEach(h=>{
-  h.addEventListener('click',()=>{
-    const sec=h.closest('.section');
+  const sec=h.closest('.section');
+  if(!sec.classList.contains('always-open')){
+    h.setAttribute('tabindex','0');
+    h.setAttribute('role','button');
+    h.setAttribute('aria-expanded',sec.classList.contains('open')?'true':'false');
+  }
+  const toggle=()=>{
     if(sec.classList.contains('always-open'))return;
     sec.classList.toggle('open');
+    h.setAttribute('aria-expanded',sec.classList.contains('open')?'true':'false');
+  };
+  h.addEventListener('click',toggle);
+  h.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}
   });
 });
 
@@ -1041,21 +1214,42 @@ document.querySelectorAll('.sh[data-sec]').forEach(h=>{
 function wireTabs(barId,onChange){
   const bar=document.getElementById(barId);if(!bar)return;
   bar.querySelectorAll('.tab').forEach(tab=>{
-    tab.addEventListener('click',()=>{
+    tab.setAttribute('tabindex','0');
+    tab.setAttribute('role','tab');
+    const activate=()=>{
       bar.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
       tab.classList.add('active');
       bar.querySelectorAll('.tab').forEach(t=>{const p=document.getElementById('tab-'+t.dataset.tab);if(p)p.classList.remove('active');});
       const p=document.getElementById('tab-'+tab.dataset.tab);if(p)p.classList.add('active');
       if(onChange)onChange();
+    };
+    tab.addEventListener('click',activate);
+    tab.addEventListener('keydown',e=>{
+      if(e.key==='Enter'||e.key===' '){e.preventDefault();activate();}
+      // Arrow key navigation within tab bar
+      const tabs=[...bar.querySelectorAll('.tab')];
+      const idx=tabs.indexOf(tab);
+      if(e.key==='ArrowRight'&&idx<tabs.length-1){e.preventDefault();tabs[idx+1].focus();}
+      if(e.key==='ArrowLeft'&&idx>0){e.preventDefault();tabs[idx-1].focus();}
     });
   });
 }
+
+function updateFolderDropzoneVisibility(){
+  const isDir=document.querySelector('#srcBar .tab.active')?.dataset.tab==='src-dir';
+  const dzS=document.getElementById('dzScenario');
+  const dzH=document.getElementById('dzHeader');
+  if(dzS)dzS.style.display=isDir?'none':'flex';
+  if(dzH)dzH.style.display=isDir?'none':'flex';
+}
+
 wireTabs('srcBar',()=>{
   const tab=document.querySelector('#srcBar .tab.active')?.dataset.tab;
   if(tab==='src-gen'){
     if(!tileData){activeSource='gen';srcTiles=null;srcByIndex={};srcEdgeGroups=null;recomputeGen();enableTools();resetCompass();}
     else{activeSource='gen';}
   }
+  updateFolderDropzoneVisibility();
 });
 wireTabs('tBar',()=>{updatePreview();logSession('terrainTab',activeTerrainTab());});
 wireTabs('eBar',()=>{updatePreview();logSession('edgeTab',activeEdgeTab());});
@@ -1233,7 +1427,10 @@ shiftSlider.addEventListener('input',()=>{const v=parseInt(shiftSlider.value);sh
 // ── Drop zones ─────────────────────────────────────────────────────────────────
 function makeDrop(zoneId,inputId,fn){
   const z=document.getElementById(zoneId),inp=document.getElementById(inputId);
+  z.setAttribute('tabindex','0');
+  z.setAttribute('role','button');
   z.addEventListener('click',()=>inp.click());
+  z.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();inp.click();}});
   z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('over');});
   z.addEventListener('dragleave',()=>z.classList.remove('over'));
   z.addEventListener('drop',e=>{e.preventDefault();z.classList.remove('over');fn(e.dataTransfer.files[0]);});
@@ -1488,7 +1685,10 @@ document.getElementById('fiScenarioDir').addEventListener('change',e=>{
 // scenario.json drop zone - file only
 (()=>{
   const dz=document.getElementById('dzScenario');
+  dz.setAttribute('tabindex','0');
+  dz.setAttribute('role','button');
   dz.addEventListener('click',()=>document.getElementById('fiScenario').click());
+  dz.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();document.getElementById('fiScenario').click();}});
   dz.addEventListener('dragover',ev=>ev.preventDefault());
   dz.addEventListener('drop',ev=>{
     ev.preventDefault();dz.classList.remove('over');
@@ -1500,7 +1700,10 @@ document.getElementById('fiScenarioDir').addEventListener('change',e=>{
 (()=>{
   const dz=document.getElementById('dzDir');
   if(!dz)return;
+  dz.setAttribute('tabindex','0');
+  dz.setAttribute('role','button');
   dz.addEventListener('click',()=>document.getElementById('fiScenarioDir').click());
+  dz.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();document.getElementById('fiScenarioDir').click();}});
   dz.addEventListener('dragover',ev=>{ev.preventDefault();dz.classList.add('over');});
   dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
   dz.addEventListener('drop',ev=>{
@@ -1739,10 +1942,16 @@ document.getElementById('btnRandSeed').addEventListener('click',()=>{
     historyCursor=history.length-1;updateUndoButtons();recomputeGen(false);
   }
 });
-document.getElementById('genAdvToggle').addEventListener('click',()=>{
-  const body=document.getElementById('genAdvBody'),chev=document.getElementById('genAdvChev'),open=body.style.display==='none';
-  body.style.display=open?'block':'none';chev.textContent=open?'▼':'▶';
-});
+(()=>{
+  const tog=document.getElementById('genAdvToggle');
+  const toggleAdv=()=>{
+    const body=document.getElementById('genAdvBody'),chev=document.getElementById('genAdvChev'),open=body.style.display==='none';
+    body.style.display=open?'block':'none';chev.textContent=open?'▼':'▶';
+    tog.setAttribute('aria-expanded',open?'true':'false');
+  };
+  tog.addEventListener('click',toggleAdv);
+  tog.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleAdv();}});
+})();
 
 function activeTerrainTab(){const a=document.querySelector('#tBar .tab.active');return a?a.dataset.tab:'ta-simple';}
 function terrainForMapLevel(mv){
@@ -1914,7 +2123,7 @@ function updatePreview(){
   ctx.putImageData(imgData,0,0);
   const used=dist.map((c,i)=>c>0?toEditor(i):null).filter(x=>x!==null);
   const lo=used.length?Math.min(...used):0,hi=used.length?Math.max(...used):0;
-  const modeLabel=showHeat?'heatmap (black=cliff, purple=slope, red=tight, green=open, blue=wide)':showNav?'navigability (green=ok, yellow-green=narrow, blue=slope, red=blocked, amber=high)':showTerrain?'terrain colours':'height colours (dark=low)';
+  const modeLabel=showHeat?'heatmap':showNav?'navigability':showTerrain?'terrain colours':'height colours (dark=low)';
   document.getElementById('previewLabel').textContent=`Editor levels ${lo}-${hi} · ${modeLabel}`;
 
   document.getElementById('sTiles').textContent=(W*H).toLocaleString();
@@ -2011,6 +2220,8 @@ function updateUndoButtons(){
     const entry=history[i],isCurrent=(i===historyCursor),isRedo=(i>historyCursor),isReadOnly=!!entry.readOnly;
     const el=document.createElement('div');
     el.style.padding='3px 8px';
+    el.style.margin='2px 3px';
+    el.style.borderRadius='3px';
     el.style.whiteSpace='nowrap';
     el.style.overflow='hidden';
     el.style.textOverflow='ellipsis';
@@ -2020,13 +2231,17 @@ function updateUndoButtons(){
     el.style.color=isCurrent?'var(--ok)':isRedo?'var(--text3)':'var(--text)';
     el.textContent=(isRedo?'↪ ':'↩ ')+entry.label;
     if(!isCurrent&&!isReadOnly){
+      el.setAttribute('tabindex','0');
+      el.setAttribute('role','button');
       el.title='Click to jump to: '+entry.label;
       el.addEventListener('mouseenter',()=>{el.style.background='var(--bg3)';});
       el.addEventListener('mouseleave',()=>{el.style.background='';});
-      el.addEventListener('click',()=>{
+      const jump=()=>{
         tileData=history[i].data.slice();restoreGenState(history[i].genState);
         historyCursor=i;syncSrc();updatePreview();updateUndoButtons();
-      });
+      };
+      el.addEventListener('click',jump);
+      el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();jump();}});
     }
     list.appendChild(el);
   }
@@ -2342,6 +2557,7 @@ function buildDebugJSON(){
       }:{})},
     landscape:{id:activeLandscape,name:LS_NAMES[activeLandscape]},
     colourScheme:activeScheme,
+    heatScheme:activeHeatScheme,
     terrain:{tab:activeTerrainTab(),defaultValue:document.getElementById('terrainSelect').value,lockToLandscape:document.getElementById('lockLandscape').checked,lowOverride:document.getElementById('lowTerrain').value,highOverride:document.getElementById('highTerrain').value},
     edges:{tab:activeEdgeTab(),globalRemap:document.getElementById('edgeRemap').value,lowRemap:document.getElementById('edgeRemapLow').value,highRemap:document.getElementById('edgeRemapHigh').value,lockToLandscape:document.getElementById('lockEdgeLandscape').checked},
     output:{tileCount:tileData?tileData.length:0,levelRange:tileData?{minEditor:toEditor(Math.min(...tileData)),maxEditor:toEditor(Math.max(...tileData))}:null},
@@ -2488,9 +2704,9 @@ function updateLvlRangeUI(){
   if(levelMax<levelMin)levelMax=levelMin;
   minEl.value=levelMin;maxEl.value=levelMax;
   const eMin=toEditor(levelMin),eMax=toEditor(levelMax);
-  const eMinStr=eMin>=0?String(eMin):('−'+Math.abs(eMin));
+  const eMinStr=eMin>=0?String(eMin):('-'+Math.abs(eMin));
   if(displayEl)displayEl.textContent='editor '+eMinStr+' → '+eMax;
-  if(rvEl)rvEl.textContent=eMinStr+'–'+eMax;
+  if(rvEl)rvEl.textContent=eMinStr+'-'+eMax;
   if(fillEl){
     const pct=100/14;
     fillEl.style.left=(levelMin*pct)+'%';
@@ -2568,6 +2784,9 @@ function updateLvlRangeUI(){
 setActiveLandscape(0,'manual');
 updateTHint();
 applyScheme('default');
+applyHeatScheme('default');
+applyNavScheme('default');
+updateFolderDropzoneVisibility();
 document.getElementById('versionDisplay').textContent='v'+TOOL_VERSION;
 
 // ── UI Theme ──────────────────────────────────────────────────────────────────

@@ -39,14 +39,14 @@ This tool allows you to:
 - **Modes:** Default single terrain, Low/High overrides, or per-level assignment
 - **Edge Remapping:** Batch-convert map edges to specific styles (e.g., Cliffs_Lava, Cliffs_Purple)
 - **Modifications:** Shift entire maps up/down, clamp extremes, or adjust specific level bands
-- **History:** 30-step Undo/Redo and state reset
+- **History:** 50-step Undo/Redo and state reset
 
 ### Analysis and Export
 - Visualise tile, height, navigability and heatmap previews
 - Elevation distribution histogram
 - Real-time stats for total tiles and level ranges
-- Export validated `map.json` and update existing `scenario.json`
-- Backup scenario folders before export
+- Export new or updated `map.json`, update existing `scenario.json` or `header.json` files or even entire scenario folders
+- Export optional backup `*.bak` files 
 - Export an optional `STTC-TT.json` file containing debugging information
 
 ---
@@ -141,6 +141,9 @@ Option: Export `STTC-TT.json` for diagnositc purposes. The following data is cap
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
+ - Keyboard navigation and focus highlights added
+ - Aria screenreader support added 
+ - Heatmap and navigation colour schemes available 
  - Heightmap and UI colour schemes available, custom schemes are saved to the device
  - Rotating a map will now rotate slopes
  - Import entire scenario folders
