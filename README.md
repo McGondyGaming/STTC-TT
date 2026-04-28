@@ -53,26 +53,42 @@ This tool allows you to:
 
 ## Usage
 
-### 0. Download
+### 0. Download or Access
 - If downloading, choose the source code in your preferred format
 - Open `index.html` in your favourite browser (currently only tested in Chrome)
+ - Alternatively, navigate to https://mcgondygaming.github.io/STTC-TT/ 
 
 ### 1. Select a Source
 - Drop or load a heightmap image *or* an existing `map.json` or scenario folder *or* generate a new layout
-- Optionally load a `scenario.json` to sync the `LandscapeId`.
+- If loading a `map.json`, optionally load a:
+ - `scenario.json` to sync the `LandscapeId` ("biome").
+ - `header.json` to sync the DLC requirements
 
-### 2. Adjust Terrain
-- Select the landscape type and configure terrain behavior (Default, Overrides, or Per-Level mapping).
+### 2. Adjust Terrain and Edges
+- Select the landscape type and configure terrain and edges (Default, Overrides, or Per-Level mapping).
 
-### 3. Modify Levels
+### 3. Modify Orientation
+- Rotate or Flip the entire terrain
+  - Does not include Units, Decor or Triggers (yet)
+
+### 4. Use Level Tools
 - Use level tools to shift elevation, clamp extremes, or refine specific bands.
 
-### 4. Export
+### 5. Settings
+- Adjust UI and Preview colour schemes
+
+### 6. History
+- Navigable history list
+  - Click on the point you would like to return to
+  - Taking an action wipes the previous history
+
+### 7. Export
+- Export the current heightmap as `heightmap.png`
 - Preview the JSON and export your files to the scenario folder.
-  - Optionally export backup files
-  - Optionally export as .zip file
-  - Optionally export STTC-TT.json debug file
-  - Optional downloads will likely prompt to Allow download of multiple files
+  - Optionally export backup `*.bak` files
+  - Optionally export all as `*.zip` file
+  - Optionally export `STTC-TT.json` debug file
+  - Multiple downloads will likely prompt to "Allow download of multiple files"
 
 **Default scenario path:**
 `%USERPROFILE%\Documents\My Games\Starship Troopers\Scenarios`
@@ -81,7 +97,7 @@ This tool allows you to:
 
 ## Exported Data Format
 
-Option: Export `STTC-TT.json` for diagnositc purposes. The following data is captured:
+### Option: Export `STTC-TT.json` for diagnositc purposes. The following data is captured:
  - STTC-TT version
  - Source
  - Generation data (if used)
@@ -89,6 +105,14 @@ Option: Export `STTC-TT.json` for diagnositc purposes. The following data is cap
  - Level ranges
  - Undo depth and history
  - Map orientation state and changes
+
+### Option: Export `*.bak` files 
+ - Snapshot of previous `*.json` files 
+
+### Heightmap
+- Current preview exported as `heightmap.png`
+- Greyscale
+- 128 x 128 pixels
 
 ### map.json
 ```json
@@ -105,12 +129,14 @@ Option: Export `STTC-TT.json` for diagnositc purposes. The following data is cap
   ]
 ...}
 ```
+
 ### scenario.json
 ```json
 {...
   "LandscapeId": 0
 ...}
 ```
+
 ### header.json
 ```json
 {...
@@ -122,6 +148,7 @@ Option: Export `STTC-TT.json` for diagnositc purposes. The following data is cap
 }
 ```
 
+---
 
 ### Notes:
  - Internal level range is 0-14 (mapped to editor levels -1 to 13)
@@ -130,22 +157,22 @@ Option: Export `STTC-TT.json` for diagnositc purposes. The following data is cap
 
 ### Limitations:
  - Fixed map resolution: 128x128 only
- - No in-engine validation: Load your map to verify/clean up
+ - No in-engine validation - Load your map in the scenario editor to verify/clean up
  - Browser-based: no file system integration beyond uploads/downloads
- - Tested in Chrome, future builds will be tested in a few browsers (e.g. Firefox, Edge)
+ - Tested in Chrome, future builds will be tested in multiple browsers (e.g. Firefox, Edge)
 
 ## Known Issues:
-- Rotating a map will not rotate slopes
 - Outside corner edges may not be generated
 - All image imported maps default to desert biome 
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
- - Fixed `scenario.json` showing unsaved changes immediately after loading a map
+ - Greyscale heightmap export added
+ - Fixed `scenario.json` showing outlined export (unsaved changes) immediately after loading a map
  - Loading a map now appears in the undo history, so you can undo all the way back to the original loaded state
  - Exporting a single file no longer disables the export button if you cancel the save dialog
  - Decors are now preserved when exporting `map.json`
- - Improved exported `map.json` formatting
+ - Improved exported `*.json` formatting
  - Keyboard navigation and focus highlights added
  - Aria screenreader support added 
  - Heatmap and navigation colour schemes available 
