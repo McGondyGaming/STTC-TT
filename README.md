@@ -59,10 +59,11 @@ This tool allows you to:
  - Alternatively, navigate to https://mcgondygaming.github.io/STTC-TT/ 
 
 ### 1. Select a Source
-- Drop or load a heightmap image *or* an existing `map.json` or scenario folder *or* generate a new layout
+- Drop or load a heightmap image *or* an existing `map.json` *or* scenario folder *or* generate a new layout
 - If loading a `map.json`, optionally load a:
  - `scenario.json` to sync the `LandscapeId` ("biome").
  - `header.json` to sync the DLC requirements
+ - `text_<language>.csv` to display scenario title - slected language based on browser settings, fallback to english -> any available -> null
 
 ### 2. Adjust Terrain and Edges
 - Select the landscape type and configure terrain and edges (Default, Overrides, or Per-Level mapping).
@@ -178,7 +179,7 @@ This tool allows you to:
  - Heatmap and navigation colour schemes available 
  - Heightmap and UI colour schemes available, custom schemes are saved to the device
  - Rotating a map will now rotate slopes
- - Import entire scenario folders
+ - Import entire scenario folders (`map.json`, `scenario.json`, `header.json`, `text_<language>.csv` - language based on browser settings, fallback to english -> any available -> null)
  - Export multiple files as zip 
  - Generator level limiter added
  - Preview mode selector now separate buttons

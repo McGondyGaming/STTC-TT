@@ -1200,7 +1200,7 @@ let scenarioName=null,dirName=null,dlcHistory=[],sessionLog=[];
 // snapMap / snapScenario / snapHeader are kept but only called at load time and
 // on export to produce the .bak copy - never called from updateExportUI.
 let _snapMap=null,_snapScenario=null,_snapHeader=null;
-let _dirtyMap=false,_dirtyScenario=false,_dirtyHeader=false;
+let _dirtyMap=false,_dirtyScenario=false,_dirtyHeader=false,_dirtyHeightmap=false;
 
 function snapMap(){return tileData?JSON.stringify(buildTiles()):null;}
 
@@ -1211,6 +1211,7 @@ function snapScenario(){if(!scenarioData)return null;const s={...scenarioData,La
 function snapHeader(){return headerData?JSON.stringify(headerData):null;}
 
 function markMapDirty(){_dirtyMap=true;}
+function markHeightmapDirty(){_dirtyHeightmap=true;}
 function markScenarioDirty(){_dirtyScenario=true;}
 function markHeaderDirty(){_dirtyHeader=true;}
 
@@ -1228,6 +1229,12 @@ function updateExportUI(){
   const stMap=document.getElementById('statusMap');
   const stScen=document.getElementById('statusScenario');
   const stHdr=document.getElementById('statusHeader');
+
+  // heightmap.png row
+  const rowHm=document.getElementById('exportRowHeightmap');
+  const stHm=document.getElementById('statusHeightmap');
+  if(rowHm)rowHm.classList.toggle('dirty',!!_dirtyHeightmap&&hasMap);
+  if(stHm)stHm.textContent=hasMap?(_dirtyHeightmap?'unsaved changes':'128×128 greyscale · re-importable'):'128×128 greyscale · re-importable';
 
   // map.json row
   document.getElementById('btnExportMap').disabled=!hasMap;
@@ -2350,7 +2357,7 @@ function updateUndoButtons(){
 }
 function syncSrc(){
   if(srcTiles)srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)t.Level=tileData[t.Index];});
-  markMapDirty();
+  markMapDirty();markHeightmapDirty();
 }
 function toolMsg(txt){const m=document.getElementById('msgTool');m.textContent=txt;m.className='msg ok';setTimeout(()=>{if(m.textContent===txt)m.textContent='';},4000);}
 
@@ -2492,7 +2499,7 @@ function enableTools(){
   // since the tile data has never been exported.
   if(_snapMap===null){
     _snapMap=snapMap();
-    if(activeSource!=='map')_dirtyMap=true;
+    if(activeSource!=='map'){_dirtyMap=true;_dirtyHeightmap=true;}
   }
   updateExportUI();
 }
@@ -2702,7 +2709,7 @@ function exportHeightmapPNG(){
 }
 
 document.getElementById('btnExportHeightmap').addEventListener('click',()=>{
-  if(exportHeightmapPNG())exportMsg(['heightmap.png']);
+  if(exportHeightmapPNG()){_dirtyHeightmap=false;exportMsg(['heightmap.png']);}
 });
 
 function buildDebugJSON(){
