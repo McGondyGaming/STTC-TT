@@ -4,7 +4,7 @@ A living document for tracking ideas, improvements, and future direction for the
 
 ---
 
-## Current Focus
+### Current Focus
 
 - [ ] Bugfixes
 - [ ] Selections in preview
@@ -12,13 +12,12 @@ A living document for tracking ideas, improvements, and future direction for the
 
 ---
 
-## Ideas
+### Import
 
-- [ ] OpenStreetMap/MapBox import to correct scale
+- [ ] OpenTopography import at correct scale (128 tiles/pixels ≈ 290m) or 2.3m/pixel
 
 ### Exports
 
-- [ ] Export greyscale heightmap
 - [ ] Allow selecting export directory
 - [ ] Add confirmation or diff view before export if overwiting
 
@@ -26,12 +25,11 @@ A living document for tracking ideas, improvements, and future direction for the
 
 - [ ] Tip of the day in preview dead space
 - [ ] Selection in preview (box, flood level contiguous, flood all contiguous)
+- [ ] Keyboard driven preview cursor
 - [ ] Keyboard driven preview selections
 - [ ] Navigability highlight level/all contigious area
 - [ ] Terrain traversability preview (including blocking decors) overlay
 - [ ] Level -1 render as water preview overlay
-    
-### Generation
 
 ### Scenario integration 
 
@@ -54,6 +52,7 @@ A living document for tracking ideas, improvements, and future direction for the
 
 Completed items
 
+- [x] Export greyscale heightmap
 - [x] Keyboard menu navigation
 - [x] Screenread support added
 - [x] Custom UI and preview colour scheme support added

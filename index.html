@@ -626,6 +626,10 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <div class="export-box">
     <div class="export-title">Export</div>
     <div class="note" style="margin-bottom:10px;">Buttons are highlighted when the file has unsaved changes. Individual files export directly; ZIP bundles everything into one download.</div>
+    <div class="export-file-row" id="exportRowHeightmap">
+      <div class="export-file-info"><span class="export-file-name">heightmap.png</span><span class="export-file-status" id="statusHeightmap">128×128 greyscale · re-importable</span></div>
+      <button class="sm" id="btnExportHeightmap" disabled>↓ Export</button>
+    </div>
     <div class="export-file-row" id="exportRowMap">
       <div class="export-file-info"><span class="export-file-name">map.json</span><span class="export-file-status" id="statusMap"></span></div>
       <button class="sm" id="btnExportMap" disabled>↓ Export</button>
@@ -712,7 +716,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 </div><!-- end layout -->
 </main>
 <script>
-const TOOL_VERSION='1.10';
+const TOOL_VERSION='1.11';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // COLOUR HELPERS - all colours in this file use hex strings for easy VS Code editing
@@ -2481,7 +2485,7 @@ function buildTiles(){
   return result;
 }
 function enableTools(){
-  ['btnShiftAll','btnClamp','btnBand','btnPreview','btnReset','btnRot90CW','btnRot90CCW','btnFlipH','btnFlipV']
+  ['btnShiftAll','btnClamp','btnBand','btnPreview','btnReset','btnRot90CW','btnRot90CCW','btnFlipH','btnFlipV','btnExportHeightmap']
     .forEach(id=>document.getElementById(id).disabled=false);
   // Take a fresh map snapshot on first load so .bak export works correctly.
   // For map.json loads the snap is already set; for image/gen sources mark dirty
@@ -2648,6 +2652,59 @@ function exportHeader(){
   dlWithBackup('header.json',json,_snapHeader);
   return true;
 }
+// ── Greyscale heightmap PNG export ────────────────────────────────────────────
+// Maps each map level (0-14) to its evenly-spaced greyscale value.
+// These 15 values are mathematically spaced so they re-import cleanly
+// with quantization steps = 15.
+const GREY_FOR_MAP_LEVEL=[0,18,36,54,73,91,109,128,146,164,182,201,219,237,255];
+
+function exportHeightmapPNG(){
+  if(!tileData)return false;
+  const canvas=document.createElement('canvas');
+  canvas.width=W;canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  const imgData=ctx.createImageData(W,H);
+  for(let i=0;i<W*H;i++){
+    const mv=Math.max(0,Math.min(MAX_LEVEL,tileData[i]));
+    const g=GREY_FOR_MAP_LEVEL[mv];
+    // Flip vertically: tile row 0 = game bottom, canvas row 0 = top
+    const gameRow=Math.floor(i/W),col=i%W,canvasRow=H-1-gameRow;
+    const ci=(canvasRow*W+col)*4;
+    imgData.data[ci]=g;imgData.data[ci+1]=g;imgData.data[ci+2]=g;imgData.data[ci+3]=255;
+  }
+  ctx.putImageData(imgData,0,0);
+  // Optional .bak PNG from stored map snapshot
+  if(document.getElementById('chkBackup')?.checked&&_snapMap){
+    try{
+      const snapData=JSON.parse(_snapMap);
+      const bakCanvas=document.createElement('canvas');bakCanvas.width=W;bakCanvas.height=H;
+      const bakCtx=bakCanvas.getContext('2d');
+      const bakImg=bakCtx.createImageData(W,H);
+      const lvMap=new Int16Array(W*H);
+      if(Array.isArray(snapData.Tiles))snapData.Tiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)lvMap[t.Index]=Math.max(0,Math.min(MAX_LEVEL,t.Level));});
+      for(let i=0;i<W*H;i++){
+        const mv=lvMap[i],g=GREY_FOR_MAP_LEVEL[mv];
+        const gameRow=Math.floor(i/W),col=i%W,canvasRow=H-1-gameRow,ci=(canvasRow*W+col)*4;
+        bakImg.data[ci]=g;bakImg.data[ci+1]=g;bakImg.data[ci+2]=g;bakImg.data[ci+3]=255;
+      }
+      bakCtx.putImageData(bakImg,0,0);
+      bakCanvas.toBlob(blob=>{
+        const url=URL.createObjectURL(blob),a=document.createElement('a');
+        a.href=url;a.download='heightmap.bak.png';a.click();URL.revokeObjectURL(url);
+      },'image/png');
+    }catch(e){/* skip bak on parse error */}
+  }
+  canvas.toBlob(blob=>{
+    const url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download='heightmap.png';a.click();URL.revokeObjectURL(url);
+  },'image/png');
+  return true;
+}
+
+document.getElementById('btnExportHeightmap').addEventListener('click',()=>{
+  if(exportHeightmapPNG())exportMsg(['heightmap.png']);
+});
+
 function buildDebugJSON(){
   return JSON.stringify({
     exportedAt:new Date().toISOString(),
