@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="sttc-tt-version" content="1.12">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
 <title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
@@ -760,7 +761,8 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 </div><!-- end layout -->
 </main>
 <script>
-const TOOL_VERSION='1.11';
+// ── Version ────────────────────────────────────────────────────────────────────
+const TOOL_VERSION=document.querySelector('meta[name="sttc-tt-version"]')?.content??'unknown';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // COLOUR HELPERS - all colours in this file use hex strings for easy VS Code editing
