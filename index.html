@@ -2959,8 +2959,9 @@ document.getElementById('edgeRemap').addEventListener('change',updateTHint);
     if(moved){
       e.preventDefault();
       moveXhair(kbCol,kbRow);
+      showInspector(kbCol,kbRow);
       // Update aria-label on canvas to reflect current position
-      cvEl.setAttribute('aria-label',`Terrain preview. Tile ${kbCol}, ${kbRow}. Press Enter or Space to inspect. Arrow keys to move, Shift+Arrow for larger steps.`);
+      cvEl.setAttribute('aria-label',`Terrain preview. Tile ${kbCol}, ${kbRow}. Arrow keys to move, Shift+Arrow for larger steps.`);
     }
   });
 })();
