@@ -168,6 +168,9 @@ This tool allows you to:
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
+ - Keyboard navigation of preview (arrows move selector, shift+arrow move 5x, space/enter selects current tile)
+ - Close tile inspector using `X` at section
+ - Preview pane is scrollable
  - Greyscale heightmap export added
  - Fixed `scenario.json` showing outlined export (unsaved changes) immediately after loading a map
  - Loading a map now appears in the undo history, so you can undo all the way back to the original loaded state

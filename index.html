@@ -70,7 +70,7 @@ h1{font-size:17px;font-weight:600;margin-bottom:3px;}
 .subtitle{font-size:11px;color:var(--text3);margin-bottom:18px;}
 .layout{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;}
 .left-col{display:flex;flex-direction:column;gap:12px;}
-.right-col{position:sticky;top:20px;}
+.right-col{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;border-radius:10px;}
 .section{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
 .sh{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;cursor:pointer;user-select:none;gap:8px;}
 .sh:hover{background:var(--bg2);}
@@ -676,7 +676,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <button class="scheme-btn" data-mode="heatmap">Heatmap</button>
       </div>
       <div class="preview-canvas-wrap" style="position:relative;" id="previewWrap">
-        <canvas id="cvPreview" width="128" height="128"></canvas>
+        <canvas id="cvPreview" width="128" height="128" tabindex="0" role="application" aria-label="Terrain preview. Use arrow keys to move selection, Enter or Space to inspect tile."></canvas>
         <div id="orientOverlay" style="display:none;position:absolute;inset:0;pointer-events:none;">
           <div style="position:absolute;top:2px;left:2px;background:rgba(0,0,0,0.65);color:#e65100;font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">N</div>
           <div style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">E</div>
@@ -693,9 +693,12 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
           <span style="font-size:11px;font-weight:700;min-width:24px;text-align:right;color:var(--text);" id="heatScaleOut">14</span>
         </div>
       </div>
-      <div class="insp-wrap" id="inspWrap">
-        <div class="insp-hdr">Tile inspector</div>
-        <div id="inspRows"><div class="insp-empty">Click any tile to inspect</div></div>
+      <div class="insp-wrap" id="inspWrap" role="region" aria-label="Tile inspector" aria-expanded="false">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+          <div class="insp-hdr" style="margin-bottom:0;" id="inspHdr">Tile inspector</div>
+          <button id="btnDismissInsp" class="sm" title="Dismiss inspector" aria-label="Dismiss tile inspector" style="padding:1px 6px;font-size:11px;line-height:1.6;display:none;">✕</button>
+        </div>
+        <div id="inspRows" aria-live="polite" aria-atomic="true" aria-labelledby="inspHdr"><div class="insp-empty">Click any tile to inspect</div></div>
         <div class="insp-hint" id="inspHint" style="display:none;"></div>
       </div>
       <div style="margin-top:10px;">
@@ -2837,6 +2840,20 @@ document.getElementById('edgeRemap').addEventListener('change',updateTHint);
     return nbrs.some(n=>n>lv)?2:0;
   }
   function mkRow(key,val){return`<div class="insp-row"><span class="insp-key">${key}</span><span class="insp-val">${val}</span></div>`;}
+  const dismissBtn=document.getElementById('btnDismissInsp');
+  const inspWrap=document.getElementById('inspWrap');
+  // Track current keyboard cursor position (canvas tile coords)
+  let kbCol=0,kbRow=0;
+  function dismissInspector(){
+    rowsEl.innerHTML='<div class="insp-empty">Click any tile to inspect</div>';
+    hintEl.style.display='none';
+    xhair.style.display='none';
+    if(dismissBtn)dismissBtn.style.display='none';
+    if(inspWrap)inspWrap.setAttribute('aria-expanded','false');
+    // Return focus to canvas so keyboard users can continue navigating
+    cvEl.focus();
+  }
+  if(dismissBtn)dismissBtn.addEventListener('click',dismissInspector);
   function showInspector(canvasCol,canvasRow){
     if(!tileData)return;
     const gameRow=H-1-canvasRow,gameCol=canvasCol;
@@ -2847,11 +2864,13 @@ document.getElementById('edgeRemap').addEventListener('change',updateTHint);
     const isCliffBase=type===2,edgeId=isCliffBase?edgeIdForTile(idx,mv):null;
     const edgeName=edgeId!==null?(EDGE_NAMES[edgeId]||`id ${edgeId}`):'-';
     const nav=navInfo(mv,type),lvcol=LV_COL[mv];
-    const swatch=`<span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${lvcol};border:1px solid rgba(128,128,128,.3);vertical-align:middle;margin-right:3px;"></span>`;
+    const swatch=`<span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${lvcol};border:1px solid rgba(128,128,128,.3);vertical-align:middle;margin-right:3px;" aria-hidden="true"></span>`;
     const typeLabel={0:'0 - flat',1:'1 - slope (navigable)',2:'2 - cliff base (non-navigable)'}[type]??type;
-    const navBadge=`<span class="nav-badge ${nav.cls}">${nav.label}</span>`;
+    const navBadge=`<span class="nav-badge ${nav.cls}" aria-label="Navigability: ${nav.label}">${nav.label}</span>`;
     rowsEl.innerHTML=mkRow('Index',idx)+mkRow('Grid (col, row)',`${gameCol}, ${gameRow}`)+mkRow('Map / Editor lv',`${mv} / ${ev}`)+mkRow('Level colour',swatch+lvcol)+mkRow('TerrainTypeId',`${tid}${terrainDef?` - ${terrainDef.name}`:''}`)+mkRow('Terrain group',terrainDef?terrainDef.group:'?')+mkRow('Tile type',typeLabel)+mkRow('Edge family',isCliffBase?`${edgeName} (id ${edgeId})`:'- (non-cliff)')+mkRow('Navigability',navBadge);
     hintEl.textContent=nav.hint;hintEl.style.display='block';
+    if(dismissBtn)dismissBtn.style.display='inline-block';
+    if(inspWrap)inspWrap.setAttribute('aria-expanded','true');
   }
   function tileCoords(e){
     const rect=cvEl.getBoundingClientRect();
@@ -2863,9 +2882,36 @@ document.getElementById('edgeRemap').addEventListener('change',updateTHint);
     xhair.style.width=Math.max(2,tw)+'px';xhair.style.height=Math.max(2,th)+'px';
   }
   cvEl.style.cursor='crosshair';
+  // Add focus ring style for keyboard users
+  cvEl.addEventListener('focus',()=>{cvEl.style.outline='2px solid var(--accent)';cvEl.style.outlineOffset='2px';});
+  cvEl.addEventListener('blur',()=>{cvEl.style.outline='none';});
   cvEl.addEventListener('click',e=>{
     if(!tileData)return;const{col,row}=tileCoords(e);
-    if(col<0||col>=W||row<0||row>=H)return;moveXhair(col,row);showInspector(col,row);
+    if(col<0||col>=W||row<0||row>=H)return;
+    kbCol=col;kbRow=row;
+    moveXhair(col,row);showInspector(col,row);
+  });
+  // Keyboard navigation: arrow keys move crosshair, Enter/Space inspects
+  cvEl.addEventListener('keydown',e=>{
+    if(!tileData)return;
+    const STEP=e.shiftKey?5:1;
+    let moved=false;
+    if(e.key==='ArrowLeft'){kbCol=Math.max(0,kbCol-STEP);moved=true;}
+    else if(e.key==='ArrowRight'){kbCol=Math.min(W-1,kbCol+STEP);moved=true;}
+    else if(e.key==='ArrowUp'){kbRow=Math.max(0,kbRow-STEP);moved=true;}
+    else if(e.key==='ArrowDown'){kbRow=Math.min(H-1,kbRow+STEP);moved=true;}
+    else if(e.key==='Enter'||e.key===' '){
+      e.preventDefault();
+      moveXhair(kbCol,kbRow);showInspector(kbCol,kbRow);
+      return;
+    }
+    else if(e.key==='Escape'){dismissInspector();return;}
+    if(moved){
+      e.preventDefault();
+      moveXhair(kbCol,kbRow);
+      // Update aria-label on canvas to reflect current position
+      cvEl.setAttribute('aria-label',`Terrain preview. Tile ${kbCol}, ${kbRow}. Press Enter or Space to inspect. Arrow keys to move, Shift+Arrow for larger steps.`);
+    }
   });
 })();
 
