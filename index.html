@@ -211,6 +211,9 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 .dual-range-wrap input[type=range]::-webkit-slider-thumb{pointer-events:all;appearance:none;-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid var(--bg3);cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.4);margin-top:-5px;position:relative;z-index:2;}
 .dual-range-wrap input[type=range]::-moz-range-thumb{pointer-events:all;width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid var(--bg3);cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.4);}
 .lvl-range-hint{font-size:10px;color:var(--text3);margin-top:4px;line-height:1.4;padding:4px 6px;background:var(--bg2);border-radius:4px;}
+.keybind-btn{min-width:36px;font-family:monospace;font-size:12px;font-weight:700;letter-spacing:.03em;}
+.keybind-btn.capturing{background:color-mix(in srgb,var(--warn) 18%,var(--bg3));border-color:var(--warn);color:var(--warn);animation:kb-pulse 0.9s ease-in-out infinite;}
+@keyframes kb-pulse{0%,100%{opacity:1;}50%{opacity:.55;}}
 </style>
 </head>
 <body>
@@ -606,6 +609,44 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
           </div>
           <canvas id="heatStripCanvas" class="scheme-preview-strip" width="280" height="14"></canvas>
         </div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px;">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">Preview cursor controls</div>
+        <div class="note" style="margin-bottom:8px;">Arrow keys always move the crosshair. WASD keys below are rebindable - click a button then press any key.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" id="keybindGrid">
+          <div style="background:var(--bg2);border-radius:7px;padding:9px 11px;">
+            <div style="font-size:10px;font-weight:700;color:var(--text3);margin-bottom:7px;text-transform:uppercase;letter-spacing:.05em;">Move left</div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:10px;color:var(--text3);">Always: ←</span>
+              <button class="sm keybind-btn" id="kb-left" data-dir="left" title="Click to rebind">A</button>
+            </div>
+          </div>
+          <div style="background:var(--bg2);border-radius:7px;padding:9px 11px;">
+            <div style="font-size:10px;font-weight:700;color:var(--text3);margin-bottom:7px;text-transform:uppercase;letter-spacing:.05em;">Move right</div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:10px;color:var(--text3);">Always: →</span>
+              <button class="sm keybind-btn" id="kb-right" data-dir="right" title="Click to rebind">D</button>
+            </div>
+          </div>
+          <div style="background:var(--bg2);border-radius:7px;padding:9px 11px;">
+            <div style="font-size:10px;font-weight:700;color:var(--text3);margin-bottom:7px;text-transform:uppercase;letter-spacing:.05em;">Move up</div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:10px;color:var(--text3);">Always: ↑</span>
+              <button class="sm keybind-btn" id="kb-up" data-dir="up" title="Click to rebind">W</button>
+            </div>
+          </div>
+          <div style="background:var(--bg2);border-radius:7px;padding:9px 11px;">
+            <div style="font-size:10px;font-weight:700;color:var(--text3);margin-bottom:7px;text-transform:uppercase;letter-spacing:.05em;">Move down</div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:10px;color:var(--text3);">Always: ↓</span>
+              <button class="sm keybind-btn" id="kb-down" data-dir="down" title="Click to rebind">S</button>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:right;margin-top:6px;">
+          <button class="sm" id="btnResetKeybinds" title="Reset to WASD defaults">↺ Reset to WASD</button>
+        </div>
+        <div class="msg" id="msgKeybind" style="margin-top:4px;"></div>
       </div>
     </div>
   </div>
@@ -2891,15 +2932,22 @@ document.getElementById('edgeRemap').addEventListener('change',updateTHint);
     kbCol=col;kbRow=row;
     moveXhair(col,row);showInspector(col,row);
   });
-  // Keyboard navigation: arrow keys move crosshair, Enter/Space inspects
+  // Keyboard navigation: arrow keys always move crosshair; WASD (rebindable) also move it.
   cvEl.addEventListener('keydown',e=>{
     if(!tileData)return;
+    // Ignore keypresses during keybind capture so they don't move the cursor
+    if(kbCapturing)return;
     const STEP=e.shiftKey?5:1;
     let moved=false;
-    if(e.key==='ArrowLeft'){kbCol=Math.max(0,kbCol-STEP);moved=true;}
-    else if(e.key==='ArrowRight'){kbCol=Math.min(W-1,kbCol+STEP);moved=true;}
-    else if(e.key==='ArrowUp'){kbRow=Math.max(0,kbRow-STEP);moved=true;}
-    else if(e.key==='ArrowDown'){kbRow=Math.min(H-1,kbRow+STEP);moved=true;}
+    const k=e.key.length===1?e.key.toLowerCase():e.key;
+    const isLeft  =e.key==='ArrowLeft'  ||k===kbBindings.left;
+    const isRight =e.key==='ArrowRight' ||k===kbBindings.right;
+    const isUp    =e.key==='ArrowUp'    ||k===kbBindings.up;
+    const isDown  =e.key==='ArrowDown'  ||k===kbBindings.down;
+    if(isLeft){kbCol=Math.max(0,kbCol-STEP);moved=true;}
+    else if(isRight){kbCol=Math.min(W-1,kbCol+STEP);moved=true;}
+    else if(isUp){kbRow=Math.max(0,kbRow-STEP);moved=true;}
+    else if(isDown){kbRow=Math.min(H-1,kbRow+STEP);moved=true;}
     else if(e.key==='Enter'||e.key===' '){
       e.preventDefault();
       moveXhair(kbCol,kbRow);showInspector(kbCol,kbRow);
@@ -3001,6 +3049,93 @@ function updateLvlRangeUI(){
   }
 })();
 
+// ── Preview cursor keybindings ─────────────────────────────────────────────────
+// Arrow keys are always active. WASD (or user-defined) keys are rebindable.
+// Keys stored as e.key values (e.g. 'a', 'w', 's', 'd').
+const KB_DEFAULTS={left:'a',right:'d',up:'w',down:'s'};
+let kbBindings={...KB_DEFAULTS};
+let kbCapturing=null; // dir string or null
+
+function loadKbBindings(){
+  try{
+    const saved=localStorage.getItem('sttctt-keybindings');
+    if(saved)kbBindings={...KB_DEFAULTS,...JSON.parse(saved)};
+  }catch(e){}
+  // Sync button labels
+  ['left','right','up','down'].forEach(dir=>{
+    const btn=document.getElementById('kb-'+dir);
+    if(btn)btn.textContent=kbBindings[dir].toUpperCase();
+  });
+}
+
+function saveKbBindings(){
+  try{localStorage.setItem('sttctt-keybindings',JSON.stringify(kbBindings));}catch(e){}
+}
+
+function cancelKbCapture(){
+  if(!kbCapturing)return;
+  const btn=document.getElementById('kb-'+kbCapturing);
+  if(btn){btn.classList.remove('capturing');btn.textContent=kbBindings[kbCapturing].toUpperCase();}
+  kbCapturing=null;
+}
+
+// Global keydown during capture - attached to document so it works even if
+// focus moves away from the button after click.
+document.addEventListener('keydown',e=>{
+  if(!kbCapturing)return;
+  // Reject modifier-only keys and Escape (Escape cancels)
+  if(e.key==='Escape'){cancelKbCapture();const m=document.getElementById('msgKeybind');if(m){m.textContent='Cancelled.';m.className='msg';setTimeout(()=>{if(m.textContent==='Cancelled.')m.textContent='';},2000);}return;}
+  if(['Shift','Control','Alt','Meta','Tab'].includes(e.key))return;
+  e.preventDefault();
+  e.stopPropagation();
+  const newKey=e.key.length===1?e.key.toLowerCase():e.key;
+  // Check for conflicts with other bindings
+  const conflict=Object.entries(kbBindings).find(([d,k])=>d!==kbCapturing&&k===newKey);
+  const dir=kbCapturing;
+  if(conflict){
+    // Swap: give the conflicting binding the old key
+    const oldKey=kbBindings[dir];
+    kbBindings[conflict[0]]=oldKey;
+    const otherBtn=document.getElementById('kb-'+conflict[0]);
+    if(otherBtn)otherBtn.textContent=oldKey.toUpperCase();
+  }
+  kbBindings[dir]=newKey;
+  const btn=document.getElementById('kb-'+dir);
+  if(btn){btn.classList.remove('capturing');btn.textContent=newKey.toUpperCase();}
+  kbCapturing=null;
+  saveKbBindings();
+  const m=document.getElementById('msgKeybind');
+  if(m){m.textContent=`${dir.charAt(0).toUpperCase()+dir.slice(1)} bound to "${newKey.toUpperCase()}"${conflict?` (swapped with ${conflict[0]})`:''}`;m.className='msg ok';setTimeout(()=>{if(m.className==='msg ok')m.textContent='';},3000);}
+  logSession('keybind',{dir,key:newKey});
+},true);
+
+// Wire keybind buttons
+document.querySelectorAll('.keybind-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const dir=btn.dataset.dir;
+    if(kbCapturing===dir){cancelKbCapture();return;}
+    cancelKbCapture();
+    kbCapturing=dir;
+    btn.classList.add('capturing');
+    btn.textContent='…';
+    const m=document.getElementById('msgKeybind');
+    if(m){m.textContent=`Press any key to bind "${dir}"… (Escape to cancel)`;m.className='msg';}
+  });
+});
+
+document.getElementById('btnResetKeybinds')?.addEventListener('click',()=>{
+  cancelKbCapture();
+  kbBindings={...KB_DEFAULTS};
+  saveKbBindings();
+  ['left','right','up','down'].forEach(dir=>{
+    const btn=document.getElementById('kb-'+dir);
+    if(btn)btn.textContent=kbBindings[dir].toUpperCase();
+  });
+  const m=document.getElementById('msgKeybind');
+  if(m){m.textContent='Reset to WASD.';m.className='msg ok';setTimeout(()=>{if(m.textContent==='Reset to WASD.')m.textContent='';},2000);}
+  logSession('keybind','reset');
+});
+
 // ── Init ───────────────────────────────────────────────────────────────────────
 setActiveLandscape(0,'auto');
 updateTHint();
@@ -3008,6 +3143,7 @@ applyScheme('default');
 applyHeatScheme('default');
 applyNavScheme('default');
 updateFolderDropzoneVisibility();
+loadKbBindings();
 document.getElementById('versionDisplay').textContent='v'+TOOL_VERSION;
 
 // ── UI Theme ──────────────────────────────────────────────────────────────────
