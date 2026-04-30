@@ -1897,7 +1897,7 @@ function recompute(){
   const lo2=Math.min(lo,hi),hi2=Math.max(lo,hi);
   tileData=new Int16Array(W*H);
   for(let i=0;i<W*H;i++)tileData[i]=quantize(imgGray[i],q,lo2,hi2);
-  origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];updateUndoButtons();updatePreview();
+  origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];updateUndoButtons();invalidateHeatCache();updatePreview();
 }
 
 // ── Noise generator ────────────────────────────────────────────────────────────
@@ -2001,7 +2001,7 @@ function recomputeGen(commitUndo=false){
   document.getElementById('srcBadge').textContent='Generated';
   document.getElementById('msgGen').textContent=`Seed: ${seed} · ${type}`;
   document.getElementById('msgGen').className='msg ok';
-  activeSource='gen';updatePreview();enableTools();resetCompass();
+  activeSource='gen';invalidateHeatCache();updatePreview();enableTools();resetCompass();
 }
 
 // ── Generator slider wiring ────────────────────────────────────────────────────
@@ -2164,6 +2164,7 @@ function heatmapColour(r,isSlope){
   return[Math.round(s0[0]+(s1[0]-s0[0])*f),Math.round(s0[1]+(s1[1]-s0[1])*f),Math.round(s0[2]+(s1[2]-s0[2])*f)];
 }
 function invalidateHeatCache(){_heatCache=null;_heatCacheStamp=null;}
+function getCachedHeat(){if(!_heatCache){_heatCache=computeNavRadius();}return _heatCache;}
 
 // ── Preview render ─────────────────────────────────────────────────────────────
 function updateSectionBadges(){
@@ -2209,11 +2210,10 @@ function updatePreview(){
   if(!tileData)return;
   updateSectionBadges();
   updateExportUI();
-  invalidateHeatCache();
   const canvas=document.getElementById('cvPreview'),ctx=canvas.getContext('2d'),imgData=ctx.createImageData(W,H);
   const dist=new Array(MAX_LEVEL+1).fill(0);
   const showTerrain=previewMode==='terrain',showNav=previewMode==='nav',showHeat=previewMode==='heatmap';
-  const heat=showHeat?computeNavRadius():null;
+  const heat=showHeat?getCachedHeat():null;
   const NAV_WATER=hexToRgb(NAV_HEX.water),NAV_CLIFF=hexToRgb(NAV_HEX.cliff),NAV_SLOPE=hexToRgb(NAV_HEX.slope);
   const NAV_HIGH=hexToRgb(NAV_HEX.high),NAV_NARROW=hexToRgb(NAV_HEX.narrow),NAV_OK=hexToRgb(NAV_HEX.ok);
 
@@ -2403,7 +2403,7 @@ function updateUndoButtons(){
 }
 function syncSrc(){
   if(srcTiles)srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)t.Level=tileData[t.Index];});
-  markMapDirty();markHeightmapDirty();
+  markMapDirty();markHeightmapDirty();invalidateHeatCache();
 }
 function toolMsg(txt){const m=document.getElementById('msgTool');m.textContent=txt;m.className='msg ok';setTimeout(()=>{if(m.textContent===txt)m.textContent='';},4000);}
 
