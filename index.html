@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="sttc-tt-version" content="1.13-beta12">
+<meta name="sttc-tt-version" content="1.13-beta14">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
 <title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
@@ -240,7 +240,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="sh-left"><span class="st">Source</span><span class="landscape-badge" id="srcBadge">No source loaded</span></div>
       <span class="sv-chev">▾</span>
     </div>
-    <div class="section-body">
+    <div class="section-body" id="secSourceBody">
       <div class="tab-bar" id="srcBar">
         <div class="tab active" data-tab="src-image">From image</div>
         <div class="tab" data-tab="src-map">Load map.json</div>
@@ -293,8 +293,8 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
               <div class="dual-range-outer">
                 <div class="dual-range-track"><div class="dual-range-fill" id="lvlRangeFill"></div></div>
                 <div class="dual-range-wrap">
-                  <input type="range" id="lvlMin" aria-label="Minimum output level" min="0" max="14" value="0" step="1">
-                  <input type="range" id="lvlMax" aria-label="Maximum output level" min="0" max="14" value="14" step="1">
+                  <input type="range" id="lvlMin" aria-label="Minimum output level" aria-valuetext="editor -1" min="0" max="14" value="0" step="1">
+                  <input type="range" id="lvlMax" aria-label="Maximum output level" aria-valuetext="editor 13" min="0" max="14" value="14" step="1">
                 </div>
               </div>
             </div>
@@ -333,7 +333,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="sh-left"><span class="st">Landscape</span><span id="lsBadge" class="landscape-badge" style="display:none"></span><span class="landscape-badge" id="lsBadgeNote" style="display:none"></span></div>
       <span class="sv-chev">▾</span>
     </div>
-    <div class="section-body">
+    <div class="section-body" id="secLandscapeBody">
       <div class="note">Controls <code>LandscapeId</code> in scenario.json - sets which cliff and terrain assets the engine uses.</div>
       <div class="dz" id="dzScenario" style="padding:11px 10px;"><div class="dl"><strong>Drop scenario.json here</strong></div><div class="dl" id="dzScenarioSub">Reads LandscapeId, included in export</div><input type="file" id="fiScenario" accept=".json,application/json" style="display:none"></div>
       <div class="msg" id="msgScenario"></div>
@@ -360,7 +360,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="sh-left"><span class="st">DLCs</span><span class="landscape-badge">Base Game</span><span class="landscape-badge" id="dlcBadge" style="display:none"></span></div>
       <span class="sv-chev">▾</span>
     </div>
-    <div class="section-body">
+    <div class="section-body" id="secDLCBody">
       <div class="note">Controls the <code>DLCs</code> array in header.json. Removing a DLC that provides assets used in the map will likely break it in-game - verify after changes.</div>
       <div id="dlcNotLoaded" style="font-size:11px;color:var(--text3);padding:4px 0 8px;">Load a scenario folder or drop header.json to edit DLCs.</div>
       <div id="dlcControls" style="display:none;">
@@ -380,7 +380,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="sh-left"><span class="st">Terrain</span><span class="landscape-badge" id="terrainBadge">No change</span></div>
       <span class="sv-chev">▾</span>
     </div>
-    <div class="section-body">
+    <div class="section-body" id="secTerrainBody">
       <div class="note">Overrides <code>TerrainTypeId</code> on export. "No change" preserves original values from a loaded map.json.</div>
       <div class="field"><label class="ck-row"><input type="checkbox" id="lockLandscape" checked>Restrict to legal landscape terrains only</label></div>
       <div class="tab-bar" id="tBar">
@@ -415,7 +415,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="sh-left"><span class="st">Edges</span><span class="landscape-badge" id="edgesBadge">No change</span></div>
       <span class="sv-chev">▾</span>
     </div>
-    <div class="section-body">
+    <div class="section-body" id="secEdgesBody">
       <div class="note">Cliff walls are written as <code>EdgeGroups</code> entries in the exported <code>map.json</code></div>
       <div class="field"><label class="ck-row"><input type="checkbox" id="lockEdgeLandscape" checked>Restrict to legal landscape edges only</label></div>
       <div class="ch" style="margin-bottom:10px;"><div class="tsw" id="tSwatch"></div><span id="tHint" style="font-size:11px;color:var(--text3);"></span></div>
@@ -466,7 +466,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="sh-left"><span class="st">Orientation</span><span class="landscape-badge" id="orientBadge">N↑</span></div>
       <span class="sv-chev">▾</span>
     </div>
-    <div class="section-body">
+    <div class="section-body" id="secOrientationBody">
       <div class="note">Rotates and flips the level heightmap only. Units, decors, and triggers are <strong>not</strong> affected - re-place these after reorienting.</div>
       <div class="lt-grid" style="grid-template-columns:1fr 1fr;">
         <div class="lt-box">
@@ -497,7 +497,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="sh-left"><span class="st">Level tools</span></div>
       <span class="sv-chev">▾</span>
     </div>
-    <div class="section-body">
+    <div class="section-body" id="secLevelToolsBody">
       <div class="lt-grid">
         <div class="lt-box">
           <div class="lt-title">Shift entire map</div>
@@ -527,7 +527,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="sh-left"><span class="st">Settings</span></div>
       <span class="sv-chev">▾</span>
     </div>
-    <div class="section-body">
+    <div class="section-body" id="secSettingsBody">
       <div style="margin-bottom:12px;">
         <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">UI Theme</div>
         <div class="scheme-presets" id="uiThemeBar">
@@ -658,7 +658,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="sh-left"><span class="st">History</span><span class="landscape-badge" id="historyBadge" style="display:none;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span></div>
       <span class="sv-chev">▾</span>
     </div>
-    <div class="section-body">
+    <div class="section-body" id="secHistoryBody">
       <div class="note" style="margin-bottom:6px;">Most recent action at top. Click an entry to undo/redo to that point.</div>
       <div id="historyList" style="font-size:11px;font-family:monospace;max-height:160px;overflow-y:auto;border:1px solid var(--border);border-radius:3px;background:var(--bg2);padding:2px 0;"></div>
     </div>
@@ -1235,7 +1235,7 @@ function remapTerrain(tid,edgeKey){
 // ── State ──────────────────────────────────────────────────────────────────────
 let imgGray=null,tileData=null,origTileData=null,srcTiles=null,srcByIndex={},srcEdgeGroups=null,srcMapExtra=null,scenarioData=null,headerData=null;
 let genPreDragSnapshot=null,genPreDragSliderId=null;
-let _heatCache=null,_heatCacheStamp=null;
+let _heatCache=null;
 let orientAngle=0,orientFlippedH=false,orientHistory=[];
 let scenarioName=null,dirName=null,dlcHistory=[],sessionLog=[];
 // Dirty tracking - snapshot JSON of each file at load time
@@ -1347,10 +1347,16 @@ Object.defineProperty(window,'redoStack',{get:()=>history.slice(historyCursor+1)
 // ── Collapsible sections ───────────────────────────────────────────────────────
 document.querySelectorAll('.sh[data-sec]').forEach(h=>{
   const sec=h.closest('.section');
+  const body=sec.querySelector('.section-body');
   if(!sec.classList.contains('always-open')){
     h.setAttribute('tabindex','0');
     h.setAttribute('role','button');
     h.setAttribute('aria-expanded',sec.classList.contains('open')?'true':'false');
+    // Wire aria-controls to the section body, adding an id if absent
+    if(body){
+      if(!body.id)body.id=h.dataset.sec+'-body';
+      h.setAttribute('aria-controls',body.id);
+    }
   }
   const toggle=()=>{
     if(sec.classList.contains('always-open'))return;
@@ -2067,10 +2073,8 @@ function mkGenSlider(id,outId,displayFn){
   s.addEventListener('pointerup',()=>{
     if(activeSource==='gen'&&genPreDragSnapshot){
       const label=genDragLabel(genPreDragSliderId,genPreDragSnapshot.genState);
-      history.splice(historyCursor+1);
-      history.push({data:genPreDragSnapshot.data,label,genState:genPreDragSnapshot.genState});
-      if(history.length>UNDO_MAX+1)history.shift();
-      historyCursor=history.length-1;updateUndoButtons();genPreDragSnapshot=null;genPreDragSliderId=null;recomputeGen(false);
+      pushUndo(label,genPreDragSnapshot.data,genPreDragSnapshot.genState);
+      genPreDragSnapshot=null;genPreDragSliderId=null;recomputeGen(false);
     }
   });
 }
@@ -2106,10 +2110,7 @@ document.getElementById('btnRandSeed').addEventListener('click',()=>{
   const prev=document.getElementById('genSeed').value;
   document.getElementById('genSeed').value=seed;
   if(activeSource==='gen'){
-    history.splice(historyCursor+1);
-    history.push({data:tileData.slice(),label:`Generate - Seed (${prev} -> ${seed})`,genState:captureGenState()});
-    if(history.length>UNDO_MAX+1)history.shift();
-    historyCursor=history.length-1;updateUndoButtons();recomputeGen(false);
+    pushUndo(`Generate - Seed (${prev} -> ${seed})`);recomputeGen(false);
   }
 });
 (()=>{
@@ -2202,7 +2203,7 @@ function heatmapColour(r,isSlope){
   const pos=t*si,lo=Math.floor(pos),hi=Math.min(si,lo+1),f=pos-lo,s0=stops[lo],s1=stops[hi];
   return[Math.round(s0[0]+(s1[0]-s0[0])*f),Math.round(s0[1]+(s1[1]-s0[1])*f),Math.round(s0[2]+(s1[2]-s0[2])*f)];
 }
-function invalidateHeatCache(){_heatCache=null;_heatCacheStamp=null;}
+function invalidateHeatCache(){_heatCache=null;}
 function getCachedHeat(){if(!_heatCache){_heatCache=computeNavRadius();}return _heatCache;}
 
 // ── Preview render ─────────────────────────────────────────────────────────────
@@ -2390,9 +2391,9 @@ function restoreGenState(gs){
   }
   updateLvlRangeUI();
 }
-function pushUndo(label='edit'){
+function pushUndo(label='edit',data=null,genState=null){
   history.splice(historyCursor+1);
-  history.push({data:tileData.slice(),label,genState:captureGenState()});
+  history.push({data:data??tileData.slice(),label,genState:genState??captureGenState()});
   if(history.length>UNDO_MAX+1)history.shift();
   historyCursor=history.length-1;updateUndoButtons();
 }
@@ -2583,8 +2584,8 @@ function applyTransform(fn,label){
   }
   orientHistory.push(label);syncSrc();updatePreview();orientMsg(label);
 }
-function rot90CW(row,col){return{r:W-1-col,c:row};}
-function rot90CCW(row,col){return{r:col,c:H-1-row};}
+function rot90CW(row,col){return{r:col,c:H-1-row};}
+function rot90CCW(row,col){return{r:W-1-col,c:row};}
 function flipH(row,col){return{r:row,c:W-1-col};}
 function flipV(row,col){return{r:H-1-row,c:col};}
 document.getElementById('btnRot90CW').addEventListener('click',()=>{applyTransform(rot90CW,'Rotate 90° CW');orientAngle=(orientAngle+90)%360;drawOrientIndicator();reconcileMapDirty();});
@@ -3126,6 +3127,8 @@ function updateLvlRangeUI(){
   minEl.value=levelMin;maxEl.value=levelMax;
   const eMin=toEditor(levelMin),eMax=toEditor(levelMax);
   const eMinStr=eMin>=0?String(eMin):('-'+Math.abs(eMin));
+  minEl.setAttribute('aria-valuetext','editor '+eMinStr);
+  maxEl.setAttribute('aria-valuetext','editor '+eMax);
   if(displayEl)displayEl.textContent='editor '+eMinStr+' → '+eMax;
   if(rvEl)rvEl.textContent=eMinStr+'-'+eMax;
   if(fillEl){
@@ -3162,10 +3165,8 @@ function updateLvlRangeUI(){
   function onRangeCommit(){
     if(activeSource==='gen'&&genPreDragSnapshot){
       const label=`Generate - Level range (${toEditor(genPreDragSnapshot.genState?.levelMin??0)}→${toEditor(genPreDragSnapshot.genState?.levelMax??14)} → ${toEditor(levelMin)}→${toEditor(levelMax)})`;
-      history.splice(historyCursor+1);
-      history.push({data:genPreDragSnapshot.data,label,genState:genPreDragSnapshot.genState});
-      if(history.length>UNDO_MAX+1)history.shift();
-      historyCursor=history.length-1;updateUndoButtons();genPreDragSnapshot=null;genPreDragSliderId=null;
+      pushUndo(label,genPreDragSnapshot.data,genPreDragSnapshot.genState);
+      genPreDragSnapshot=null;genPreDragSliderId=null;
       recomputeGen(false);
     }
   }
