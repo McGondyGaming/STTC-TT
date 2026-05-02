@@ -168,6 +168,11 @@ This tool allows you to:
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
+ - Fixed undo/redo not correctly restoring orientation
+ - Fixed CW/CCW rotating in wrong directions
+ - Fixed image sliders wiping undo history
+ - Fixed loading a new image preserving rotation from previous session
+ - Fixed image sliders (quantization, min/max level) wiping undo history
  - Numerous bugfixes (Edge rotations, preview caches, edge variations, export available/unsaved changes, undo depth)
  - Heatmap performance improvements
  - Customised keyboard binding for preview keyboard navigation - defaults to WASD

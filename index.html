@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="sttc-tt-version" content="1.13">
+<meta name="sttc-tt-version" content="1.14">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
 <title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
@@ -1237,6 +1237,10 @@ let imgGray=null,tileData=null,origTileData=null,srcTiles=null,srcByIndex={},src
 let genPreDragSnapshot=null,genPreDragSliderId=null;
 let _heatCache=null;
 let orientAngle=0,orientFlippedH=false,orientHistory=[];
+// orientStack mirrors the history array index-for-index.
+// Each entry stores {angle, flippedH} for the corresponding history cursor position.
+// This keeps orient undo perfectly in sync without embedding it in tile-data entries.
+let orientStack=[];
 let scenarioName=null,dirName=null,dlcHistory=[],sessionLog=[];
 // Dirty tracking - snapshot JSON of each file at load time
 // ── Dirty tracking ────────────────────────────────────────────────────────────
@@ -1578,9 +1582,28 @@ function mkSlider(id,outId,cb,displayFn){
   if(o)o.textContent=displayFn?displayFn(parseInt(s.value)):s.value;
   s.addEventListener('input',()=>{if(o)o.textContent=displayFn?displayFn(parseInt(s.value)):s.value;cb&&cb();});
 }
-mkSlider('levels','levelsOut',()=>{if(activeSource==='image')recompute();});
-mkSlider('minLevel','minLevelOut',()=>{if(activeSource==='image')recompute();});
-mkSlider('maxLevel','maxLevelOut',()=>{if(activeSource==='image')recompute();});
+mkSlider('levels','levelsOut',()=>{if(activeSource==='image')recomputeTiles();});
+mkSlider('minLevel','minLevelOut',()=>{if(activeSource==='image')recomputeTiles();});
+mkSlider('maxLevel','maxLevelOut',()=>{if(activeSource==='image')recomputeTiles();});
+
+// Image slider undo - snapshot on pointerdown, push undo on pointerup (mirrors gen sliders)
+const IMG_SLIDER_LABELS={levels:'Quantization steps',minLevel:'Min level (black)',maxLevel:'Max level (white)'};
+let _imgPreDragSnapshot=null,_imgPreDragSliderId=null;
+['levels','minLevel','maxLevel'].forEach(id=>{
+  const el=document.getElementById(id);
+  el.addEventListener('pointerdown',()=>{
+    if(activeSource==='image'&&tileData)_imgPreDragSnapshot={data:tileData.slice(),sliderId:id,val:el.value};
+    _imgPreDragSliderId=id;
+  });
+  el.addEventListener('pointerup',()=>{
+    if(activeSource==='image'&&_imgPreDragSnapshot){
+      const label=`Image remap - ${IMG_SLIDER_LABELS[id]||id} (${_imgPreDragSnapshot.val} → ${el.value})`;
+      recomputeTiles();
+      pushUndo(label);
+      _imgPreDragSnapshot=null;_imgPreDragSliderId=null;
+    }
+  });
+});
 const shiftSlider=document.getElementById('shiftSlider'),shiftValEl=document.getElementById('shiftVal');
 shiftSlider.addEventListener('input',()=>{const v=parseInt(shiftSlider.value);shiftValEl.textContent=(v>0?'+':'')+v;});
 
@@ -1616,7 +1639,7 @@ makeDrop('dzImg','fiImg',file=>{
     document.getElementById('dzImg').classList.add('loaded');
     document.getElementById('srcBadge').textContent='Image loaded';
     activeSource='image';srcTiles=null;srcByIndex={};srcEdgeGroups=null;srcMapExtra=null;dirName=null;
-    recompute();enableTools();resetCompass();
+    resetCompass();recomputeInitial();enableTools();
   };
   img.onerror=()=>{msg.textContent='Could not read image.';msg.className='msg err';};
   img.src=url;
@@ -1636,13 +1659,13 @@ makeDrop('dzMap','fiMap',file=>{
       srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)srcByIndex[t.Index]=t;});
       tileData=new Int16Array(W*H);
       srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)tileData[t.Index]=Math.max(0,Math.min(MAX_LEVEL,t.Level));});
-      origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];
+      origTileData=tileData.slice();history=[];orientStack=[];historyCursor=-1;sessionLog=[];dlcHistory=[];
       _snapMap=null;_dirtyMap=false;  // will be re-snapped in enableTools; fresh load is clean
       // Push loaded state as the initial undo entry so edits can be undone back to it
-      history.push({data:tileData.slice(),label:'loaded map.json',genState:null});
+      history.push({data:tileData.slice(),label:'loaded map.json',genState:null});orientStack.push({angle:0,flippedH:false});
       historyCursor=0;
       if(data._STTCTT?.undoHistory?.length){
-        data._STTCTT.undoHistory.forEach(label=>history.unshift({data:null,label:`[prev] ${label}`,genState:null,readOnly:true}));
+        data._STTCTT.undoHistory.forEach(label=>{history.unshift({data:null,label:`[prev] ${label}`,genState:null,readOnly:true});orientStack.unshift({angle:0,flippedH:false});});
         historyCursor=history.length-1;
       }
       updateUndoButtons();
@@ -1776,13 +1799,13 @@ function loadScenarioDir(files){
     srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)srcByIndex[t.Index]=t;});
     tileData=new Int16Array(W*H);
     srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)tileData[t.Index]=Math.max(0,Math.min(MAX_LEVEL,t.Level));});
-    origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];
+    origTileData=tileData.slice();history=[];orientStack=[];historyCursor=-1;sessionLog=[];dlcHistory=[];
     _snapMap=null;_dirtyMap=false;  // will be re-snapped in enableTools; fresh load is clean
     // Push loaded state as the initial undo entry so edits can be undone back to it
-    history.push({data:tileData.slice(),label:'loaded map.json',genState:null});
+    history.push({data:tileData.slice(),label:'loaded map.json',genState:null});orientStack.push({angle:0,flippedH:false});
     historyCursor=0;
     if(d._STTCTT?.undoHistory?.length){
-      d._STTCTT.undoHistory.forEach(label=>history.unshift({data:null,label:'[prev] '+label,genState:null,readOnly:true}));
+      d._STTCTT.undoHistory.forEach(label=>{history.unshift({data:null,label:'[prev] '+label,genState:null,readOnly:true});orientStack.unshift({angle:0,flippedH:false});});
       historyCursor=history.length-1;
     }
   }));
@@ -1796,7 +1819,7 @@ function loadScenarioDir(files){
     }
     // Import undo history labels as read-only entries (no tile data, just audit trail)
     if(Array.isArray(d.undoHistory)&&d.undoHistory.length&&history.length===0){
-      d.undoHistory.forEach(label=>history.push({data:null,label:'[prev] '+label,genState:null,readOnly:true}));
+      d.undoHistory.forEach(label=>{history.push({data:null,label:'[prev] '+label,genState:null,readOnly:true});orientStack.push({angle:0,flippedH:false});});
       historyCursor=history.length-1;
     }
   }));
@@ -1935,14 +1958,41 @@ function quantize(gray,q,lo,hi){
   const loM=toMap(lo),hiM=toMap(hi),b=Math.min(q-1,Math.floor(gray*q));
   return Math.round(loM+(b/Math.max(1,q-1))*(hiM-loM));
 }
-function recompute(){
+// Apply a transform function to tileData in-place without touching undo/history.
+// Used by recomputeTiles to re-apply orientation after rebuilding from imgGray.
+function applyTransformSilent(fn){
+  const src=tileData.slice(),dst=new Int16Array(W*H);
+  for(let row=0;row<H;row++)for(let col=0;col<W;col++){const{r:nr,c:nc}=fn(row,col);dst[nr*W+nc]=src[row*W+col];}
+  tileData=dst;
+}
+// Re-apply the current orientAngle + orientFlippedH to tileData silently.
+// orientAngle is the net CW rotation in degrees (0/90/180/270).
+// orientFlippedH is a horizontal flip applied after rotation.
+function reapplyOrientation(){
+  const steps=((orientAngle/90)%4+4)%4;
+  for(let s=0;s<steps;s++)applyTransformSilent(rot90CW);
+  if(orientFlippedH)applyTransformSilent(flipH);
+}
+// Recompute tile data from imgGray using current slider values.
+// Does NOT touch undo history - callers manage undo themselves.
+// Re-applies any active orientation so sliders don't reset rotations/flips.
+function recomputeTiles(){
   if(!imgGray)return;
   const q=parseInt(document.getElementById('levels').value);
   const lo=parseInt(document.getElementById('minLevel').value),hi=parseInt(document.getElementById('maxLevel').value);
   const lo2=Math.min(lo,hi),hi2=Math.max(lo,hi);
   tileData=new Int16Array(W*H);
   for(let i=0;i<W*H;i++)tileData[i]=quantize(imgGray[i],q,lo2,hi2);
-  origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];updateUndoButtons();invalidateHeatCache();updatePreview();
+  reapplyOrientation();
+  invalidateHeatCache();updatePreview();
+}
+// Full recompute on first image load: resets history to a clean initial state.
+function recomputeInitial(){
+  recomputeTiles();
+  origTileData=tileData.slice();history=[];orientStack=[];historyCursor=-1;sessionLog=[];dlcHistory=[];
+  history.push({data:tileData.slice(),label:'loaded image',genState:null});orientStack.push({angle:0,flippedH:false});
+  historyCursor=0;
+  updateUndoButtons();
 }
 
 // ── Noise generator ────────────────────────────────────────────────────────────
@@ -2036,11 +2086,11 @@ function runNoiseGen(){
 function recomputeGenPreview(){if(!tileData)return;const{data}=runNoiseGen();tileData=data;invalidateHeatCache();updatePreview();}
 function recomputeGen(commitUndo=false){
   const firstLoad=!tileData||activeSource!=='gen';
-  if(commitUndo&&!firstLoad)pushUndo('generate');
   const{data,seed,type}=runNoiseGen();tileData=data;
+  if(commitUndo&&!firstLoad)pushUndo('generate');
   if(firstLoad){
-    origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];
-    history.push({data:tileData.slice(),label:'initial generate',genState:captureGenState()});
+    origTileData=tileData.slice();history=[];orientStack=[];historyCursor=-1;sessionLog=[];dlcHistory=[];
+    history.push({data:tileData.slice(),label:'initial generate',genState:captureGenState()});orientStack.push({angle:0,flippedH:false});
     historyCursor=0;updateUndoButtons();
   }
   document.getElementById('srcBadge').textContent='Generated';
@@ -2073,8 +2123,9 @@ function mkGenSlider(id,outId,displayFn){
   s.addEventListener('pointerup',()=>{
     if(activeSource==='gen'&&genPreDragSnapshot){
       const label=genDragLabel(genPreDragSliderId,genPreDragSnapshot.genState);
-      pushUndo(label,genPreDragSnapshot.data,genPreDragSnapshot.genState);
-      genPreDragSnapshot=null;genPreDragSliderId=null;recomputeGen(false);
+      genPreDragSnapshot=null;genPreDragSliderId=null;
+      recomputeGen(false);
+      pushUndo(label);
     }
   });
 }
@@ -2091,12 +2142,10 @@ document.querySelectorAll('.gen-reset').forEach(btn=>{
   btn.addEventListener('click',()=>{
     const sl=document.getElementById(btn.dataset.id),out=document.getElementById(btn.dataset.id+'Out');
     if(!sl)return;
-    if(activeSource==='gen'){
-      const meta=GEN_SLIDER_META[btn.dataset.id];
-      pushUndo(`Reset ${meta?meta.name:btn.dataset.id} (${meta?meta.fmt(sl.value):sl.value} -> ${meta?meta.fmt(btn.dataset.def):btn.dataset.def})`);
-    }
+    const meta=GEN_SLIDER_META[btn.dataset.id];
+    const label=`Reset ${meta?meta.name:btn.dataset.id} (${meta?meta.fmt(sl.value):sl.value} -> ${meta?meta.fmt(btn.dataset.def):btn.dataset.def})`;
     sl.value=btn.dataset.def;if(out)sl.dispatchEvent(new Event('input'));
-    if(activeSource==='gen')recomputeGen(false);
+    if(activeSource==='gen'){recomputeGen(false);pushUndo(label);}
   });
 });
 document.querySelectorAll('input[name="noiseType"]').forEach(r=>r.addEventListener('change',()=>{if(activeSource==='gen')recomputeGen(true);}));
@@ -2110,7 +2159,7 @@ document.getElementById('btnRandSeed').addEventListener('click',()=>{
   const prev=document.getElementById('genSeed').value;
   document.getElementById('genSeed').value=seed;
   if(activeSource==='gen'){
-    pushUndo(`Generate - Seed (${prev} -> ${seed})`);recomputeGen(false);
+    recomputeGen(false);pushUndo(`Generate - Seed (${prev} -> ${seed})`);
   }
 });
 (()=>{
@@ -2391,10 +2440,18 @@ function restoreGenState(gs){
   }
   updateLvlRangeUI();
 }
-function pushUndo(label='edit',data=null,genState=null){
+function captureOrientState(){return{angle:orientAngle,flippedH:orientFlippedH};}
+function restoreOrientState(os){
+  if(!os)return;
+  orientAngle=os.angle??0;orientFlippedH=os.flippedH??false;
+  drawOrientIndicator();
+}
+function pushUndo(label='edit'){
   history.splice(historyCursor+1);
-  history.push({data:data??tileData.slice(),label,genState:genState??captureGenState()});
-  if(history.length>UNDO_MAX+1)history.shift();
+  orientStack.splice(historyCursor+1);
+  history.push({data:tileData.slice(),label,genState:captureGenState()});
+  orientStack.push(captureOrientState());
+  if(history.length>UNDO_MAX+1){history.shift();orientStack.shift();}
   historyCursor=history.length-1;updateUndoButtons();
 }
 function updateUndoButtons(){
@@ -2432,7 +2489,7 @@ function updateUndoButtons(){
       el.addEventListener('mouseenter',()=>{el.style.background='var(--bg3)';});
       el.addEventListener('mouseleave',()=>{el.style.background='';});
       const jump=()=>{
-        tileData=history[i].data.slice();restoreGenState(history[i].genState);
+        tileData=history[i].data.slice();restoreGenState(history[i].genState);restoreOrientState(orientStack[i]);
         historyCursor=i;syncSrc();updatePreview();updateUndoButtons();reconcileMapDirty();
       };
       el.addEventListener('click',jump);
@@ -2452,7 +2509,8 @@ function clampMap(v){return Math.max(0,Math.min(MAX_LEVEL,Math.round(v)));}
 document.getElementById('btnShiftAll').addEventListener('click',()=>{
   if(!tileData)return;const sh=parseInt(shiftSlider.value);if(sh===0){toolMsg('Shift is 0 - nothing to do.');return;}
   const shLabel=`Shift all ${sh>0?'+':''}${sh}`;
-  pushUndo(shLabel);for(let i=0;i<tileData.length;i++)tileData[i]=clampMap(tileData[i]+sh);
+  for(let i=0;i<tileData.length;i++)tileData[i]=clampMap(tileData[i]+sh);
+  pushUndo(shLabel);
   syncSrc();updatePreview();toolMsg(shLabel+' (editor levels)');shiftSlider.value=0;shiftValEl.textContent='0';
 });
 document.getElementById('btnClamp').addEventListener('click',()=>{
@@ -2460,8 +2518,9 @@ document.getElementById('btnClamp').addEventListener('click',()=>{
   const loE=parseInt(document.getElementById('clampLow').value),loVE=parseInt(document.getElementById('clampLowVal').value);
   const hiE=parseInt(document.getElementById('clampHigh').value),hiVE=parseInt(document.getElementById('clampHighVal').value);
   const clampLabel=`Clamp (<=editor ${loE} -> ${loVE}, >=editor ${hiE} -> ${hiVE})`;
-  pushUndo(clampLabel);let n=0;
+  let n=0;
   for(let i=0;i<tileData.length;i++){const ev=toEditor(tileData[i]);if(ev<=loE){tileData[i]=clampMap(toMap(loVE));n++;}else if(ev>=hiE){tileData[i]=clampMap(toMap(hiVE));n++;}}
+  pushUndo(clampLabel);
   syncSrc();updatePreview();toolMsg(`Clamped ${n.toLocaleString()} tiles - `+clampLabel);
 });
 document.getElementById('btnBand').addEventListener('click',()=>{
@@ -2469,18 +2528,19 @@ document.getElementById('btnBand').addEventListener('click',()=>{
   const op=document.getElementById('bandOp').value,threshE=parseInt(document.getElementById('bandThresh').value),sh=parseInt(document.getElementById('bandShift').value)||0;
   const opLabel={lte:'<=',eq:'=',gte:'>='}[op]||op;
   const bandLabel=`Band shift (editor ${opLabel}${threshE}) ${sh>0?'+':''}${sh}`;
-  pushUndo(bandLabel);let n=0;
+  let n=0;
   for(let i=0;i<tileData.length;i++){const ev=toEditor(tileData[i]);const hit=(op==='eq'?ev===threshE:op==='lte'?ev<=threshE:ev>=threshE);if(hit){tileData[i]=clampMap(tileData[i]+sh);n++;}}
+  pushUndo(bandLabel);
   syncSrc();updatePreview();toolMsg(`${n.toLocaleString()} tiles shifted (editor ${opLabel}${threshE}) by ${sh>0?'+':''}${sh}`);
 });
 document.getElementById('btnUndo').addEventListener('click',()=>{
   if(historyCursor<=0)return;historyCursor--;
-  const entry=history[historyCursor];tileData=entry.data.slice();restoreGenState(entry.genState);
+  const entry=history[historyCursor];tileData=entry.data.slice();restoreGenState(entry.genState);restoreOrientState(orientStack[historyCursor]);
   syncSrc();updatePreview();updateUndoButtons();reconcileMapDirty();toolMsg(`Undone: ${history[historyCursor+1].label}`);
 });
 document.getElementById('btnRedo').addEventListener('click',()=>{
   if(historyCursor>=history.length-1)return;historyCursor++;
-  const entry=history[historyCursor];tileData=entry.data.slice();restoreGenState(entry.genState);
+  const entry=history[historyCursor];tileData=entry.data.slice();restoreGenState(entry.genState);restoreOrientState(orientStack[historyCursor]);
   syncSrc();updatePreview();updateUndoButtons();reconcileMapDirty();toolMsg(`Redone: ${entry.label}`);
 });
 document.getElementById('btnReset').addEventListener('click',()=>{
@@ -2541,19 +2601,27 @@ function resetTerrainEdgeUI(){
 
 // ── Orientation ────────────────────────────────────────────────────────────────
 function orientMsg(txt){const m=document.getElementById('msgOrient');m.textContent=txt;m.className='msg ok';setTimeout(()=>{if(m.textContent===txt)m.textContent='';},4000);}
-const ORIENT_BADGE_DIRS=['N↑','W←','S↓','E→'];
+const ORIENT_BADGE_DIRS=['N↑','E→','S↓','W←'];
 function drawOrientIndicator(){
   const show=document.getElementById('chkCompass')?.checked;
   const overlay=document.getElementById('orientOverlay');if(overlay)overlay.style.display=show?'block':'none';
   const idx=((orientAngle/90)%4+4)%4;let badge=ORIENT_BADGE_DIRS[idx];if(orientFlippedH)badge+=' ⟺';
   const ob=document.getElementById('orientBadge');if(ob)ob.textContent=badge;
 }
-function applyTransform(fn,label){
-  if(!tileData)return;pushUndo(label);
-  // Rotate level data
+function applyTransform(fn,label,angleDelta,flipH_toggle,flipV_toggle){
+  if(!tileData)return;
+  // Rotate level data first
   const src=tileData.slice(),dst=new Int16Array(W*H);
   for(let row=0;row<H;row++)for(let col=0;col<W;col++){const{r:nr,c:nc}=fn(row,col);dst[nr*W+nc]=src[row*W+col];}
   tileData=dst;
+  // Update orient state
+  if(angleDelta)orientAngle=((orientAngle+angleDelta)%360+360)%360;
+  if(flipH_toggle)orientFlippedH=!orientFlippedH;
+  if(flipV_toggle){orientAngle=(orientAngle+180)%360;orientFlippedH=!orientFlippedH;}
+  // Push undo after both tile rotation and orient update so orientStack captures post-op state.
+  // Non-orient pushUndo callers push pre-op tile data but that's fine - orient is tracked
+  // separately and always reflects the state concurrent with those tiles.
+  pushUndo(label);
   // Rotate srcByIndex so Type (slope/cliff) and TerrainTypeId follow their tiles
   if(Object.keys(srcByIndex).length){
     const newByIndex={};
@@ -2584,14 +2652,14 @@ function applyTransform(fn,label){
   }
   orientHistory.push(label);syncSrc();updatePreview();orientMsg(label);
 }
-function rot90CW(row,col){return{r:col,c:H-1-row};}
-function rot90CCW(row,col){return{r:W-1-col,c:row};}
+function rot90CW(row,col){return{r:W-1-col,c:row};}
+function rot90CCW(row,col){return{r:col,c:H-1-row};}
 function flipH(row,col){return{r:row,c:W-1-col};}
 function flipV(row,col){return{r:H-1-row,c:col};}
-document.getElementById('btnRot90CW').addEventListener('click',()=>{applyTransform(rot90CW,'Rotate 90° CW');orientAngle=(orientAngle+90)%360;drawOrientIndicator();reconcileMapDirty();});
-document.getElementById('btnRot90CCW').addEventListener('click',()=>{applyTransform(rot90CCW,'Rotate 90° CCW');orientAngle=(orientAngle-90+360)%360;drawOrientIndicator();reconcileMapDirty();});
-document.getElementById('btnFlipH').addEventListener('click',()=>{applyTransform(flipH,'Flip horizontal');orientFlippedH=!orientFlippedH;drawOrientIndicator();reconcileMapDirty();});
-document.getElementById('btnFlipV').addEventListener('click',()=>{applyTransform(flipV,'Flip vertical');orientAngle=(orientAngle+180)%360;orientFlippedH=!orientFlippedH;drawOrientIndicator();reconcileMapDirty();});
+document.getElementById('btnRot90CW').addEventListener('click',()=>{applyTransform(rot90CW,'Rotate 90° CW',90,false,false);drawOrientIndicator();reconcileMapDirty();});
+document.getElementById('btnRot90CCW').addEventListener('click',()=>{applyTransform(rot90CCW,'Rotate 90° CCW',-90,false,false);drawOrientIndicator();reconcileMapDirty();});
+document.getElementById('btnFlipH').addEventListener('click',()=>{applyTransform(flipH,'Flip horizontal',0,true,false);drawOrientIndicator();reconcileMapDirty();});
+document.getElementById('btnFlipV').addEventListener('click',()=>{applyTransform(flipV,'Flip vertical',0,false,true);drawOrientIndicator();reconcileMapDirty();});
 document.getElementById('chkCompass').addEventListener('change',drawOrientIndicator);
 function resetCompass(){orientAngle=0;orientFlippedH=false;orientHistory=[];drawOrientIndicator();}
 
@@ -3165,9 +3233,9 @@ function updateLvlRangeUI(){
   function onRangeCommit(){
     if(activeSource==='gen'&&genPreDragSnapshot){
       const label=`Generate - Level range (${toEditor(genPreDragSnapshot.genState?.levelMin??0)}→${toEditor(genPreDragSnapshot.genState?.levelMax??14)} → ${toEditor(levelMin)}→${toEditor(levelMax)})`;
-      pushUndo(label,genPreDragSnapshot.data,genPreDragSnapshot.genState);
       genPreDragSnapshot=null;genPreDragSliderId=null;
       recomputeGen(false);
+      pushUndo(label);
     }
   }
 
@@ -3194,10 +3262,9 @@ function updateLvlRangeUI(){
   const resetBtn=document.getElementById('btnLvlRangeReset');
   if(resetBtn){
     resetBtn.addEventListener('click',()=>{
-      if(activeSource==='gen')pushUndo('Reset level range');
       levelMin=0;levelMax=14;
       updateLvlRangeUI();
-      if(activeSource==='gen')recomputeGen(false);
+      if(activeSource==='gen'){recomputeGen(false);pushUndo('Reset level range');}
     });
   }
 })();
