@@ -163,7 +163,6 @@ This tool allows you to:
  - Tested in Chrome, future builds will be tested in multiple browsers (e.g. Firefox, Edge)
 
 ## Known Issues:
-- Undoing a map orientation step will first undo two 
 - Outside corner edges may not be generated
 - All image imported maps default to desert biome 
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
