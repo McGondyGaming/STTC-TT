@@ -163,12 +163,16 @@ This tool allows you to:
  - Tested in Chrome, future builds will be tested in multiple browsers (e.g. Firefox, Edge)
 
 ## Known Issues:
+- Undoing a map orientation step will first undo two 
 - Outside corner edges may not be generated
 - All image imported maps default to desert biome 
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
- - Numerous bugfixes (Edge rotations, preview caches, edge variations, export available/unsaved changes, undo depth)
+ - Fixed image sliders (quantization, min/max level) wiping undo history
+ - Fixed rotating/flipping an image heightmap being lost when adjusting sliders
+ - Fixed undo/redo not restoring orientation
+ - Fixed CW and CCW rotating in the wrong directions- Numerous bugfixes (Edge rotations, preview caches, edge variations, export available/unsaved changes, undo depth)
  - Heatmap performance improvements
  - Customised keyboard binding for preview keyboard navigation - defaults to WASD
  - Keyboard navigation of preview (arrows move selector, shift+arrow move 5x, space/enter selects current tile)

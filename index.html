@@ -1578,9 +1578,28 @@ function mkSlider(id,outId,cb,displayFn){
   if(o)o.textContent=displayFn?displayFn(parseInt(s.value)):s.value;
   s.addEventListener('input',()=>{if(o)o.textContent=displayFn?displayFn(parseInt(s.value)):s.value;cb&&cb();});
 }
-mkSlider('levels','levelsOut',()=>{if(activeSource==='image')recompute();});
-mkSlider('minLevel','minLevelOut',()=>{if(activeSource==='image')recompute();});
-mkSlider('maxLevel','maxLevelOut',()=>{if(activeSource==='image')recompute();});
+mkSlider('levels','levelsOut',()=>{if(activeSource==='image')recomputeTiles();});
+mkSlider('minLevel','minLevelOut',()=>{if(activeSource==='image')recomputeTiles();});
+mkSlider('maxLevel','maxLevelOut',()=>{if(activeSource==='image')recomputeTiles();});
+
+// Image slider undo - snapshot on pointerdown, push undo on pointerup (mirrors gen sliders)
+const IMG_SLIDER_LABELS={levels:'Quantization steps',minLevel:'Min level (black)',maxLevel:'Max level (white)'};
+let _imgPreDragSnapshot=null,_imgPreDragSliderId=null;
+['levels','minLevel','maxLevel'].forEach(id=>{
+  const el=document.getElementById(id);
+  el.addEventListener('pointerdown',()=>{
+    if(activeSource==='image'&&tileData)_imgPreDragSnapshot={data:tileData.slice(),sliderId:id,val:el.value};
+    _imgPreDragSliderId=id;
+  });
+  el.addEventListener('pointerup',()=>{
+    if(activeSource==='image'&&_imgPreDragSnapshot){
+      const label=`Image remap - ${IMG_SLIDER_LABELS[id]||id} (${_imgPreDragSnapshot.val} → ${el.value})`;
+      pushUndo(label,_imgPreDragSnapshot.data,null);
+      _imgPreDragSnapshot=null;_imgPreDragSliderId=null;
+      recomputeTiles();
+    }
+  });
+});
 const shiftSlider=document.getElementById('shiftSlider'),shiftValEl=document.getElementById('shiftVal');
 shiftSlider.addEventListener('input',()=>{const v=parseInt(shiftSlider.value);shiftValEl.textContent=(v>0?'+':'')+v;});
 
@@ -1616,7 +1635,7 @@ makeDrop('dzImg','fiImg',file=>{
     document.getElementById('dzImg').classList.add('loaded');
     document.getElementById('srcBadge').textContent='Image loaded';
     activeSource='image';srcTiles=null;srcByIndex={};srcEdgeGroups=null;srcMapExtra=null;dirName=null;
-    recompute();enableTools();resetCompass();
+    recomputeInitial();enableTools();resetCompass();
   };
   img.onerror=()=>{msg.textContent='Could not read image.';msg.className='msg err';};
   img.src=url;
@@ -1935,14 +1954,41 @@ function quantize(gray,q,lo,hi){
   const loM=toMap(lo),hiM=toMap(hi),b=Math.min(q-1,Math.floor(gray*q));
   return Math.round(loM+(b/Math.max(1,q-1))*(hiM-loM));
 }
-function recompute(){
+// Apply a transform function to tileData in-place without touching undo/history.
+// Used by recomputeTiles to re-apply orientation after rebuilding from imgGray.
+function applyTransformSilent(fn){
+  const src=tileData.slice(),dst=new Int16Array(W*H);
+  for(let row=0;row<H;row++)for(let col=0;col<W;col++){const{r:nr,c:nc}=fn(row,col);dst[nr*W+nc]=src[row*W+col];}
+  tileData=dst;
+}
+// Re-apply the current orientAngle + orientFlippedH to tileData silently.
+// orientAngle is the net CW rotation in degrees (0/90/180/270).
+// orientFlippedH is a horizontal flip applied after rotation.
+function reapplyOrientation(){
+  const steps=((orientAngle/90)%4+4)%4;
+  for(let s=0;s<steps;s++)applyTransformSilent(rot90CW);
+  if(orientFlippedH)applyTransformSilent(flipH);
+}
+// Recompute tile data from imgGray using current slider values.
+// Does NOT touch undo history - callers manage undo themselves.
+// Re-applies any active orientation so sliders don't reset rotations/flips.
+function recomputeTiles(){
   if(!imgGray)return;
   const q=parseInt(document.getElementById('levels').value);
   const lo=parseInt(document.getElementById('minLevel').value),hi=parseInt(document.getElementById('maxLevel').value);
   const lo2=Math.min(lo,hi),hi2=Math.max(lo,hi);
   tileData=new Int16Array(W*H);
   for(let i=0;i<W*H;i++)tileData[i]=quantize(imgGray[i],q,lo2,hi2);
-  origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];updateUndoButtons();invalidateHeatCache();updatePreview();
+  reapplyOrientation();
+  invalidateHeatCache();updatePreview();
+}
+// Full recompute on first image load: resets history to a clean initial state.
+function recomputeInitial(){
+  recomputeTiles();
+  origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];
+  history.push({data:tileData.slice(),label:'loaded image',genState:null});
+  historyCursor=0;
+  updateUndoButtons();
 }
 
 // ── Noise generator ────────────────────────────────────────────────────────────
@@ -2391,9 +2437,15 @@ function restoreGenState(gs){
   }
   updateLvlRangeUI();
 }
-function pushUndo(label='edit',data=null,genState=null){
+function captureOrientState(){return{angle:orientAngle,flippedH:orientFlippedH};}
+function restoreOrientState(os){
+  if(!os)return;
+  orientAngle=os.angle??0;orientFlippedH=os.flippedH??false;
+  drawOrientIndicator();
+}
+function pushUndo(label='edit',data=null,genState=null,orientState=null){
   history.splice(historyCursor+1);
-  history.push({data:data??tileData.slice(),label,genState:genState??captureGenState()});
+  history.push({data:data??tileData.slice(),label,genState:genState??captureGenState(),orientState:orientState??captureOrientState()});
   if(history.length>UNDO_MAX+1)history.shift();
   historyCursor=history.length-1;updateUndoButtons();
 }
@@ -2432,7 +2484,7 @@ function updateUndoButtons(){
       el.addEventListener('mouseenter',()=>{el.style.background='var(--bg3)';});
       el.addEventListener('mouseleave',()=>{el.style.background='';});
       const jump=()=>{
-        tileData=history[i].data.slice();restoreGenState(history[i].genState);
+        tileData=history[i].data.slice();restoreGenState(history[i].genState);restoreOrientState(history[i].orientState);
         historyCursor=i;syncSrc();updatePreview();updateUndoButtons();reconcileMapDirty();
       };
       el.addEventListener('click',jump);
@@ -2475,12 +2527,12 @@ document.getElementById('btnBand').addEventListener('click',()=>{
 });
 document.getElementById('btnUndo').addEventListener('click',()=>{
   if(historyCursor<=0)return;historyCursor--;
-  const entry=history[historyCursor];tileData=entry.data.slice();restoreGenState(entry.genState);
+  const entry=history[historyCursor];tileData=entry.data.slice();restoreGenState(entry.genState);restoreOrientState(entry.orientState);
   syncSrc();updatePreview();updateUndoButtons();reconcileMapDirty();toolMsg(`Undone: ${history[historyCursor+1].label}`);
 });
 document.getElementById('btnRedo').addEventListener('click',()=>{
   if(historyCursor>=history.length-1)return;historyCursor++;
-  const entry=history[historyCursor];tileData=entry.data.slice();restoreGenState(entry.genState);
+  const entry=history[historyCursor];tileData=entry.data.slice();restoreGenState(entry.genState);restoreOrientState(entry.orientState);
   syncSrc();updatePreview();updateUndoButtons();reconcileMapDirty();toolMsg(`Redone: ${entry.label}`);
 });
 document.getElementById('btnReset').addEventListener('click',()=>{
@@ -2549,7 +2601,9 @@ function drawOrientIndicator(){
   const ob=document.getElementById('orientBadge');if(ob)ob.textContent=badge;
 }
 function applyTransform(fn,label){
-  if(!tileData)return;pushUndo(label);
+  if(!tileData)return;
+  const preOrient=captureOrientState();
+  pushUndo(label,null,null,preOrient);
   // Rotate level data
   const src=tileData.slice(),dst=new Int16Array(W*H);
   for(let row=0;row<H;row++)for(let col=0;col<W;col++){const{r:nr,c:nc}=fn(row,col);dst[nr*W+nc]=src[row*W+col];}
@@ -2584,8 +2638,8 @@ function applyTransform(fn,label){
   }
   orientHistory.push(label);syncSrc();updatePreview();orientMsg(label);
 }
-function rot90CW(row,col){return{r:col,c:H-1-row};}
-function rot90CCW(row,col){return{r:W-1-col,c:row};}
+function rot90CW(row,col){return{r:W-1-col,c:row};}
+function rot90CCW(row,col){return{r:col,c:H-1-row};}
 function flipH(row,col){return{r:row,c:W-1-col};}
 function flipV(row,col){return{r:H-1-row,c:col};}
 document.getElementById('btnRot90CW').addEventListener('click',()=>{applyTransform(rot90CW,'Rotate 90° CW');orientAngle=(orientAngle+90)%360;drawOrientIndicator();reconcileMapDirty();});
