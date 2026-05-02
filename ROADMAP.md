@@ -52,10 +52,12 @@ A living document for tracking ideas, improvements, and future direction for the
 
 Completed items
 
+- [x] Edge variations randomised + changes in cliff height add or remove edge tiles as required
+- [x] Keyboard preview navigation
 - [x] Export greyscale heightmap
 - [x] Keyboard menu navigation
-- [x] Screenread support added
-- [x] Custom UI and preview colour scheme support added
+- [x] Screenreader support
+- [x] Custom UI and preview colour scheme support
 - [x] Browser language detected to pull scenario name from best guessed text_<language>.csv 
 - [x] File backups before export
 - [x] Load and export entire scenario folders
