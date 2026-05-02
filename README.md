@@ -168,6 +168,8 @@ This tool allows you to:
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
+ - Numerous bugfixes (Edge rotations, preview caches, edge variations, export available/unsaved changes, undo depth)
+ - Heatmap performance improvements
  - Customised keyboard binding for preview keyboard navigation - defaults to WASD
  - Keyboard navigation of preview (arrows move selector, shift+arrow move 5x, space/enter selects current tile)
  - Close tile inspector using `X` at section

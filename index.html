@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="sttc-tt-version" content="1.12">
+<meta name="sttc-tt-version" content="1.13">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
 <title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
@@ -240,7 +240,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="sh-left"><span class="st">Source</span><span class="landscape-badge" id="srcBadge">No source loaded</span></div>
       <span class="sv-chev">▾</span>
     </div>
-    <div class="section-body">
+    <div class="section-body" id="secSourceBody">
       <div class="tab-bar" id="srcBar">
         <div class="tab active" data-tab="src-image">From image</div>
         <div class="tab" data-tab="src-map">Load map.json</div>
@@ -293,8 +293,8 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
               <div class="dual-range-outer">
                 <div class="dual-range-track"><div class="dual-range-fill" id="lvlRangeFill"></div></div>
                 <div class="dual-range-wrap">
-                  <input type="range" id="lvlMin" aria-label="Minimum output level" min="0" max="14" value="0" step="1">
-                  <input type="range" id="lvlMax" aria-label="Maximum output level" min="0" max="14" value="14" step="1">
+                  <input type="range" id="lvlMin" aria-label="Minimum output level" aria-valuetext="editor -1" min="0" max="14" value="0" step="1">
+                  <input type="range" id="lvlMax" aria-label="Maximum output level" aria-valuetext="editor 13" min="0" max="14" value="14" step="1">
                 </div>
               </div>
             </div>
@@ -333,7 +333,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="sh-left"><span class="st">Landscape</span><span id="lsBadge" class="landscape-badge" style="display:none"></span><span class="landscape-badge" id="lsBadgeNote" style="display:none"></span></div>
       <span class="sv-chev">▾</span>
     </div>
-    <div class="section-body">
+    <div class="section-body" id="secLandscapeBody">
       <div class="note">Controls <code>LandscapeId</code> in scenario.json - sets which cliff and terrain assets the engine uses.</div>
       <div class="dz" id="dzScenario" style="padding:11px 10px;"><div class="dl"><strong>Drop scenario.json here</strong></div><div class="dl" id="dzScenarioSub">Reads LandscapeId, included in export</div><input type="file" id="fiScenario" accept=".json,application/json" style="display:none"></div>
       <div class="msg" id="msgScenario"></div>
@@ -360,7 +360,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="sh-left"><span class="st">DLCs</span><span class="landscape-badge">Base Game</span><span class="landscape-badge" id="dlcBadge" style="display:none"></span></div>
       <span class="sv-chev">▾</span>
     </div>
-    <div class="section-body">
+    <div class="section-body" id="secDLCBody">
       <div class="note">Controls the <code>DLCs</code> array in header.json. Removing a DLC that provides assets used in the map will likely break it in-game - verify after changes.</div>
       <div id="dlcNotLoaded" style="font-size:11px;color:var(--text3);padding:4px 0 8px;">Load a scenario folder or drop header.json to edit DLCs.</div>
       <div id="dlcControls" style="display:none;">
@@ -380,7 +380,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="sh-left"><span class="st">Terrain</span><span class="landscape-badge" id="terrainBadge">No change</span></div>
       <span class="sv-chev">▾</span>
     </div>
-    <div class="section-body">
+    <div class="section-body" id="secTerrainBody">
       <div class="note">Overrides <code>TerrainTypeId</code> on export. "No change" preserves original values from a loaded map.json.</div>
       <div class="field"><label class="ck-row"><input type="checkbox" id="lockLandscape" checked>Restrict to legal landscape terrains only</label></div>
       <div class="tab-bar" id="tBar">
@@ -415,7 +415,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="sh-left"><span class="st">Edges</span><span class="landscape-badge" id="edgesBadge">No change</span></div>
       <span class="sv-chev">▾</span>
     </div>
-    <div class="section-body">
+    <div class="section-body" id="secEdgesBody">
       <div class="note">Cliff walls are written as <code>EdgeGroups</code> entries in the exported <code>map.json</code></div>
       <div class="field"><label class="ck-row"><input type="checkbox" id="lockEdgeLandscape" checked>Restrict to legal landscape edges only</label></div>
       <div class="ch" style="margin-bottom:10px;"><div class="tsw" id="tSwatch"></div><span id="tHint" style="font-size:11px;color:var(--text3);"></span></div>
@@ -466,7 +466,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="sh-left"><span class="st">Orientation</span><span class="landscape-badge" id="orientBadge">N↑</span></div>
       <span class="sv-chev">▾</span>
     </div>
-    <div class="section-body">
+    <div class="section-body" id="secOrientationBody">
       <div class="note">Rotates and flips the level heightmap only. Units, decors, and triggers are <strong>not</strong> affected - re-place these after reorienting.</div>
       <div class="lt-grid" style="grid-template-columns:1fr 1fr;">
         <div class="lt-box">
@@ -497,7 +497,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="sh-left"><span class="st">Level tools</span></div>
       <span class="sv-chev">▾</span>
     </div>
-    <div class="section-body">
+    <div class="section-body" id="secLevelToolsBody">
       <div class="lt-grid">
         <div class="lt-box">
           <div class="lt-title">Shift entire map</div>
@@ -527,7 +527,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="sh-left"><span class="st">Settings</span></div>
       <span class="sv-chev">▾</span>
     </div>
-    <div class="section-body">
+    <div class="section-body" id="secSettingsBody">
       <div style="margin-bottom:12px;">
         <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">UI Theme</div>
         <div class="scheme-presets" id="uiThemeBar">
@@ -658,7 +658,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       <div class="sh-left"><span class="st">History</span><span class="landscape-badge" id="historyBadge" style="display:none;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span></div>
       <span class="sv-chev">▾</span>
     </div>
-    <div class="section-body">
+    <div class="section-body" id="secHistoryBody">
       <div class="note" style="margin-bottom:6px;">Most recent action at top. Click an entry to undo/redo to that point.</div>
       <div id="historyList" style="font-size:11px;font-family:monospace;max-height:160px;overflow-y:auto;border:1px solid var(--border);border-radius:3px;background:var(--bg2);padding:2px 0;"></div>
     </div>
@@ -1235,7 +1235,7 @@ function remapTerrain(tid,edgeKey){
 // ── State ──────────────────────────────────────────────────────────────────────
 let imgGray=null,tileData=null,origTileData=null,srcTiles=null,srcByIndex={},srcEdgeGroups=null,srcMapExtra=null,scenarioData=null,headerData=null;
 let genPreDragSnapshot=null,genPreDragSliderId=null;
-let _heatCache=null,_heatCacheStamp=null;
+let _heatCache=null;
 let orientAngle=0,orientFlippedH=false,orientHistory=[];
 let scenarioName=null,dirName=null,dlcHistory=[],sessionLog=[];
 // Dirty tracking - snapshot JSON of each file at load time
@@ -1247,6 +1247,7 @@ let scenarioName=null,dirName=null,dlcHistory=[],sessionLog=[];
 // on export to produce the .bak copy - never called from updateExportUI.
 let _snapMap=null,_snapScenario=null,_snapHeader=null;
 let _dirtyMap=false,_dirtyScenario=false,_dirtyHeader=false,_dirtyHeightmap=false;
+let _loadedLandscape=null,_loadedDLCs=null; // originals for reset
 
 function snapMap(){return tileData?JSON.stringify(buildTiles()):null;}
 
@@ -1257,7 +1258,42 @@ function snapScenario(){if(!scenarioData)return null;const s={...scenarioData,La
 function snapHeader(){return headerData?JSON.stringify(headerData):null;}
 
 function markMapDirty(){_dirtyMap=true;}
+function markMapDirtyIfLoaded(){if(srcTiles||activeSource==='map')_dirtyMap=true;}
 function markHeightmapDirty(){_dirtyHeightmap=true;}
+
+// ── Terrain/edge UI fingerprint ───────────────────────────────────────────────
+// Captures a compact string of all terrain/edge UI values. Snapped at load
+// time; if the current fingerprint matches and tile data is at its initial
+// state, map.json is considered clean again.
+let _uiFingerprint=null;
+function captureUIFingerprint(){
+  const parts=[
+    document.querySelector('#tBar .tab.active')?.dataset.tab||'',
+    document.querySelector('#eBar .tab.active')?.dataset.tab||'',
+    document.getElementById('terrainSelect')?.value||'',
+    document.getElementById('lowTerrain')?.value||'',
+    document.getElementById('highTerrain')?.value||'',
+    document.getElementById('edgeRemap')?.value||'',
+    document.getElementById('edgeRemapLow')?.value||'',
+    document.getElementById('edgeRemapHigh')?.value||'',
+  ];
+  for(let mv=0;mv<=MAX_LEVEL;mv++){
+    parts.push(document.getElementById(`plT_${mv}`)?.value||'');
+    parts.push(document.getElementById(`edgePL_${mv}`)?.value||'');
+  }
+  return parts.join('|');
+}
+function reconcileMapDirty(){
+  if(!srcTiles&&activeSource!=='map')return; // not a loaded map source
+  const uiClean=_uiFingerprint!==null&&captureUIFingerprint()===_uiFingerprint;
+  // Tile data is clean when cursor is at position 0 (initial loaded state)
+  const tileClean=historyCursor<=0;
+  // Orientation is clean when net transform is identity (angle=0, no flip)
+  const orientClean=orientAngle===0&&!orientFlippedH;
+  _dirtyMap=!(uiClean&&tileClean&&orientClean);
+  _dirtyHeightmap=!(tileClean&&orientClean);
+  updateExportUI();
+}
 function markScenarioDirty(){_dirtyScenario=true;}
 function markHeaderDirty(){_dirtyHeader=true;}
 
@@ -1311,10 +1347,16 @@ Object.defineProperty(window,'redoStack',{get:()=>history.slice(historyCursor+1)
 // ── Collapsible sections ───────────────────────────────────────────────────────
 document.querySelectorAll('.sh[data-sec]').forEach(h=>{
   const sec=h.closest('.section');
+  const body=sec.querySelector('.section-body');
   if(!sec.classList.contains('always-open')){
     h.setAttribute('tabindex','0');
     h.setAttribute('role','button');
     h.setAttribute('aria-expanded',sec.classList.contains('open')?'true':'false');
+    // Wire aria-controls to the section body, adding an id if absent
+    if(body){
+      if(!body.id)body.id=h.dataset.sec+'-body';
+      h.setAttribute('aria-controls',body.id);
+    }
   }
   const toggle=()=>{
     if(sec.classList.contains('always-open'))return;
@@ -1363,13 +1405,13 @@ function updateFolderDropzoneVisibility(){
 wireTabs('srcBar',()=>{
   const tab=document.querySelector('#srcBar .tab.active')?.dataset.tab;
   if(tab==='src-gen'){
-    if(!tileData){activeSource='gen';srcTiles=null;srcByIndex={};srcEdgeGroups=null;srcMapExtra=null;recomputeGen();enableTools();resetCompass();}
-    else{activeSource='gen';}
+    activeSource='gen';srcTiles=null;srcByIndex={};srcEdgeGroups=null;srcMapExtra=null;
+    recomputeGen();enableTools();resetCompass();
   }
   updateFolderDropzoneVisibility();
 });
-wireTabs('tBar',()=>{updatePreview();logSession('terrainTab',activeTerrainTab());});
-wireTabs('eBar',()=>{updatePreview();logSession('edgeTab',activeEdgeTab());});
+wireTabs('tBar',()=>{reconcileMapDirty();updatePreview();logSession('terrainTab',activeTerrainTab());});
+wireTabs('eBar',()=>{reconcileMapDirty();updatePreview();logSession('edgeTab',activeEdgeTab());});
 
 // ── Edge select builder ────────────────────────────────────────────────────────
 const LS_EDGE_DLCS={
@@ -1411,7 +1453,7 @@ function buildEdgePLGrid(){
     const b=document.createElement('div');b.className='lbadge';b.style.background=LV_COL[mv];
     b.style.color=mv>=12?'#1a1a1a':'#fff';b.textContent=ev;
     const s=document.createElement('select');s.id=`edgePL_${mv}`;s.style.fontSize='11px';
-    buildEdgeSelect(s);s.addEventListener('change',updatePreview);
+    buildEdgeSelect(s);s.addEventListener('change',()=>{reconcileMapDirty();updatePreview();});
     g.appendChild(b);g.appendChild(s);
   }
 }
@@ -1462,6 +1504,7 @@ function buildPLGrid(){
     const b=document.createElement('div');b.className='lbadge';b.style.background=LV_COL[mv];
     b.style.color=mv>=12?'#1a1a1a':'#fff';b.textContent=ev;
     const s=document.createElement('select');s.id=`plT_${mv}`;s.style.fontSize='11px';buildSelect(s,true,'lockLandscape');
+    s.addEventListener('change',()=>{reconcileMapDirty();updatePreview();});
     g.appendChild(b);g.appendChild(s);
   }
 }
@@ -1625,7 +1668,7 @@ makeDrop('dzMap','fiMap',file=>{
       folderPill.textContent=folderHint||'';
       folderPill.style.display=folderHint?'inline-flex':'none';
       activeSource='map';setActiveLandscape(detectLandscape(srcTiles),'auto');
-      updatePreview();enableTools();resetCompass();
+      invalidateHeatCache();updatePreview();enableTools();resetCompass();
     }catch(err){msg.textContent='Error: '+err.message;msg.className='msg err';msg.style.display='block';}
   };
   reader.readAsText(file);
@@ -1651,6 +1694,7 @@ function readText(file){
 
 function applyScenarioData(lid){
   setActiveLandscape(lid,'scenario');
+  _loadedLandscape=lid; // snap for reset
   _snapScenario=snapScenario();
   _dirtyScenario=false;  // just loaded - clean
   document.getElementById('msgScenario').textContent='LandscapeId '+lid+' ('+( LS_NAMES[lid]??'unknown')+')';
@@ -1678,6 +1722,7 @@ function applyHeaderData(d){
   [2,4].forEach(id=>{const el=document.getElementById('dlc'+id);if(el)el.checked=dlcs.includes(id);});
   // Ensure DLC 1 is always present in data
   if(!dlcs.includes(1))headerData.DLCs=[1,...dlcs];
+  _loadedDLCs=[...headerData.DLCs]; // snap for reset
   document.getElementById('dlcControls').style.display='block';
   document.getElementById('dlcNotLoaded').style.display='none';
   const badge=document.getElementById('dlcBadge');
@@ -1790,7 +1835,7 @@ function loadScenarioDir(files){
     if(mapFile){
       activeSource='map';updateUndoButtons();
       setActiveLandscape(detectLandscape(srcTiles),'auto');
-      updatePreview();enableTools();resetCompass();
+      invalidateHeatCache();updatePreview();enableTools();resetCompass();
     }
   }).catch(err=>{
     document.getElementById('msgScenario').textContent='Error loading folder: '+err.message;
@@ -1897,7 +1942,7 @@ function recompute(){
   const lo2=Math.min(lo,hi),hi2=Math.max(lo,hi);
   tileData=new Int16Array(W*H);
   for(let i=0;i<W*H;i++)tileData[i]=quantize(imgGray[i],q,lo2,hi2);
-  origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];updateUndoButtons();updatePreview();
+  origTileData=tileData.slice();history=[];historyCursor=-1;sessionLog=[];dlcHistory=[];updateUndoButtons();invalidateHeatCache();updatePreview();
 }
 
 // ── Noise generator ────────────────────────────────────────────────────────────
@@ -1988,7 +2033,7 @@ function runNoiseGen(){
   return{data:flipped,seed:rawSeed,type};
 }
 
-function recomputeGenPreview(){if(!tileData)return;const{data}=runNoiseGen();tileData=data;updatePreview();}
+function recomputeGenPreview(){if(!tileData)return;const{data}=runNoiseGen();tileData=data;invalidateHeatCache();updatePreview();}
 function recomputeGen(commitUndo=false){
   const firstLoad=!tileData||activeSource!=='gen';
   if(commitUndo&&!firstLoad)pushUndo('generate');
@@ -2001,7 +2046,7 @@ function recomputeGen(commitUndo=false){
   document.getElementById('srcBadge').textContent='Generated';
   document.getElementById('msgGen').textContent=`Seed: ${seed} · ${type}`;
   document.getElementById('msgGen').className='msg ok';
-  activeSource='gen';updatePreview();enableTools();resetCompass();
+  activeSource='gen';invalidateHeatCache();updatePreview();enableTools();resetCompass();
 }
 
 // ── Generator slider wiring ────────────────────────────────────────────────────
@@ -2028,10 +2073,8 @@ function mkGenSlider(id,outId,displayFn){
   s.addEventListener('pointerup',()=>{
     if(activeSource==='gen'&&genPreDragSnapshot){
       const label=genDragLabel(genPreDragSliderId,genPreDragSnapshot.genState);
-      history.splice(historyCursor+1);
-      history.push({data:genPreDragSnapshot.data,label,genState:genPreDragSnapshot.genState});
-      if(history.length>UNDO_MAX+1)history.shift();
-      historyCursor=history.length-1;updateUndoButtons();genPreDragSnapshot=null;genPreDragSliderId=null;recomputeGen(false);
+      pushUndo(label,genPreDragSnapshot.data,genPreDragSnapshot.genState);
+      genPreDragSnapshot=null;genPreDragSliderId=null;recomputeGen(false);
     }
   });
 }
@@ -2067,10 +2110,7 @@ document.getElementById('btnRandSeed').addEventListener('click',()=>{
   const prev=document.getElementById('genSeed').value;
   document.getElementById('genSeed').value=seed;
   if(activeSource==='gen'){
-    history.splice(historyCursor+1);
-    history.push({data:tileData.slice(),label:`Generate - Seed (${prev} -> ${seed})`,genState:captureGenState()});
-    if(history.length>UNDO_MAX+1)history.shift();
-    historyCursor=history.length-1;updateUndoButtons();recomputeGen(false);
+    pushUndo(`Generate - Seed (${prev} -> ${seed})`);recomputeGen(false);
   }
 });
 (()=>{
@@ -2163,7 +2203,8 @@ function heatmapColour(r,isSlope){
   const pos=t*si,lo=Math.floor(pos),hi=Math.min(si,lo+1),f=pos-lo,s0=stops[lo],s1=stops[hi];
   return[Math.round(s0[0]+(s1[0]-s0[0])*f),Math.round(s0[1]+(s1[1]-s0[1])*f),Math.round(s0[2]+(s1[2]-s0[2])*f)];
 }
-function invalidateHeatCache(){_heatCache=null;_heatCacheStamp=null;}
+function invalidateHeatCache(){_heatCache=null;}
+function getCachedHeat(){if(!_heatCache){_heatCache=computeNavRadius();}return _heatCache;}
 
 // ── Preview render ─────────────────────────────────────────────────────────────
 function updateSectionBadges(){
@@ -2209,11 +2250,10 @@ function updatePreview(){
   if(!tileData)return;
   updateSectionBadges();
   updateExportUI();
-  invalidateHeatCache();
   const canvas=document.getElementById('cvPreview'),ctx=canvas.getContext('2d'),imgData=ctx.createImageData(W,H);
   const dist=new Array(MAX_LEVEL+1).fill(0);
   const showTerrain=previewMode==='terrain',showNav=previewMode==='nav',showHeat=previewMode==='heatmap';
-  const heat=showHeat?computeNavRadius():null;
+  const heat=showHeat?getCachedHeat():null;
   const NAV_WATER=hexToRgb(NAV_HEX.water),NAV_CLIFF=hexToRgb(NAV_HEX.cliff),NAV_SLOPE=hexToRgb(NAV_HEX.slope);
   const NAV_HIGH=hexToRgb(NAV_HEX.high),NAV_NARROW=hexToRgb(NAV_HEX.narrow),NAV_OK=hexToRgb(NAV_HEX.ok);
 
@@ -2351,9 +2391,9 @@ function restoreGenState(gs){
   }
   updateLvlRangeUI();
 }
-function pushUndo(label='edit'){
+function pushUndo(label='edit',data=null,genState=null){
   history.splice(historyCursor+1);
-  history.push({data:tileData.slice(),label,genState:captureGenState()});
+  history.push({data:data??tileData.slice(),label,genState:genState??captureGenState()});
   if(history.length>UNDO_MAX+1)history.shift();
   historyCursor=history.length-1;updateUndoButtons();
 }
@@ -2393,7 +2433,7 @@ function updateUndoButtons(){
       el.addEventListener('mouseleave',()=>{el.style.background='';});
       const jump=()=>{
         tileData=history[i].data.slice();restoreGenState(history[i].genState);
-        historyCursor=i;syncSrc();updatePreview();updateUndoButtons();
+        historyCursor=i;syncSrc();updatePreview();updateUndoButtons();reconcileMapDirty();
       };
       el.addEventListener('click',jump);
       el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();jump();}});
@@ -2403,7 +2443,7 @@ function updateUndoButtons(){
 }
 function syncSrc(){
   if(srcTiles)srcTiles.forEach(t=>{if(t.Index>=0&&t.Index<W*H)t.Level=tileData[t.Index];});
-  markMapDirty();markHeightmapDirty();
+  markMapDirty();markHeightmapDirty();invalidateHeatCache();
 }
 function toolMsg(txt){const m=document.getElementById('msgTool');m.textContent=txt;m.className='msg ok';setTimeout(()=>{if(m.textContent===txt)m.textContent='';},4000);}
 
@@ -2436,17 +2476,68 @@ document.getElementById('btnBand').addEventListener('click',()=>{
 document.getElementById('btnUndo').addEventListener('click',()=>{
   if(historyCursor<=0)return;historyCursor--;
   const entry=history[historyCursor];tileData=entry.data.slice();restoreGenState(entry.genState);
-  syncSrc();updatePreview();updateUndoButtons();toolMsg(`Undone: ${history[historyCursor+1].label}`);
+  syncSrc();updatePreview();updateUndoButtons();reconcileMapDirty();toolMsg(`Undone: ${history[historyCursor+1].label}`);
 });
 document.getElementById('btnRedo').addEventListener('click',()=>{
   if(historyCursor>=history.length-1)return;historyCursor++;
   const entry=history[historyCursor];tileData=entry.data.slice();restoreGenState(entry.genState);
-  syncSrc();updatePreview();updateUndoButtons();toolMsg(`Redone: ${entry.label}`);
+  syncSrc();updatePreview();updateUndoButtons();reconcileMapDirty();toolMsg(`Redone: ${entry.label}`);
 });
 document.getElementById('btnReset').addEventListener('click',()=>{
-  if(!origTileData)return;pushUndo('before reset');tileData=origTileData.slice();resetCompass();
-  syncSrc();updatePreview();toolMsg('Reset to loaded state.');
+  if(!origTileData||!history.length)return;
+  // Jump to the first history entry (the original loaded/generated state)
+  // rather than pushing a new undo entry, which would shift historyCursor away from 0.
+  historyCursor=0;
+  const entry=history[0];
+  tileData=entry.data.slice();
+  restoreGenState(entry.genState);
+  resetCompass();
+  resetTerrainEdgeUI();
+  // Restore landscape to loaded value if available
+  if(_loadedLandscape!==null)setActiveLandscape(_loadedLandscape,'scenario');
+  // Restore DLCs to loaded value if available
+  if(_loadedDLCs!==null&&headerData){
+    headerData.DLCs=[..._loadedDLCs];
+    [2,4].forEach(id=>{const el=document.getElementById('dlc'+id);if(el)el.checked=headerData.DLCs.includes(id);});
+    _dirtyHeader=false;
+    const badge=document.getElementById('dlcBadge');
+    const optDlcs=headerData.DLCs.filter(id=>id!==1);
+    badge.textContent=optDlcs.length?optDlcs.map(id=>DLC_NAMES[id]||'DLC '+id).join(', '):'';
+    badge.style.display=optDlcs.length?'inline-flex':'none';
+    document.getElementById('msgDLC').textContent='';
+  }
+  srcTiles?.forEach(t=>{if(t.Index>=0&&t.Index<W*H)t.Level=tileData[t.Index];});
+  invalidateHeatCache();
+  updatePreview();updateUndoButtons();reconcileMapDirty();
+  toolMsg('Reset to loaded state.');
 });
+
+// Reset all terrain/edge selects and tabs to "no change" default state.
+// Called on reset so the UI matches the clean loaded map exactly.
+function resetTerrainEdgeUI(){
+  // Terrain: switch to simple tab, clear all selects
+  const tSimple=document.querySelector('#tBar .tab[data-tab="ta-simple"]');
+  if(tSimple&&!tSimple.classList.contains('active'))tSimple.click();
+  ['terrainSelect','lowTerrain','highTerrain'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  for(let mv=0;mv<=MAX_LEVEL;mv++){
+    const s=document.getElementById(`plT_${mv}`);if(s)s.value='';
+  }
+  // Edge: switch to simple tab, clear all selects
+  const eSimple=document.querySelector('#eBar .tab[data-tab="ea-simple"]');
+  if(eSimple&&!eSimple.classList.contains('active'))eSimple.click();
+  ['edgeRemap','edgeRemapLow','edgeRemapHigh'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  for(let mv=0;mv<=MAX_LEVEL;mv++){
+    const s=document.getElementById(`edgePL_${mv}`);if(s)s.value='';
+  }
+  const w=document.getElementById('edgeWarn');if(w)w.style.display='none';
+  updateTHint();
+  // Re-snap the fingerprint so reconcileMapDirty sees this as the clean state
+  _uiFingerprint=captureUIFingerprint();
+}
 
 // ── Orientation ────────────────────────────────────────────────────────────────
 function orientMsg(txt){const m=document.getElementById('msgOrient');m.textContent=txt;m.className='msg ok';setTimeout(()=>{if(m.textContent===txt)m.textContent='';},4000);}
@@ -2483,16 +2574,24 @@ function applyTransform(fn,label){
       });
     }
   }
+  // Rotate srcEdgeGroups so cliff edge assignments follow their tiles
+  if(srcEdgeGroups){
+    srcEdgeGroups.forEach(eg=>{
+      const row=Math.floor(eg.TileIndex/W),col=eg.TileIndex%W;
+      const{r:nr,c:nc}=fn(row,col);
+      eg.TileIndex=nr*W+nc;
+    });
+  }
   orientHistory.push(label);syncSrc();updatePreview();orientMsg(label);
 }
-function rot90CW(row,col){return{r:W-1-col,c:row};}
-function rot90CCW(row,col){return{r:col,c:H-1-row};}
+function rot90CW(row,col){return{r:col,c:H-1-row};}
+function rot90CCW(row,col){return{r:W-1-col,c:row};}
 function flipH(row,col){return{r:row,c:W-1-col};}
 function flipV(row,col){return{r:H-1-row,c:col};}
-document.getElementById('btnRot90CW').addEventListener('click',()=>{applyTransform(rot90CW,'Rotate 90° CW');orientAngle=(orientAngle+90)%360;drawOrientIndicator();});
-document.getElementById('btnRot90CCW').addEventListener('click',()=>{applyTransform(rot90CCW,'Rotate 90° CCW');orientAngle=(orientAngle-90+360)%360;drawOrientIndicator();});
-document.getElementById('btnFlipH').addEventListener('click',()=>{applyTransform(flipH,'Flip horizontal');orientFlippedH=!orientFlippedH;drawOrientIndicator();});
-document.getElementById('btnFlipV').addEventListener('click',()=>{applyTransform(flipV,'Flip vertical');orientAngle=(orientAngle+180)%360;orientFlippedH=!orientFlippedH;drawOrientIndicator();});
+document.getElementById('btnRot90CW').addEventListener('click',()=>{applyTransform(rot90CW,'Rotate 90° CW');orientAngle=(orientAngle+90)%360;drawOrientIndicator();reconcileMapDirty();});
+document.getElementById('btnRot90CCW').addEventListener('click',()=>{applyTransform(rot90CCW,'Rotate 90° CCW');orientAngle=(orientAngle-90+360)%360;drawOrientIndicator();reconcileMapDirty();});
+document.getElementById('btnFlipH').addEventListener('click',()=>{applyTransform(flipH,'Flip horizontal');orientFlippedH=!orientFlippedH;drawOrientIndicator();reconcileMapDirty();});
+document.getElementById('btnFlipV').addEventListener('click',()=>{applyTransform(flipV,'Flip vertical');orientAngle=(orientAngle+180)%360;orientFlippedH=!orientFlippedH;drawOrientIndicator();reconcileMapDirty();});
 document.getElementById('chkCompass').addEventListener('change',drawOrientIndicator);
 function resetCompass(){orientAngle=0;orientFlippedH=false;orientHistory=[];drawOrientIndicator();}
 
@@ -2508,32 +2607,80 @@ function computeTypesForExport(levels){
 }
 function buildTiles(){
   if(!tileData)return null;
-  const lockEdge=document.getElementById('lockEdgeLandscape').checked,origEdgeById={};
-  if(srcEdgeGroups)srcEdgeGroups.forEach(eg=>{origEdgeById[eg.TileIndex]=eg.EdgeTypeId;});
+  const lockEdge=document.getElementById('lockEdgeLandscape').checked,origEdgeByIdx={};
+  if(srcEdgeGroups)srcEdgeGroups.forEach(eg=>{origEdgeByIdx[eg.TileIndex]=eg;});
   const computedTypes=computeTypesForExport(tileData),tiles=[],edgeGroups=[];
+
+  // Helper: compute max upward height difference to any orthogonal neighbour.
+  // This determines how many level-panel slots EdgeVariations needs (diff + 2).
+  function cliffDiff(i,mv){
+    const row=Math.floor(i/W),col=i%W;
+    let diff=0;
+    if(row>0)        diff=Math.max(diff,tileData[i-W]-mv);
+    if(row<H-1)      diff=Math.max(diff,tileData[i+W]-mv);
+    if(col>0)        diff=Math.max(diff,tileData[i-1]-mv);
+    if(col<W-1)      diff=Math.max(diff,tileData[i+1]-mv);
+    return Math.max(0,diff);
+  }
+
+  // Helper: build a correct-length EdgeVariations array.
+  // Preserves as much of orig as possible; pads with 0s or truncates as needed.
+  // foot/roof (-1 means default) are preserved from orig when available.
+  function makeEdgeVariations(diff,orig){
+    const needed=diff+2; // 2 header slots (foot, roof) + one per cliff level
+    const foot=orig&&orig.length>0?orig[0]:-1;
+    const roof=orig&&orig.length>1?orig[1]:-1;
+    const panels=[];
+    for(let p=0;p<diff;p++){
+      // orig panels start at index 2
+      panels.push(orig&&orig.length>p+2?orig[p+2]:0);
+    }
+    return[foot,roof,...panels];
+  }
+
   for(let i=0;i<W*H;i++){
     const mv=clampMap(tileData[i]),origTile=srcByIndex[i];
     const chosen=terrainForMapLevel(mv),terrain=chosen!==null?chosen:(origTile?origTile.TerrainTypeId:2);
-    const type=origTile?.Type===1?1:computedTypes[i];
+    // Preserve original Type when available and the level hasn't changed.
+    // Recomputing from neighbours alone misses cliff tiles the engine marks
+    // via diagonal adjacency or other rules not visible in the tile array.
+    const levelUnchanged=origTile&&origTile.Level===mv;
+    const type=origTile?.Type===1?1:(levelUnchanged?origTile.Type:computedTypes[i]);
     tiles.push({Index:i,Level:mv,Type:type,TerrainTypeId:terrain});
     if(type===2){
-      const edgeKey=edgeFamilyForMapLevel(mv);let edgeTypeId;
-      if(!edgeKey){edgeTypeId=origEdgeById.hasOwnProperty(i)?origEdgeById[i]:0;}
-      else{
+      const edgeKey=edgeFamilyForMapLevel(mv);
+      const origEg=origEdgeByIdx[i];
+      const diff=cliffDiff(i,mv);
+      let edgeTypeId,edgeVariations;
+      if(!edgeKey){
+        // No remap - preserve original entry if level unchanged, otherwise
+        // truncate/extend EdgeVariations to match the new cliff height.
+        edgeTypeId=origEg?origEg.EdgeTypeId:0;
+        if(origEg){
+          edgeVariations=levelUnchanged
+            ?origEg.EdgeVariations                       // unchanged: verbatim
+            :makeEdgeVariations(diff,origEg.EdgeVariations); // changed: adapt length
+        }else{
+          edgeVariations=makeEdgeVariations(diff,null);  // no source: basic default
+        }
+      }else{
+        // Remapping edge family - new edge type, generate correct-length basic array.
+        // Foot/roof default to -1; per-level panels default to 0.
+        edgeVariations=makeEdgeVariations(diff,null);
         const edgeDef=EDGE_BY_KEY[edgeKey];
-        if(!edgeDef){edgeTypeId=origEdgeById.hasOwnProperty(i)?origEdgeById[i]:0;}
-        else if(lockEdge){const legalDlcs=LS_EDGE_DLCS[activeLandscape]||[];edgeTypeId=legalDlcs.includes(edgeDef.dlc)?edgeDef.id:(origEdgeById.hasOwnProperty(i)?origEdgeById[i]:0);}
+        if(!edgeDef){edgeTypeId=origEg?origEg.EdgeTypeId:0;}
+        else if(lockEdge){const legalDlcs=LS_EDGE_DLCS[activeLandscape]||[];edgeTypeId=legalDlcs.includes(edgeDef.dlc)?edgeDef.id:(origEg?origEg.EdgeTypeId:0);}
         else{edgeTypeId=edgeDef.id;}
       }
-      edgeGroups.push({TileIndex:i,EdgeTypeId:edgeTypeId||0,EdgeVariationsIncludeFootAndRoof:true,EdgeVariations:[-1,-1,i%3]});
+      edgeGroups.push({TileIndex:i,EdgeTypeId:edgeTypeId||0,EdgeVariationsIncludeFootAndRoof:true,EdgeVariations:edgeVariations});
     }
   }
-  // Spread any extra top-level keys from the original loaded map (e.g. Decorations)
-  // then overwrite only the keys this tool manages.
+  // Build result with stable key order matching vanilla: Width, Height, Tiles, EdgeGroups,
+  // then any extra keys from the original file (e.g. Decorations) at the end.
   const extra=srcMapExtra?Object.fromEntries(
     Object.entries(srcMapExtra).filter(([k])=>!['Width','Height','Tiles','EdgeGroups','_STTCTT'].includes(k))
   ):{};
-  const result={...extra,Width:W,Height:H,Tiles:tiles,EdgeGroups:edgeGroups};
+  const result={Width:W,Height:H,Tiles:tiles,EdgeGroups:edgeGroups,...extra};
   if(srcEdgeGroups===null&&edgeGroups.length===0)delete result.EdgeGroups;
   return result;
 }
@@ -2547,6 +2694,8 @@ function enableTools(){
     _snapMap=snapMap();
     if(activeSource!=='map'){_dirtyMap=true;_dirtyHeightmap=true;}
   }
+  // Snap the terrain/edge UI state so we can detect if the user reverts to it
+  _uiFingerprint=captureUIFingerprint();
   updateExportUI();
 }
 function dl(name,text){
@@ -2854,9 +3003,10 @@ document.getElementById('btnExportAll').addEventListener('click',()=>{
 });
 
 // ── Change listeners ───────────────────────────────────────────────────────────
-document.getElementById('terrainSelect').addEventListener('change',updatePreview);
-['lowTerrain','highTerrain'].forEach(id=>document.getElementById(id).addEventListener('change',updatePreview));
-document.getElementById('edgeRemap').addEventListener('change',updateTHint);
+document.getElementById('terrainSelect').addEventListener('change',()=>{reconcileMapDirty();updatePreview();});
+['lowTerrain','highTerrain'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{reconcileMapDirty();updatePreview();}));
+document.getElementById('edgeRemap').addEventListener('change',()=>{reconcileMapDirty();updateTHint();updatePreview();});
+['edgeRemapLow','edgeRemapHigh'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{reconcileMapDirty();updatePreview();}));
 
 // ── Tile Inspector ─────────────────────────────────────────────────────────────
 (()=>{
@@ -2977,6 +3127,8 @@ function updateLvlRangeUI(){
   minEl.value=levelMin;maxEl.value=levelMax;
   const eMin=toEditor(levelMin),eMax=toEditor(levelMax);
   const eMinStr=eMin>=0?String(eMin):('-'+Math.abs(eMin));
+  minEl.setAttribute('aria-valuetext','editor '+eMinStr);
+  maxEl.setAttribute('aria-valuetext','editor '+eMax);
   if(displayEl)displayEl.textContent='editor '+eMinStr+' → '+eMax;
   if(rvEl)rvEl.textContent=eMinStr+'-'+eMax;
   if(fillEl){
@@ -3013,10 +3165,8 @@ function updateLvlRangeUI(){
   function onRangeCommit(){
     if(activeSource==='gen'&&genPreDragSnapshot){
       const label=`Generate - Level range (${toEditor(genPreDragSnapshot.genState?.levelMin??0)}→${toEditor(genPreDragSnapshot.genState?.levelMax??14)} → ${toEditor(levelMin)}→${toEditor(levelMax)})`;
-      history.splice(historyCursor+1);
-      history.push({data:genPreDragSnapshot.data,label,genState:genPreDragSnapshot.genState});
-      if(history.length>UNDO_MAX+1)history.shift();
-      historyCursor=history.length-1;updateUndoButtons();genPreDragSnapshot=null;genPreDragSliderId=null;
+      pushUndo(label,genPreDragSnapshot.data,genPreDragSnapshot.genState);
+      genPreDragSnapshot=null;genPreDragSliderId=null;
       recomputeGen(false);
     }
   }
