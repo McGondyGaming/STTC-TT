@@ -173,9 +173,7 @@ This tool allows you to:
  - Fixed image sliders wiping undo history
  - Fixed loading a new image preserving rotation from previous session
  - Fixed image sliders (quantization, min/max level) wiping undo history
- - Fixed rotating/flipping an image heightmap being lost when adjusting sliders
- - Fixed undo/redo not restoring orientation
- - Fixed CW and CCW rotating in the wrong directions- Numerous bugfixes (Edge rotations, preview caches, edge variations, export available/unsaved changes, undo depth)
+ - Numerous bugfixes (Edge rotations, preview caches, edge variations, export available/unsaved changes, undo depth)
  - Heatmap performance improvements
  - Customised keyboard binding for preview keyboard navigation - defaults to WASD
  - Keyboard navigation of preview (arrows move selector, shift+arrow move 5x, space/enter selects current tile)
