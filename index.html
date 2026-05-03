@@ -215,24 +215,24 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 .keybind-btn{min-width:36px;font-family:monospace;font-size:12px;font-weight:700;letter-spacing:.03em;}
 .keybind-btn.capturing{background:color-mix(in srgb,var(--warn) 18%,var(--bg3));border-color:var(--warn);color:var(--warn);animation:kb-pulse 0.9s ease-in-out infinite;}
 @keyframes kb-pulse{0%,100%{opacity:1;}50%{opacity:.55;}}
-/* ── Preview layout modes ────────────────────────────────────────────────────── */
-/* Cap: limits canvas height so content below stays visible */
+/* ── Preview layout modes ──────────────────────────────────────────────────── */
 .preview-cap-on .preview-canvas-wrap canvas{max-height:var(--preview-cap,50vh);object-fit:contain;}
-/* Flex: previewInner becomes a scroll container so sidebar never disappears */
-.preview-flex-on #previewInner{display:flex;flex-direction:column;overflow-y:auto;max-height:calc(100vh - 120px);}
-.preview-flex-on .preview-canvas-wrap{flex-shrink:1;min-height:0;}
-.preview-flex-on #previewLabel,
-.preview-flex-on #heatScaleWrap,
-.preview-flex-on #previewSidebar{flex-shrink:0;}
-/* Split: canvas + label stacked left, sidebar expands naturally right — no scroll */
-.preview-split-on #previewInner{display:grid;grid-template-columns:55% 1fr;grid-template-rows:auto auto 1fr;column-gap:10px;}
-.preview-split-on .preview-canvas-wrap{grid-column:1;grid-row:1;}
-.preview-split-on #previewLabel{grid-column:1;grid-row:2;text-align:left;}
-.preview-split-on #heatScaleWrap{grid-column:1;grid-row:3;align-self:start;}
-.preview-split-on #previewSidebar{grid-column:2;grid-row:1/4;overflow:visible;}
-/* When split is on, no cap needed — the grid already controls space */
+/* Split: mode bar spans both cols; canvas+label left, sidebar right */
+.preview-split-on .right-col-inner{display:grid;grid-template-columns:55% 1fr;grid-template-rows:auto auto 1fr;column-gap:10px;min-height:calc(100vh - 80px);}
+.preview-split-on #previewModeBar{grid-column:1/3;grid-row:1;margin-bottom:8px;}
+.preview-split-on .preview-canvas-wrap{grid-column:1;grid-row:2;}
+.preview-split-on #previewLabel{grid-column:1;grid-row:3;text-align:left;align-self:start;margin-top:5px;}
+.preview-split-on #heatScaleWrap{grid-column:1;grid-row:3;align-self:end;}
+.preview-split-on #previewSidebar{grid-column:2;grid-row:2/4;overflow:visible;}
 .preview-split-on .preview-canvas-wrap canvas{max-height:none!important;}
-/* Inspector 2-column table layout */
+/* Cap + split: left col shrinks to canvas actual width so sidebar gains the space */
+.preview-cap-on.preview-split-on .right-col-inner{grid-template-columns:auto 1fr;}
+.preview-cap-on.preview-split-on .preview-canvas-wrap canvas{max-height:var(--preview-cap,50vh)!important;width:auto;}
+/* Compact sidebar stats in split mode */
+.preview-split-on .stat{padding:5px 7px;}
+.preview-split-on .stat-l{font-size:9px;}
+.preview-split-on .stat-v{font-size:13px;}
+/* Inspector 2-column table */
 #inspRows.insp-2col{display:grid;grid-template-columns:1fr 1fr;column-gap:10px;}
 #inspRows.insp-2col .insp-row{min-width:0;}
 #inspRows.insp-2col .insp-val{max-width:unset;}
@@ -634,16 +634,15 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
       </div>
       <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px;">
         <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">Preview layout</div>
-        <div class="note" style="margin-bottom:8px;">Options combine freely. Split overrides cap while active.</div>
+        <div class="note" style="margin-bottom:8px;">Options combine freely.</div>
         <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;">
           <label class="ck-row"><input type="checkbox" id="chkPreviewCap"> Cap canvas height</label>
-          <label class="ck-row"><input type="checkbox" id="chkPreviewFlex"> Flex: keep stats always scrollable</label>
           <label class="ck-row"><input type="checkbox" id="chkPreviewSplit"> Split: sidebar alongside canvas</label>
           <label class="ck-row"><input type="checkbox" id="chkInsp2col"> Inspector: 2-column table</label>
         </div>
         <div id="previewCapRow" style="display:none;">
-          <label class="fl" for="previewCapSlider">Max canvas height <span id="previewCapOut" style="font-weight:700;">50</span>vh</label>
-          <div class="rr"><input type="range" id="previewCapSlider" min="20" max="90" value="50" step="5" style="accent-color:var(--accent);"><span class="rv" id="previewCapPx"></span></div>
+          <label class="fl" for="previewCapSlider">Max canvas height <span id="previewCapOut" style="font-weight:700;">50</span>vh <span id="previewCapPx" style="color:var(--text3);font-weight:400;"></span></label>
+          <div class="rr"><input type="range" id="previewCapSlider" min="20" max="90" value="50" step="5" style="accent-color:var(--accent);"></div>
         </div>
       </div>
       <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px;">
@@ -746,13 +745,13 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <div class="section always-open">
     <div class="sh"><span class="st">Preview</span></div>
     <div class="section-body" style="padding-top:8px;">
-      <div class="scheme-presets" id="previewModeBar" style="margin-bottom:8px;">
-        <button class="scheme-btn active" data-mode="height">Height</button>
-        <button class="scheme-btn" data-mode="terrain">Terrain</button>
-        <button class="scheme-btn" data-mode="nav">Navigability</button>
-        <button class="scheme-btn" data-mode="heatmap">Heatmap</button>
-      </div>
-      <div id="previewInner">
+      <div class="right-col-inner">
+        <div class="scheme-presets" id="previewModeBar" style="margin-bottom:8px;">
+          <button class="scheme-btn active" data-mode="height">Height</button>
+          <button class="scheme-btn" data-mode="terrain">Terrain</button>
+          <button class="scheme-btn" data-mode="nav">Navigability</button>
+          <button class="scheme-btn" data-mode="heatmap">Heatmap</button>
+        </div>
         <div class="preview-canvas-wrap" style="position:relative;" id="previewWrap">
           <canvas id="cvPreview" width="128" height="128" tabindex="0" role="application" aria-label="Terrain preview. Use arrow keys to move selection, Enter or Space to inspect tile."></canvas>
           <div id="orientOverlay" style="display:none;position:absolute;inset:0;pointer-events:none;">
@@ -3187,7 +3186,6 @@ document.getElementById('edgeRemap').addEventListener('change',()=>{reconcileMap
   }
   function moveXhair(col,row){
     const rect=cvEl.getBoundingClientRect();
-    // Use the smaller per-tile dimension so crosshair stays square when capped (tw≠th)
     const tw=rect.width/W,th=rect.height/H,ts=Math.min(tw,th);
     const ox=(tw-ts)/2,oy=(th-ts)/2;
     xhair.style.display='block';
@@ -3532,64 +3530,6 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
   if(activeUITheme==='custom')syncCustomUITheme();
 });
 
-// ── Preview layout controls ────────────────────────────────────────────────────
-(()=>{
-  const rightCol=document.querySelector('.right-col');
-  if(!rightCol)return;
-  const capSlider=document.getElementById('previewCapSlider');
-  const capOut=document.getElementById('previewCapOut');
-  const capPx=document.getElementById('previewCapPx');
-  const capRow=document.getElementById('previewCapRow');
-  const chkCap=document.getElementById('chkPreviewCap');
-  const chkFlex=document.getElementById('chkPreviewFlex');
-  const chkSplit=document.getElementById('chkPreviewSplit');
-  const chkInsp2col=document.getElementById('chkInsp2col');
-  const inspRowsEl=document.getElementById('inspRows');
-
-  function pxApprox(vh){return Math.round(window.innerHeight*vh/100)+'px';}
-
-  function applyCapValue(){
-    const v=parseInt(capSlider.value);
-    capOut.textContent=v;
-    capPx.textContent='≈'+pxApprox(v);
-    rightCol.style.setProperty('--preview-cap',v+'vh');
-    try{localStorage.setItem('sttctt-preview-cap',v);}catch(e){}
-  }
-
-  function applyLayout(){
-    rightCol.classList.toggle('preview-cap-on', chkCap.checked);
-    rightCol.classList.toggle('preview-flex-on', chkFlex.checked);
-    rightCol.classList.toggle('preview-split-on', chkSplit.checked);
-    if(inspRowsEl)inspRowsEl.classList.toggle('insp-2col', chkInsp2col.checked);
-    capRow.style.display=chkCap.checked?'block':'none';
-    try{
-      localStorage.setItem('sttctt-preview-cap-on', chkCap.checked?'1':'0');
-      localStorage.setItem('sttctt-preview-flex-on', chkFlex.checked?'1':'0');
-      localStorage.setItem('sttctt-preview-split-on', chkSplit.checked?'1':'0');
-      localStorage.setItem('sttctt-preview-insp2col', chkInsp2col.checked?'1':'0');
-    }catch(e){}
-  }
-
-  chkCap.addEventListener('change', applyLayout);
-  chkFlex.addEventListener('change', applyLayout);
-  chkSplit.addEventListener('change', applyLayout);
-  chkInsp2col.addEventListener('change', applyLayout);
-  capSlider.addEventListener('input', applyCapValue);
-
-  // Restore persisted layout prefs
-  try{
-    const sv=localStorage.getItem('sttctt-preview-cap');
-    if(sv){capSlider.value=sv;}
-    chkCap.checked=localStorage.getItem('sttctt-preview-cap-on')==='1';
-    chkFlex.checked=localStorage.getItem('sttctt-preview-flex-on')==='1';
-    chkSplit.checked=localStorage.getItem('sttctt-preview-split-on')==='1';
-    chkInsp2col.checked=localStorage.getItem('sttctt-preview-insp2col')==='1';
-  }catch(e){}
-
-  applyCapValue();
-  applyLayout();
-})();
-
 // Restore persisted theme preference
 (()=>{
   // Restore custom colour picker values first
@@ -3609,6 +3549,57 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
   let saved='auto';
   try{saved=localStorage.getItem('sttctt-ui-theme')||'auto';}catch(e){}
   applyUITheme(saved);
+})();
+
+// ── Preview layout controls ────────────────────────────────────────────────────
+(()=>{
+  const rightCol=document.querySelector('.right-col');
+  if(!rightCol)return;
+  const capSlider=document.getElementById('previewCapSlider');
+  const capOut=document.getElementById('previewCapOut');
+  const capPx=document.getElementById('previewCapPx');
+  const capRow=document.getElementById('previewCapRow');
+  const chkCap=document.getElementById('chkPreviewCap');
+  const chkSplit=document.getElementById('chkPreviewSplit');
+  const chkInsp2col=document.getElementById('chkInsp2col');
+  const inspRowsEl=document.getElementById('inspRows');
+
+  function applyCapValue(){
+    const v=parseInt(capSlider.value);
+    capOut.textContent=v;
+    capPx.textContent='≈'+Math.round(window.innerHeight*v/100)+'px';
+    rightCol.style.setProperty('--preview-cap',v+'vh');
+    try{localStorage.setItem('sttctt-preview-cap',v);}catch(e){}
+  }
+
+  function applyLayout(){
+    rightCol.classList.toggle('preview-cap-on',chkCap.checked);
+    rightCol.classList.toggle('preview-split-on',chkSplit.checked);
+    if(inspRowsEl)inspRowsEl.classList.toggle('insp-2col',chkInsp2col.checked);
+    capRow.style.display=chkCap.checked?'block':'none';
+    try{
+      localStorage.setItem('sttctt-preview-cap-on',chkCap.checked?'1':'0');
+      localStorage.setItem('sttctt-preview-split-on',chkSplit.checked?'1':'0');
+      localStorage.setItem('sttctt-preview-insp2col',chkInsp2col.checked?'1':'0');
+    }catch(e){}
+  }
+
+  chkCap.addEventListener('change',applyLayout);
+  chkSplit.addEventListener('change',applyLayout);
+  chkInsp2col.addEventListener('change',applyLayout);
+  capSlider.addEventListener('input',applyCapValue);
+
+  // Restore persisted prefs
+  try{
+    const sv=localStorage.getItem('sttctt-preview-cap');
+    if(sv)capSlider.value=sv;
+    chkCap.checked=localStorage.getItem('sttctt-preview-cap-on')==='1';
+    chkSplit.checked=localStorage.getItem('sttctt-preview-split-on')==='1';
+    chkInsp2col.checked=localStorage.getItem('sttctt-preview-insp2col')==='1';
+  }catch(e){}
+
+  applyCapValue();
+  applyLayout();
 })();
 </script>
 </body>
