@@ -225,9 +225,8 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 .preview-split-on #heatScaleWrap{grid-column:1;grid-row:3;align-self:end;}
 .preview-split-on #previewSidebar{grid-column:2;grid-row:2/4;overflow:visible;}
 .preview-split-on .preview-canvas-wrap canvas{max-height:none!important;}
-/* Cap + split: left col width = capped canvas height (canvas is square, so height == width).
-   min(55%, cap) keeps it from ever being wider than the uncapped split column. */
-.preview-cap-on.preview-split-on .right-col-inner{grid-template-columns:min(55%, var(--preview-cap, 50vh)) 1fr;}
+/* Cap + split: left col width driven by JS-computed --preview-left-w (px) */
+.preview-cap-on.preview-split-on .right-col-inner{grid-template-columns:var(--preview-left-w,55%) 1fr;}
 .preview-cap-on.preview-split-on .preview-canvas-wrap canvas{max-height:var(--preview-cap,50vh)!important;}
 /* Compact sidebar stats in split mode */
 .preview-split-on .stat{padding:5px 7px;}
@@ -637,12 +636,12 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">Preview layout</div>
         <div class="note" style="margin-bottom:8px;">Options combine freely.</div>
         <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;">
-          <label class="ck-row"><input type="checkbox" id="chkPreviewCap"> Cap canvas height</label>
+          <label class="ck-row"><input type="checkbox" id="chkPreviewCap"> Adjust preview size</label>
           <label class="ck-row"><input type="checkbox" id="chkPreviewSplit"> Split: sidebar alongside canvas</label>
           <label class="ck-row"><input type="checkbox" id="chkInsp2col"> Inspector: 2-column table</label>
         </div>
         <div id="previewCapRow" style="display:none;">
-          <label class="fl" for="previewCapSlider">Max canvas height <span id="previewCapOut" style="font-weight:700;">50</span>vh <span id="previewCapPx" style="color:var(--text3);font-weight:400;"></span></label>
+          <label class="fl" for="previewCapSlider">Max preview size</label>
           <div class="rr"><input type="range" id="previewCapSlider" min="20" max="90" value="50" step="5" style="accent-color:var(--accent);"></div>
         </div>
       </div>
@@ -3567,9 +3566,16 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
 
   function applyCapValue(){
     const v=parseInt(capSlider.value);
+    const capPxVal=Math.round(window.innerHeight*v/100);
     capOut.textContent=v;
-    capPx.textContent='≈'+Math.round(window.innerHeight*v/100)+'px';
+    capPx.textContent='≈'+capPxVal+'px';
     rightCol.style.setProperty('--preview-cap',v+'vh');
+    // Compute left column width for cap+split: canvas is square so left col = cap height in px,
+    // clamped so the sidebar always gets at least 180px.
+    const rcW=rightCol.getBoundingClientRect().width||rightCol.offsetWidth||600;
+    const minSidebar=180;
+    const leftW=Math.min(capPxVal, rcW-minSidebar);
+    rightCol.style.setProperty('--preview-left-w',Math.max(80,leftW)+'px');
     try{localStorage.setItem('sttctt-preview-cap',v);}catch(e){}
   }
 
@@ -3578,6 +3584,8 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
     rightCol.classList.toggle('preview-split-on',chkSplit.checked);
     if(inspRowsEl)inspRowsEl.classList.toggle('insp-2col',chkInsp2col.checked);
     capRow.style.display=chkCap.checked?'block':'none';
+    // Re-apply cap value so --preview-left-w is current when split is toggled
+    if(chkCap.checked)applyCapValue();
     try{
       localStorage.setItem('sttctt-preview-cap-on',chkCap.checked?'1':'0');
       localStorage.setItem('sttctt-preview-split-on',chkSplit.checked?'1':'0');
@@ -3589,8 +3597,10 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
   chkSplit.addEventListener('change',applyLayout);
   chkInsp2col.addEventListener('change',applyLayout);
   capSlider.addEventListener('input',applyCapValue);
+  // Recompute on resize so --preview-left-w stays correct if window is resized
+  window.addEventListener('resize',()=>{if(chkCap.checked&&chkSplit.checked)applyCapValue();});
 
-  // Restore persisted prefs
+  // Restore persisted prefs — default all to off (false) when no saved value
   try{
     const sv=localStorage.getItem('sttctt-preview-cap');
     if(sv)capSlider.value=sv;
