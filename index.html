@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="sttc-tt-version" content="1.14">
+<meta name="sttc-tt-version" content="1.15">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
 <title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
@@ -159,7 +159,7 @@ button.sm{padding:5px 10px;font-size:12px;border-radius:5px;}
 .shift-val{font-size:13px;font-weight:700;min-width:32px;text-align:center;color:var(--text);}
 .ch{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);margin-top:4px;}
 .tsw{width:11px;height:11px;border-radius:3px;display:inline-block;flex-shrink:0;}
-.landscape-badge{font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;background:var(--bg2);border:1px solid var(--border);color:var(--text);align-self:center;}
+.landscape-badge{font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;background:var(--bg2);border:1px solid var(--border);color:var(--text);align-self:center;white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis;}
 .export-box{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 15px;}
 .export-file-row{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-radius:7px;margin-bottom:4px;background:var(--bg2);border:1px solid var(--border);transition:border-color .15s;}
 .export-file-row.dirty{border-color:var(--ok);}
@@ -215,6 +215,27 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 .keybind-btn{min-width:36px;font-family:monospace;font-size:12px;font-weight:700;letter-spacing:.03em;}
 .keybind-btn.capturing{background:color-mix(in srgb,var(--warn) 18%,var(--bg3));border-color:var(--warn);color:var(--warn);animation:kb-pulse 0.9s ease-in-out infinite;}
 @keyframes kb-pulse{0%,100%{opacity:1;}50%{opacity:.55;}}
+/* ── Preview layout modes ──────────────────────────────────────────────────── */
+.preview-cap-on .preview-canvas-wrap canvas{max-height:var(--preview-cap,50vh);object-fit:contain;}
+/* Split: mode bar spans both cols; canvas+label left, sidebar right */
+.preview-split-on .right-col-inner{display:grid;grid-template-columns:55% 1fr;grid-template-rows:auto auto 1fr;column-gap:10px;min-height:calc(100vh - 80px);}
+.preview-split-on #previewModeBar{grid-column:1/3;grid-row:1;margin-bottom:8px;}
+.preview-split-on .preview-canvas-wrap{grid-column:1;grid-row:2;}
+.preview-split-on #previewLabel{grid-column:1;grid-row:3;text-align:left;align-self:start;margin-top:5px;}
+.preview-split-on #heatScaleWrap{grid-column:1;grid-row:3;align-self:end;}
+.preview-split-on #previewSidebar{grid-column:2;grid-row:2/4;overflow:visible;}
+.preview-split-on .preview-canvas-wrap canvas{max-height:none!important;}
+/* Cap + split: left col width driven by JS-computed --preview-left-w (px) */
+.preview-cap-on.preview-split-on .right-col-inner{grid-template-columns:var(--preview-left-w,55%) 1fr;}
+.preview-cap-on.preview-split-on .preview-canvas-wrap canvas{max-height:var(--preview-cap,50vh)!important;}
+/* Compact sidebar stats in split mode */
+.preview-split-on .stat{padding:5px 7px;}
+.preview-split-on .stat-l{font-size:9px;}
+.preview-split-on .stat-v{font-size:13px;}
+/* Inspector 2-column table */
+#inspRows.insp-2col{display:grid;grid-template-columns:1fr 1fr;column-gap:10px;}
+#inspRows.insp-2col .insp-row{min-width:0;}
+#inspRows.insp-2col .insp-val{max-width:unset;}
 </style>
 </head>
 <body>
@@ -251,7 +272,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <div class="dz" id="dzImg"><div class="dl"><strong>Drop heightmap image here</strong></div><div class="dl">PNG / BMP / JPEG - resampled to 128×128</div><input type="file" id="fiImg" accept="image/*" style="display:none"></div>
         <div class="msg" id="msgImg"></div>
         <div style="margin-top:11px;">
-          <div class="field"><label class="fl" for="levels">Quantization steps</label><div class="rr"><input type="range" id="levels" min="2" max="15" value="15" step="1"><span class="rv" id="levelsOut">15</span></div></div>
+          <div class="field"><label class="fl" for="levels">Quantization steps <span style="font-size:11px;color:var(--text3)">posterization levels</span></label><div class="rr"><input type="range" id="levels" min="2" max="15" value="15" step="1"><span class="rv" id="levelsOut">15</span></div></div>
           <div class="field"><label class="fl" for="minLevel">Black (dark) → editor level <span style="font-size:11px;color:var(--text3)">lowest</span></label><div class="rr"><input type="range" id="minLevel" min="-1" max="13" value="-1" step="1"><span class="rv" id="minLevelOut">-1</span></div></div>
           <div class="field"><label class="fl" for="maxLevel">White (bright) → editor level <span style="font-size:11px;color:var(--text3)">highest</span></label><div class="rr"><input type="range" id="maxLevel" min="-1" max="13" value="13" step="1"><span class="rv" id="maxLevelOut">13</span></div></div>
         </div>
@@ -357,7 +378,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <!-- DLC -->
   <div class="section" id="secDLC">
     <div class="sh" data-sec="secDLC">
-      <div class="sh-left"><span class="st">DLCs</span><span class="landscape-badge">Base Game</span><span class="landscape-badge" id="dlcBadge" style="display:none"></span></div>
+      <div class="sh-left"><span class="st">DLCs</span><span class="landscape-badge" id="dlcBaseGameBadge" style="display:none">Base Game</span><span class="landscape-badge" id="dlcBadge" style="display:none"></span></div>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body" id="secDLCBody">
@@ -377,7 +398,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <!-- TERRAIN -->
   <div class="section" id="secTerrain">
     <div class="sh" data-sec="secTerrain">
-      <div class="sh-left"><span class="st">Terrain</span><span class="landscape-badge" id="terrainBadge">No change</span></div>
+      <div class="sh-left"><span class="st">Terrain</span><span class="landscape-badge" id="terrainBadge" style="display:none">No change</span></div>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body" id="secTerrainBody">
@@ -412,7 +433,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <!-- EDGES -->
   <div class="section" id="secEdges">
     <div class="sh" data-sec="secEdges">
-      <div class="sh-left"><span class="st">Edges</span><span class="landscape-badge" id="edgesBadge">No change</span></div>
+      <div class="sh-left"><span class="st">Edges</span><span class="landscape-badge" id="edgesBadge" style="display:none">No change</span></div>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body" id="secEdgesBody">
@@ -463,7 +484,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <!-- ORIENTATION -->
   <div class="section" id="secOrientation">
     <div class="sh" data-sec="secOrientation">
-      <div class="sh-left"><span class="st">Orientation</span><span class="landscape-badge" id="orientBadge">N↑</span></div>
+      <div class="sh-left"><span class="st">Orientation</span><span class="landscape-badge" id="orientBadge" style="display:none">N↑</span></div>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body" id="secOrientationBody">
@@ -612,6 +633,19 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         </div>
       </div>
       <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px;">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">Preview layout</div>
+        <div class="note" style="margin-bottom:8px;">Options combine freely.</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;">
+          <label class="ck-row"><input type="checkbox" id="chkPreviewCap"> Adjust preview size</label>
+          <label class="ck-row"><input type="checkbox" id="chkPreviewSplit"> Split: sidebar alongside canvas</label>
+          <label class="ck-row"><input type="checkbox" id="chkInsp2col"> Inspector: 2-column table</label>
+        </div>
+        <div id="previewCapRow" style="display:none;">
+          <label class="fl" for="previewCapSlider">Max preview size</label>
+          <div class="rr"><input type="range" id="previewCapSlider" min="20" max="90" value="50" step="5" style="accent-color:var(--accent);"></div>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px;">
         <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">Preview cursor controls</div>
         <div class="note" style="margin-bottom:8px;">Arrow keys always move the crosshair. WASD keys below are rebindable - click a button then press any key.</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" id="keybindGrid">
@@ -655,7 +689,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <!-- HISTORY -->
   <div class="section" id="secHistory">
     <div class="sh" data-sec="secHistory">
-      <div class="sh-left"><span class="st">History</span><span class="landscape-badge" id="historyBadge" style="display:none;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span></div>
+      <div class="sh-left"><span class="st">History</span><span class="landscape-badge" id="historyBadge" style="display:none;max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span></div>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body" id="secHistoryBody">
@@ -711,48 +745,52 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <div class="section always-open">
     <div class="sh"><span class="st">Preview</span></div>
     <div class="section-body" style="padding-top:8px;">
-      <div class="scheme-presets" id="previewModeBar" style="margin-bottom:8px;">
-        <button class="scheme-btn active" data-mode="height">Height</button>
-        <button class="scheme-btn" data-mode="terrain">Terrain</button>
-        <button class="scheme-btn" data-mode="nav">Navigability</button>
-        <button class="scheme-btn" data-mode="heatmap">Heatmap</button>
-      </div>
-      <div class="preview-canvas-wrap" style="position:relative;" id="previewWrap">
-        <canvas id="cvPreview" width="128" height="128" tabindex="0" role="application" aria-label="Terrain preview. Use arrow keys to move selection, Enter or Space to inspect tile."></canvas>
-        <div id="orientOverlay" style="display:none;position:absolute;inset:0;pointer-events:none;">
-          <div style="position:absolute;top:2px;left:2px;background:rgba(0,0,0,0.65);color:#e65100;font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">N</div>
-          <div style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">E</div>
-          <div style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">S</div>
-          <div style="position:absolute;bottom:2px;left:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">W</div>
+      <div class="right-col-inner">
+        <div class="scheme-presets" id="previewModeBar" style="margin-bottom:8px;">
+          <button class="scheme-btn active" data-mode="height">Height</button>
+          <button class="scheme-btn" data-mode="terrain">Terrain</button>
+          <button class="scheme-btn" data-mode="nav">Navigability</button>
+          <button class="scheme-btn" data-mode="heatmap">Heatmap</button>
         </div>
-        <div class="cv-xhair" id="cvXhair"></div>
-      </div>
-      <div id="previewLabel">No source loaded</div>
-      <div id="heatScaleWrap" style="display:none;margin-top:6px;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;">Heat scale</span>
-          <input type="range" id="heatScaleSlider" aria-label="Heatmap scale (max navigability radius)" min="4" max="24" value="14" step="1" style="flex:1;accent-color:var(--accent);">
-          <span style="font-size:11px;font-weight:700;min-width:24px;text-align:right;color:var(--text);" id="heatScaleOut">14</span>
+        <div class="preview-canvas-wrap" style="position:relative;" id="previewWrap">
+          <canvas id="cvPreview" width="128" height="128" tabindex="0" role="application" aria-label="Terrain preview. Use arrow keys to move selection, Enter or Space to inspect tile."></canvas>
+          <div id="orientOverlay" style="display:none;position:absolute;inset:0;pointer-events:none;">
+            <div style="position:absolute;top:2px;left:2px;background:rgba(0,0,0,0.65);color:#e65100;font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">N</div>
+            <div style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">E</div>
+            <div style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">S</div>
+            <div style="position:absolute;bottom:2px;left:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">W</div>
+          </div>
+          <div class="cv-xhair" id="cvXhair"></div>
         </div>
-      </div>
-      <div class="insp-wrap" id="inspWrap" role="region" aria-label="Tile inspector" aria-expanded="false">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
-          <div class="insp-hdr" style="margin-bottom:0;" id="inspHdr">Tile inspector</div>
-          <button id="btnDismissInsp" class="sm" title="Dismiss inspector" aria-label="Dismiss tile inspector" style="padding:1px 6px;font-size:11px;line-height:1.6;display:none;">✕</button>
+        <div id="previewLabel">No source loaded</div>
+        <div id="heatScaleWrap" style="display:none;margin-top:6px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;">Heat scale</span>
+            <input type="range" id="heatScaleSlider" aria-label="Heatmap scale (max navigability radius)" min="4" max="24" value="14" step="1" style="flex:1;accent-color:var(--accent);">
+            <span style="font-size:11px;font-weight:700;min-width:24px;text-align:right;color:var(--text);" id="heatScaleOut">14</span>
+          </div>
         </div>
-        <div id="inspRows" aria-live="polite" aria-atomic="true" aria-labelledby="inspHdr"><div class="insp-empty">Click any tile to inspect</div></div>
-        <div class="insp-hint" id="inspHint" style="display:none;"></div>
-      </div>
-      <div style="margin-top:10px;">
-        <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px;">Level distribution</div>
-        <canvas id="cvHist" width="280" height="40" style="width:100%;border:none;border-radius:3px;display:block;"></canvas>
-        <div id="histLabels" style="display:flex;margin-top:2px;"></div>
-        <div class="legend" id="legend"></div>
-      </div>
-      <div class="g3" style="margin-top:10px;">
-        <div class="stat"><div class="stat-l">Total tiles</div><div class="stat-v" id="sTiles">-</div></div>
-        <div class="stat"><div class="stat-l">Level range</div><div class="stat-v" id="sRange">-</div></div>
-        <div class="stat"><div class="stat-l">Non-zero</div><div class="stat-v" id="sNonZero">-</div></div>
+        <div id="previewSidebar">
+          <div class="insp-wrap" id="inspWrap" role="region" aria-label="Tile inspector" aria-expanded="false">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+              <div class="insp-hdr" style="margin-bottom:0;" id="inspHdr">Tile inspector</div>
+              <button id="btnDismissInsp" class="sm" title="Dismiss inspector" aria-label="Dismiss tile inspector" style="padding:1px 6px;font-size:11px;line-height:1.6;display:none;">✕</button>
+            </div>
+            <div id="inspRows" aria-live="polite" aria-atomic="true" aria-labelledby="inspHdr"><div class="insp-empty">Click any tile to inspect</div></div>
+            <div class="insp-hint" id="inspHint" style="display:none;"></div>
+          </div>
+          <div style="margin-top:10px;">
+            <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px;">Level distribution</div>
+            <canvas id="cvHist" width="280" height="40" style="width:100%;border:none;border-radius:3px;display:block;"></canvas>
+            <div id="histLabels" style="display:flex;margin-top:2px;"></div>
+            <div class="legend" id="legend"></div>
+          </div>
+          <div class="g3" style="margin-top:10px;">
+            <div class="stat"><div class="stat-l">Total tiles</div><div class="stat-v" id="sTiles">-</div></div>
+            <div class="stat"><div class="stat-l">Level range</div><div class="stat-v" id="sRange">-</div></div>
+            <div class="stat"><div class="stat-l">Non-zero</div><div class="stat-v" id="sNonZero">-</div></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1529,11 +1567,13 @@ function setActiveLandscape(id,source){
   activeLandscape=id;
   document.getElementById('landscapeSelect').value=id;
   const badge=document.getElementById('lsBadge');
-  badge.style.display='inline-block';badge.textContent=LS_NAMES[id];
   const noteEl=document.getElementById('lsBadgeNote');
-  const noteText={auto:'Auto-detected',scenario:'From scenario.json',manual:''}[source]||'';
-  noteEl.textContent=noteText;
-  noteEl.style.display=noteText?'inline-flex':'none';
+  if(source!=='init'){
+    badge.style.display='inline-block';badge.textContent=LS_NAMES[id];
+    const noteText={auto:'Auto-detected',scenario:'From scenario.json',manual:''}[source]||'';
+    noteEl.textContent=noteText;
+    noteEl.style.display=noteText?'inline-flex':'none';
+  }
   rebuildTerrainSelects();rebuildEdgeSelects();
   const curVal=document.getElementById('terrainSelect').value;
   if(curVal!==''){
@@ -1748,6 +1788,9 @@ function applyHeaderData(d){
   _loadedDLCs=[...headerData.DLCs]; // snap for reset
   document.getElementById('dlcControls').style.display='block';
   document.getElementById('dlcNotLoaded').style.display='none';
+  // Show the Base Game badge now that a header is loaded
+  const baseGameBadge=document.getElementById('dlcBaseGameBadge');
+  if(baseGameBadge)baseGameBadge.style.display='inline-flex';
   const badge=document.getElementById('dlcBadge');
     const optionalDlcs=dlcs.filter(id=>id!==1);
   badge.textContent=optionalDlcs.length?optionalDlcs.map(id=>DLC_NAMES[id]||'DLC '+id).join(', '):'';
@@ -2755,6 +2798,10 @@ function buildTiles(){
 function enableTools(){
   ['btnShiftAll','btnClamp','btnBand','btnPreview','btnReset','btnRot90CW','btnRot90CCW','btnFlipH','btnFlipV','btnExportHeightmap']
     .forEach(id=>document.getElementById(id).disabled=false);
+  // Show section badges now that a source is loaded
+  ['terrainBadge','edgesBadge','orientBadge'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display='inline-flex';
+  });
   // Take a fresh map snapshot on first load so .bak export works correctly.
   // For map.json loads the snap is already set; for image/gen sources mark dirty
   // since the tile data has never been exported.
@@ -3128,7 +3175,7 @@ document.getElementById('edgeRemap').addEventListener('change',()=>{reconcileMap
     const swatch=`<span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${lvcol};border:1px solid rgba(128,128,128,.3);vertical-align:middle;margin-right:3px;" aria-hidden="true"></span>`;
     const typeLabel={0:'0 - flat',1:'1 - slope (navigable)',2:'2 - cliff base (non-navigable)'}[type]??type;
     const navBadge=`<span class="nav-badge ${nav.cls}" aria-label="Navigability: ${nav.label}">${nav.label}</span>`;
-    rowsEl.innerHTML=mkRow('Index',idx)+mkRow('Grid (col, row)',`${gameCol}, ${gameRow}`)+mkRow('Map / Editor lv',`${mv} / ${ev}`)+mkRow('Level colour',swatch+lvcol)+mkRow('TerrainTypeId',`${tid}${terrainDef?` - ${terrainDef.name}`:''}`)+mkRow('Terrain group',terrainDef?terrainDef.group:'?')+mkRow('Tile type',typeLabel)+mkRow('Edge family',isCliffBase?`${edgeName} (id ${edgeId})`:'- (non-cliff)')+mkRow('Navigability',navBadge);
+    rowsEl.innerHTML=mkRow('Index',idx)+mkRow('Grid (col, row)',`${gameCol}, ${gameRow}`)+mkRow('Map / Editor lvl',`${mv} / ${ev}`)+mkRow('Level colour',swatch+lvcol)+mkRow('TerrainTypeId',`${tid}${terrainDef?` - ${terrainDef.name}`:''}`)+mkRow('Terrain group',terrainDef?terrainDef.group:'?')+mkRow('Tile type',typeLabel)+mkRow('Edge family',isCliffBase?`${edgeName} (id ${edgeId})`:'- (non-cliff)')+mkRow('Navigability',navBadge);
     hintEl.textContent=nav.hint;hintEl.style.display='block';
     if(dismissBtn)dismissBtn.style.display='inline-block';
     if(inspWrap)inspWrap.setAttribute('aria-expanded','true');
@@ -3138,9 +3185,12 @@ document.getElementById('edgeRemap').addEventListener('change',()=>{reconcileMap
     return{col:Math.floor((e.clientX-rect.left)/(rect.width/W)),row:Math.floor((e.clientY-rect.top)/(rect.height/H))};
   }
   function moveXhair(col,row){
-    const rect=cvEl.getBoundingClientRect(),tw=rect.width/W,th=rect.height/H;
-    xhair.style.display='block';xhair.style.left=(col*tw)+'px';xhair.style.top=(row*th)+'px';
-    xhair.style.width=Math.max(2,tw)+'px';xhair.style.height=Math.max(2,th)+'px';
+    const rect=cvEl.getBoundingClientRect();
+    const tw=rect.width/W,th=rect.height/H,ts=Math.min(tw,th);
+    const ox=(tw-ts)/2,oy=(th-ts)/2;
+    xhair.style.display='block';
+    xhair.style.left=(col*tw+ox)+'px';xhair.style.top=(row*th+oy)+'px';
+    xhair.style.width=Math.max(2,ts)+'px';xhair.style.height=Math.max(2,ts)+'px';
   }
   cvEl.style.cursor='crosshair';
   // Add focus ring style for keyboard users
@@ -3357,7 +3407,7 @@ document.getElementById('btnResetKeybinds')?.addEventListener('click',()=>{
 });
 
 // ── Init ───────────────────────────────────────────────────────────────────────
-setActiveLandscape(0,'auto');
+setActiveLandscape(0,'init');
 updateTHint();
 applyScheme('default');
 applyHeatScheme('default');
@@ -3499,6 +3549,68 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
   let saved='auto';
   try{saved=localStorage.getItem('sttctt-ui-theme')||'auto';}catch(e){}
   applyUITheme(saved);
+})();
+
+// ── Preview layout controls ────────────────────────────────────────────────────
+(()=>{
+  const rightCol=document.querySelector('.right-col');
+  if(!rightCol)return;
+  const capSlider=document.getElementById('previewCapSlider');
+  const capOut=document.getElementById('previewCapOut');
+  const capPx=document.getElementById('previewCapPx');
+  const capRow=document.getElementById('previewCapRow');
+  const chkCap=document.getElementById('chkPreviewCap');
+  const chkSplit=document.getElementById('chkPreviewSplit');
+  const chkInsp2col=document.getElementById('chkInsp2col');
+  const inspRowsEl=document.getElementById('inspRows');
+
+  function applyCapValue(){
+    const v=parseInt(capSlider.value);
+    const capPxVal=Math.round(window.innerHeight*v/100);
+    capOut.textContent=v;
+    capPx.textContent='≈'+capPxVal+'px';
+    rightCol.style.setProperty('--preview-cap',v+'vh');
+    // Compute left column width for cap+split: canvas is square so left col = cap height in px,
+    // clamped so the sidebar always gets at least 180px.
+    const rcW=rightCol.getBoundingClientRect().width||rightCol.offsetWidth||600;
+    const minSidebar=180;
+    const leftW=Math.min(capPxVal, rcW-minSidebar);
+    rightCol.style.setProperty('--preview-left-w',Math.max(80,leftW)+'px');
+    try{localStorage.setItem('sttctt-preview-cap',v);}catch(e){}
+  }
+
+  function applyLayout(){
+    rightCol.classList.toggle('preview-cap-on',chkCap.checked);
+    rightCol.classList.toggle('preview-split-on',chkSplit.checked);
+    if(inspRowsEl)inspRowsEl.classList.toggle('insp-2col',chkInsp2col.checked);
+    capRow.style.display=chkCap.checked?'block':'none';
+    // Re-apply cap value so --preview-left-w is current when split is toggled
+    if(chkCap.checked)applyCapValue();
+    try{
+      localStorage.setItem('sttctt-preview-cap-on',chkCap.checked?'1':'0');
+      localStorage.setItem('sttctt-preview-split-on',chkSplit.checked?'1':'0');
+      localStorage.setItem('sttctt-preview-insp2col',chkInsp2col.checked?'1':'0');
+    }catch(e){}
+  }
+
+  chkCap.addEventListener('change',applyLayout);
+  chkSplit.addEventListener('change',applyLayout);
+  chkInsp2col.addEventListener('change',applyLayout);
+  capSlider.addEventListener('input',applyCapValue);
+  // Recompute on resize so --preview-left-w stays correct if window is resized
+  window.addEventListener('resize',()=>{if(chkCap.checked&&chkSplit.checked)applyCapValue();});
+
+  // Restore persisted prefs — default all to off (false) when no saved value
+  try{
+    const sv=localStorage.getItem('sttctt-preview-cap');
+    if(sv)capSlider.value=sv;
+    chkCap.checked=localStorage.getItem('sttctt-preview-cap-on')==='1';
+    chkSplit.checked=localStorage.getItem('sttctt-preview-split-on')==='1';
+    chkInsp2col.checked=localStorage.getItem('sttctt-preview-insp2col')==='1';
+  }catch(e){}
+
+  applyCapValue();
+  applyLayout();
 })();
 </script>
 </body>
