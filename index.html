@@ -159,7 +159,7 @@ button.sm{padding:5px 10px;font-size:12px;border-radius:5px;}
 .shift-val{font-size:13px;font-weight:700;min-width:32px;text-align:center;color:var(--text);}
 .ch{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);margin-top:4px;}
 .tsw{width:11px;height:11px;border-radius:3px;display:inline-block;flex-shrink:0;}
-.landscape-badge{font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;background:var(--bg2);border:1px solid var(--border);color:var(--text);align-self:center;}
+.landscape-badge{font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;background:var(--bg2);border:1px solid var(--border);color:var(--text);align-self:center;white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis;}
 .export-box{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 15px;}
 .export-file-row{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-radius:7px;margin-bottom:4px;background:var(--bg2);border:1px solid var(--border);transition:border-color .15s;}
 .export-file-row.dirty{border-color:var(--ok);}
@@ -655,7 +655,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   <!-- HISTORY -->
   <div class="section" id="secHistory">
     <div class="sh" data-sec="secHistory">
-      <div class="sh-left"><span class="st">History</span><span class="landscape-badge" id="historyBadge" style="display:none;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span></div>
+      <div class="sh-left"><span class="st">History</span><span class="landscape-badge" id="historyBadge" style="display:none;max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span></div>
       <span class="sv-chev">▾</span>
     </div>
     <div class="section-body" id="secHistoryBody">
