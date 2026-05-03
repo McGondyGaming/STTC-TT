@@ -215,6 +215,27 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 .keybind-btn{min-width:36px;font-family:monospace;font-size:12px;font-weight:700;letter-spacing:.03em;}
 .keybind-btn.capturing{background:color-mix(in srgb,var(--warn) 18%,var(--bg3));border-color:var(--warn);color:var(--warn);animation:kb-pulse 0.9s ease-in-out infinite;}
 @keyframes kb-pulse{0%,100%{opacity:1;}50%{opacity:.55;}}
+/* ── Preview layout modes ────────────────────────────────────────────────────── */
+/* Cap: limits canvas height so content below stays visible */
+.preview-cap-on .preview-canvas-wrap canvas{max-height:var(--preview-cap,50vh);object-fit:contain;}
+/* Flex: previewInner becomes a scroll container so sidebar never disappears */
+.preview-flex-on #previewInner{display:flex;flex-direction:column;overflow-y:auto;max-height:calc(100vh - 120px);}
+.preview-flex-on .preview-canvas-wrap{flex-shrink:1;min-height:0;}
+.preview-flex-on #previewLabel,
+.preview-flex-on #heatScaleWrap,
+.preview-flex-on #previewSidebar{flex-shrink:0;}
+/* Split: canvas + label stacked left, sidebar expands naturally right — no scroll */
+.preview-split-on #previewInner{display:grid;grid-template-columns:55% 1fr;grid-template-rows:auto auto 1fr;column-gap:10px;}
+.preview-split-on .preview-canvas-wrap{grid-column:1;grid-row:1;}
+.preview-split-on #previewLabel{grid-column:1;grid-row:2;text-align:left;}
+.preview-split-on #heatScaleWrap{grid-column:1;grid-row:3;align-self:start;}
+.preview-split-on #previewSidebar{grid-column:2;grid-row:1/4;overflow:visible;}
+/* When split is on, no cap needed — the grid already controls space */
+.preview-split-on .preview-canvas-wrap canvas{max-height:none!important;}
+/* Inspector 2-column table layout */
+#inspRows.insp-2col{display:grid;grid-template-columns:1fr 1fr;column-gap:10px;}
+#inspRows.insp-2col .insp-row{min-width:0;}
+#inspRows.insp-2col .insp-val{max-width:unset;}
 </style>
 </head>
 <body>
@@ -251,7 +272,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <div class="dz" id="dzImg"><div class="dl"><strong>Drop heightmap image here</strong></div><div class="dl">PNG / BMP / JPEG - resampled to 128×128</div><input type="file" id="fiImg" accept="image/*" style="display:none"></div>
         <div class="msg" id="msgImg"></div>
         <div style="margin-top:11px;">
-          <div class="field"><label class="fl" for="levels">Quantization steps</label><div class="rr"><input type="range" id="levels" min="2" max="15" value="15" step="1"><span class="rv" id="levelsOut">15</span></div></div>
+          <div class="field"><label class="fl" for="levels">Quantization steps <span style="font-size:11px;color:var(--text3)">posterization levels</span></label><div class="rr"><input type="range" id="levels" min="2" max="15" value="15" step="1"><span class="rv" id="levelsOut">15</span></div></div>
           <div class="field"><label class="fl" for="minLevel">Black (dark) → editor level <span style="font-size:11px;color:var(--text3)">lowest</span></label><div class="rr"><input type="range" id="minLevel" min="-1" max="13" value="-1" step="1"><span class="rv" id="minLevelOut">-1</span></div></div>
           <div class="field"><label class="fl" for="maxLevel">White (bright) → editor level <span style="font-size:11px;color:var(--text3)">highest</span></label><div class="rr"><input type="range" id="maxLevel" min="-1" max="13" value="13" step="1"><span class="rv" id="maxLevelOut">13</span></div></div>
         </div>
@@ -612,6 +633,20 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         </div>
       </div>
       <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px;">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">Preview layout</div>
+        <div class="note" style="margin-bottom:8px;">Options combine freely. Split overrides cap while active.</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;">
+          <label class="ck-row"><input type="checkbox" id="chkPreviewCap"> Cap canvas height</label>
+          <label class="ck-row"><input type="checkbox" id="chkPreviewFlex"> Flex: keep stats always scrollable</label>
+          <label class="ck-row"><input type="checkbox" id="chkPreviewSplit"> Split: sidebar alongside canvas</label>
+          <label class="ck-row"><input type="checkbox" id="chkInsp2col"> Inspector: 2-column table</label>
+        </div>
+        <div id="previewCapRow" style="display:none;">
+          <label class="fl" for="previewCapSlider">Max canvas height <span id="previewCapOut" style="font-weight:700;">50</span>vh</label>
+          <div class="rr"><input type="range" id="previewCapSlider" min="20" max="90" value="50" step="5" style="accent-color:var(--accent);"><span class="rv" id="previewCapPx"></span></div>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px;">
         <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">Preview cursor controls</div>
         <div class="note" style="margin-bottom:8px;">Arrow keys always move the crosshair. WASD keys below are rebindable - click a button then press any key.</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" id="keybindGrid">
@@ -717,42 +752,46 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <button class="scheme-btn" data-mode="nav">Navigability</button>
         <button class="scheme-btn" data-mode="heatmap">Heatmap</button>
       </div>
-      <div class="preview-canvas-wrap" style="position:relative;" id="previewWrap">
-        <canvas id="cvPreview" width="128" height="128" tabindex="0" role="application" aria-label="Terrain preview. Use arrow keys to move selection, Enter or Space to inspect tile."></canvas>
-        <div id="orientOverlay" style="display:none;position:absolute;inset:0;pointer-events:none;">
-          <div style="position:absolute;top:2px;left:2px;background:rgba(0,0,0,0.65);color:#e65100;font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">N</div>
-          <div style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">E</div>
-          <div style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">S</div>
-          <div style="position:absolute;bottom:2px;left:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">W</div>
+      <div id="previewInner">
+        <div class="preview-canvas-wrap" style="position:relative;" id="previewWrap">
+          <canvas id="cvPreview" width="128" height="128" tabindex="0" role="application" aria-label="Terrain preview. Use arrow keys to move selection, Enter or Space to inspect tile."></canvas>
+          <div id="orientOverlay" style="display:none;position:absolute;inset:0;pointer-events:none;">
+            <div style="position:absolute;top:2px;left:2px;background:rgba(0,0,0,0.65);color:#e65100;font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">N</div>
+            <div style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">E</div>
+            <div style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">S</div>
+            <div style="position:absolute;bottom:2px;left:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">W</div>
+          </div>
+          <div class="cv-xhair" id="cvXhair"></div>
         </div>
-        <div class="cv-xhair" id="cvXhair"></div>
-      </div>
-      <div id="previewLabel">No source loaded</div>
-      <div id="heatScaleWrap" style="display:none;margin-top:6px;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;">Heat scale</span>
-          <input type="range" id="heatScaleSlider" aria-label="Heatmap scale (max navigability radius)" min="4" max="24" value="14" step="1" style="flex:1;accent-color:var(--accent);">
-          <span style="font-size:11px;font-weight:700;min-width:24px;text-align:right;color:var(--text);" id="heatScaleOut">14</span>
+        <div id="previewLabel">No source loaded</div>
+        <div id="heatScaleWrap" style="display:none;margin-top:6px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;">Heat scale</span>
+            <input type="range" id="heatScaleSlider" aria-label="Heatmap scale (max navigability radius)" min="4" max="24" value="14" step="1" style="flex:1;accent-color:var(--accent);">
+            <span style="font-size:11px;font-weight:700;min-width:24px;text-align:right;color:var(--text);" id="heatScaleOut">14</span>
+          </div>
         </div>
-      </div>
-      <div class="insp-wrap" id="inspWrap" role="region" aria-label="Tile inspector" aria-expanded="false">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
-          <div class="insp-hdr" style="margin-bottom:0;" id="inspHdr">Tile inspector</div>
-          <button id="btnDismissInsp" class="sm" title="Dismiss inspector" aria-label="Dismiss tile inspector" style="padding:1px 6px;font-size:11px;line-height:1.6;display:none;">✕</button>
+        <div id="previewSidebar">
+          <div class="insp-wrap" id="inspWrap" role="region" aria-label="Tile inspector" aria-expanded="false">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+              <div class="insp-hdr" style="margin-bottom:0;" id="inspHdr">Tile inspector</div>
+              <button id="btnDismissInsp" class="sm" title="Dismiss inspector" aria-label="Dismiss tile inspector" style="padding:1px 6px;font-size:11px;line-height:1.6;display:none;">✕</button>
+            </div>
+            <div id="inspRows" aria-live="polite" aria-atomic="true" aria-labelledby="inspHdr"><div class="insp-empty">Click any tile to inspect</div></div>
+            <div class="insp-hint" id="inspHint" style="display:none;"></div>
+          </div>
+          <div style="margin-top:10px;">
+            <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px;">Level distribution</div>
+            <canvas id="cvHist" width="280" height="40" style="width:100%;border:none;border-radius:3px;display:block;"></canvas>
+            <div id="histLabels" style="display:flex;margin-top:2px;"></div>
+            <div class="legend" id="legend"></div>
+          </div>
+          <div class="g3" style="margin-top:10px;">
+            <div class="stat"><div class="stat-l">Total tiles</div><div class="stat-v" id="sTiles">-</div></div>
+            <div class="stat"><div class="stat-l">Level range</div><div class="stat-v" id="sRange">-</div></div>
+            <div class="stat"><div class="stat-l">Non-zero</div><div class="stat-v" id="sNonZero">-</div></div>
+          </div>
         </div>
-        <div id="inspRows" aria-live="polite" aria-atomic="true" aria-labelledby="inspHdr"><div class="insp-empty">Click any tile to inspect</div></div>
-        <div class="insp-hint" id="inspHint" style="display:none;"></div>
-      </div>
-      <div style="margin-top:10px;">
-        <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px;">Level distribution</div>
-        <canvas id="cvHist" width="280" height="40" style="width:100%;border:none;border-radius:3px;display:block;"></canvas>
-        <div id="histLabels" style="display:flex;margin-top:2px;"></div>
-        <div class="legend" id="legend"></div>
-      </div>
-      <div class="g3" style="margin-top:10px;">
-        <div class="stat"><div class="stat-l">Total tiles</div><div class="stat-v" id="sTiles">-</div></div>
-        <div class="stat"><div class="stat-l">Level range</div><div class="stat-v" id="sRange">-</div></div>
-        <div class="stat"><div class="stat-l">Non-zero</div><div class="stat-v" id="sNonZero">-</div></div>
       </div>
     </div>
   </div>
@@ -3137,7 +3176,7 @@ document.getElementById('edgeRemap').addEventListener('change',()=>{reconcileMap
     const swatch=`<span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${lvcol};border:1px solid rgba(128,128,128,.3);vertical-align:middle;margin-right:3px;" aria-hidden="true"></span>`;
     const typeLabel={0:'0 - flat',1:'1 - slope (navigable)',2:'2 - cliff base (non-navigable)'}[type]??type;
     const navBadge=`<span class="nav-badge ${nav.cls}" aria-label="Navigability: ${nav.label}">${nav.label}</span>`;
-    rowsEl.innerHTML=mkRow('Index',idx)+mkRow('Grid (col, row)',`${gameCol}, ${gameRow}`)+mkRow('Map / Editor lv',`${mv} / ${ev}`)+mkRow('Level colour',swatch+lvcol)+mkRow('TerrainTypeId',`${tid}${terrainDef?` - ${terrainDef.name}`:''}`)+mkRow('Terrain group',terrainDef?terrainDef.group:'?')+mkRow('Tile type',typeLabel)+mkRow('Edge family',isCliffBase?`${edgeName} (id ${edgeId})`:'- (non-cliff)')+mkRow('Navigability',navBadge);
+    rowsEl.innerHTML=mkRow('Index',idx)+mkRow('Grid (col, row)',`${gameCol}, ${gameRow}`)+mkRow('Map / Editor lvl',`${mv} / ${ev}`)+mkRow('Level colour',swatch+lvcol)+mkRow('TerrainTypeId',`${tid}${terrainDef?` - ${terrainDef.name}`:''}`)+mkRow('Terrain group',terrainDef?terrainDef.group:'?')+mkRow('Tile type',typeLabel)+mkRow('Edge family',isCliffBase?`${edgeName} (id ${edgeId})`:'- (non-cliff)')+mkRow('Navigability',navBadge);
     hintEl.textContent=nav.hint;hintEl.style.display='block';
     if(dismissBtn)dismissBtn.style.display='inline-block';
     if(inspWrap)inspWrap.setAttribute('aria-expanded','true');
@@ -3147,9 +3186,13 @@ document.getElementById('edgeRemap').addEventListener('change',()=>{reconcileMap
     return{col:Math.floor((e.clientX-rect.left)/(rect.width/W)),row:Math.floor((e.clientY-rect.top)/(rect.height/H))};
   }
   function moveXhair(col,row){
-    const rect=cvEl.getBoundingClientRect(),tw=rect.width/W,th=rect.height/H;
-    xhair.style.display='block';xhair.style.left=(col*tw)+'px';xhair.style.top=(row*th)+'px';
-    xhair.style.width=Math.max(2,tw)+'px';xhair.style.height=Math.max(2,th)+'px';
+    const rect=cvEl.getBoundingClientRect();
+    // Use the smaller per-tile dimension so crosshair stays square when capped (tw≠th)
+    const tw=rect.width/W,th=rect.height/H,ts=Math.min(tw,th);
+    const ox=(tw-ts)/2,oy=(th-ts)/2;
+    xhair.style.display='block';
+    xhair.style.left=(col*tw+ox)+'px';xhair.style.top=(row*th+oy)+'px';
+    xhair.style.width=Math.max(2,ts)+'px';xhair.style.height=Math.max(2,ts)+'px';
   }
   cvEl.style.cursor='crosshair';
   // Add focus ring style for keyboard users
@@ -3488,6 +3531,64 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
   });
   if(activeUITheme==='custom')syncCustomUITheme();
 });
+
+// ── Preview layout controls ────────────────────────────────────────────────────
+(()=>{
+  const rightCol=document.querySelector('.right-col');
+  if(!rightCol)return;
+  const capSlider=document.getElementById('previewCapSlider');
+  const capOut=document.getElementById('previewCapOut');
+  const capPx=document.getElementById('previewCapPx');
+  const capRow=document.getElementById('previewCapRow');
+  const chkCap=document.getElementById('chkPreviewCap');
+  const chkFlex=document.getElementById('chkPreviewFlex');
+  const chkSplit=document.getElementById('chkPreviewSplit');
+  const chkInsp2col=document.getElementById('chkInsp2col');
+  const inspRowsEl=document.getElementById('inspRows');
+
+  function pxApprox(vh){return Math.round(window.innerHeight*vh/100)+'px';}
+
+  function applyCapValue(){
+    const v=parseInt(capSlider.value);
+    capOut.textContent=v;
+    capPx.textContent='≈'+pxApprox(v);
+    rightCol.style.setProperty('--preview-cap',v+'vh');
+    try{localStorage.setItem('sttctt-preview-cap',v);}catch(e){}
+  }
+
+  function applyLayout(){
+    rightCol.classList.toggle('preview-cap-on', chkCap.checked);
+    rightCol.classList.toggle('preview-flex-on', chkFlex.checked);
+    rightCol.classList.toggle('preview-split-on', chkSplit.checked);
+    if(inspRowsEl)inspRowsEl.classList.toggle('insp-2col', chkInsp2col.checked);
+    capRow.style.display=chkCap.checked?'block':'none';
+    try{
+      localStorage.setItem('sttctt-preview-cap-on', chkCap.checked?'1':'0');
+      localStorage.setItem('sttctt-preview-flex-on', chkFlex.checked?'1':'0');
+      localStorage.setItem('sttctt-preview-split-on', chkSplit.checked?'1':'0');
+      localStorage.setItem('sttctt-preview-insp2col', chkInsp2col.checked?'1':'0');
+    }catch(e){}
+  }
+
+  chkCap.addEventListener('change', applyLayout);
+  chkFlex.addEventListener('change', applyLayout);
+  chkSplit.addEventListener('change', applyLayout);
+  chkInsp2col.addEventListener('change', applyLayout);
+  capSlider.addEventListener('input', applyCapValue);
+
+  // Restore persisted layout prefs
+  try{
+    const sv=localStorage.getItem('sttctt-preview-cap');
+    if(sv){capSlider.value=sv;}
+    chkCap.checked=localStorage.getItem('sttctt-preview-cap-on')==='1';
+    chkFlex.checked=localStorage.getItem('sttctt-preview-flex-on')==='1';
+    chkSplit.checked=localStorage.getItem('sttctt-preview-split-on')==='1';
+    chkInsp2col.checked=localStorage.getItem('sttctt-preview-insp2col')==='1';
+  }catch(e){}
+
+  applyCapValue();
+  applyLayout();
+})();
 
 // Restore persisted theme preference
 (()=>{
