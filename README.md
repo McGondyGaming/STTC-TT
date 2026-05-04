@@ -168,6 +168,8 @@ This tool allows you to:
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
+ - UI split 30/70
+ - Adjust preview size and split sidebar alongside canvas
  - Drag handle interacts with max preview size 
  - Drag handle between controls and preview panes - persists, reset on double clicks
  - Preview modes added + UI fixes

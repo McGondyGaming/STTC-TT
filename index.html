@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="sttc-tt-version" content="1.16-beta03">
+<meta name="sttc-tt-version" content="1.16-beta04">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
 <title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
@@ -735,8 +735,8 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
     </div>
     <div style="font-size:11px;color:var(--text3);margin-top:4px;" id="undoBadge"></div>
     <div class="field" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
-      <label class="ck-row" style="margin-bottom:5px;align-items:flex-start;"><input type="checkbox" id="chkBackup" style="margin-top:2px;"><span><span>Download .bak copy before each export</span><span style="display:block;color:var(--text3);font-size:10px;margin-top:1px;">(save alongside originals manually)</span></span></label>
-      <label class="ck-row" style="align-items:flex-start;"><input type="checkbox" id="chkDebugFile" style="margin-top:2px;"><span><span>Write STTC-TT.json alongside exports</span><span style="display:block;color:var(--text3);font-size:10px;margin-top:1px;">(separate file, not embedded in game files)</span></span></label>
+      <label class="ck-row" style="margin-bottom:5px;align-items:flex-start;"><input type="checkbox" id="chkBackup" style="margin-top:2px;"><span><span>Download .bak copy before each export</span></span></label>
+      <label class="ck-row" style="align-items:flex-start;"><input type="checkbox" id="chkDebugFile" style="margin-top:2px;"><span><span>Write STTC-TT.json alongside exports</span></span></label>
     </div>
     <div class="msg" id="msgExport"></div>
     <div class="path-note" id="pathNote"></div>
@@ -3444,7 +3444,7 @@ document.getElementById('btnResetKeybinds')?.addEventListener('click',()=>{
     requestAnimationFrame(updatePreviewHeight);
   }
 
-  let saved=0.5;
+  let saved=0.32;
   try{const v=parseFloat(localStorage.getItem(STORAGE_KEY));if(v>=MIN_FRAC&&v<=MAX_FRAC)saved=v;}catch(e){}
   applyRatio(saved);
 
@@ -3682,14 +3682,18 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
   // Recompute on resize so --preview-left-w stays correct if window is resized
   window.addEventListener('resize',()=>{if(chkCap.checked&&chkSplit.checked)applyCapValue();});
 
-  // Restore persisted prefs — default all to off (false) when no saved value
+  // Restore persisted prefs — new defaults: cap on @ 75, split on
   try{
-    const sv=localStorage.getItem('sttctt-preview-cap');
-    if(sv)capSlider.value=sv;
-    chkCap.checked=localStorage.getItem('sttctt-preview-cap-on')==='1';
-    chkSplit.checked=localStorage.getItem('sttctt-preview-split-on')==='1';
+    const capSaved=localStorage.getItem('sttctt-preview-cap');
+    capSlider.value=capSaved!==null?capSaved:'75';
+    const capOn=localStorage.getItem('sttctt-preview-cap-on');
+    chkCap.checked=capOn!==null?capOn==='1':true;
+    const splitOn=localStorage.getItem('sttctt-preview-split-on');
+    chkSplit.checked=splitOn!==null?splitOn==='1':true;
     chkInsp2col.checked=localStorage.getItem('sttctt-preview-insp2col')==='1';
-  }catch(e){}
+  }catch(e){
+    capSlider.value='75';chkCap.checked=true;chkSplit.checked=true;
+  }
 
   applyCapValue();
   applyLayout();
