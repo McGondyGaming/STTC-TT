@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="sttc-tt-version" content="1.16">
+<meta name="sttc-tt-version" content="1.17b">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
 <title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
@@ -223,12 +223,12 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 /* ── Preview layout modes ──────────────────────────────────────────────────── */
 .preview-cap-on .preview-canvas-wrap canvas{max-height:var(--preview-cap,50vh);object-fit:contain;}
 /* Split: mode bar spans both cols; canvas+label left, sidebar right */
-.preview-split-on .right-col-inner{display:grid;grid-template-columns:55% 1fr;grid-template-rows:auto auto 1fr;column-gap:10px;min-height:calc(100vh - 80px);}
+.preview-split-on .right-col-inner{display:grid;grid-template-columns:55% 1fr;grid-template-rows:auto auto auto auto 1fr;column-gap:10px;min-height:calc(100vh - 80px);}
 .preview-split-on #previewModeBar{grid-column:1/3;grid-row:1;margin-bottom:8px;}
 .preview-split-on .preview-canvas-wrap{grid-column:1;grid-row:2;}
-.preview-split-on #previewLabel{grid-column:1;grid-row:3;text-align:left;align-self:start;margin-top:5px;}
-.preview-split-on #heatScaleWrap{grid-column:1;grid-row:3;align-self:end;}
-.preview-split-on #previewSidebar{grid-column:2;grid-row:2/4;overflow:visible;}
+.preview-split-on #heatScaleWrap{grid-column:1;grid-row:3;margin-top:4px;}
+.preview-split-on #previewLabel{grid-column:1;grid-row:4;text-align:left;align-self:start;margin-top:3px;}
+.preview-split-on #previewSidebar{grid-column:2;grid-row:2/6;overflow:visible;}
 .preview-split-on .preview-canvas-wrap canvas{max-height:none!important;}
 /* Cap + split: left col width driven by JS-computed --preview-left-w (px) */
 .preview-cap-on.preview-split-on .right-col-inner{grid-template-columns:var(--preview-left-w,55%) 1fr;}
@@ -237,6 +237,27 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 .preview-split-on .stat{padding:5px 7px;}
 .preview-split-on .stat-l{font-size:9px;}
 .preview-split-on .stat-v{font-size:13px;}
+/* ── Settings overlay (slides over right-col sidebar, canvas untouched) ── */
+.settings-overlay{
+  display:none;position:absolute;top:0;left:0;right:0;bottom:0;
+  background:var(--bg3);border:1px solid var(--border);border-radius:10px;
+  z-index:50;overflow-y:auto;overflow-x:hidden;
+  scrollbar-width:thin;scrollbar-color:var(--border2) transparent;
+  padding:14px 15px;
+  animation:settingsFadeIn .15s ease;
+}
+.settings-overlay.open{display:block;}
+@keyframes settingsFadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.settings-overlay-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);
+}
+.settings-overlay-title{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;}
+/* Gear button sits in the preview mode bar row */
+.btn-gear{padding:4px 8px;font-size:13px;line-height:1.4;border-radius:5px;border:1px solid var(--border2);background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .12s;margin-left:auto;}
+.btn-gear:hover{color:var(--text);background:var(--bg3);}
+.btn-gear.active{background:var(--accent);color:var(--accent-fg);border-color:transparent;}
+.btn-gear:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 /* Inspector 2-column table */
 #inspRows.insp-2col{display:grid;grid-template-columns:1fr 1fr;column-gap:10px;}
 #inspRows.insp-2col .insp-row{min-width:0;}
@@ -547,13 +568,8 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
     </div>
   </div>
 
-  <!-- SETTINGS -->
-  <div class="section" id="secSettings">
-    <div class="sh" data-sec="secSettings">
-      <div class="sh-left"><span class="st">Settings</span></div>
-      <span class="sv-chev">▾</span>
-    </div>
-    <div class="section-body" id="secSettingsBody">
+  <!-- SETTINGS (content moved to overlay at runtime by JS) -->
+  <div id="secSettingsTemplate" style="display:none;">
       <div style="margin-bottom:12px;">
         <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">UI Theme</div>
         <div class="scheme-presets" id="uiThemeBar">
@@ -688,8 +704,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         </div>
         <div class="msg" id="msgKeybind" style="margin-top:4px;"></div>
       </div>
-    </div>
-  </div>
+  </div><!-- end secSettingsTemplate -->
 
   <!-- HISTORY -->
   <div class="section" id="secHistory">
@@ -753,11 +768,12 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
     <div class="sh"><span class="st">Preview</span></div>
     <div class="section-body" style="padding-top:8px;">
       <div class="right-col-inner">
-        <div class="scheme-presets" id="previewModeBar" style="margin-bottom:8px;">
+        <div class="scheme-presets" id="previewModeBar" style="margin-bottom:8px;display:flex;align-items:center;">
           <button class="scheme-btn active" data-mode="height">Height</button>
           <button class="scheme-btn" data-mode="terrain">Terrain</button>
           <button class="scheme-btn" data-mode="nav">Navigability</button>
           <button class="scheme-btn" data-mode="heatmap">Heatmap</button>
+          <button class="btn-gear" id="btnSettingsGear" title="Settings" aria-label="Open settings panel" aria-expanded="false">⚙</button>
         </div>
         <div class="preview-canvas-wrap" style="position:relative;" id="previewWrap">
           <canvas id="cvPreview" width="128" height="128" tabindex="0" role="application" aria-label="Terrain preview. Use arrow keys to move selection, Enter or Space to inspect tile."></canvas>
@@ -769,7 +785,6 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
           </div>
           <div class="cv-xhair" id="cvXhair"></div>
         </div>
-        <div id="previewLabel">No source loaded</div>
         <div id="heatScaleWrap" style="display:none;margin-top:6px;">
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;">Heat scale</span>
@@ -777,7 +792,15 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
             <span style="font-size:11px;font-weight:700;min-width:24px;text-align:right;color:var(--text);" id="heatScaleOut">14</span>
           </div>
         </div>
-        <div id="previewSidebar">
+        <div id="previewLabel">No source loaded</div>
+        <div id="previewSidebar" style="position:relative;">
+          <div class="settings-overlay" id="settingsOverlay" role="dialog" aria-label="Settings" aria-modal="true" tabindex="-1">
+            <div class="settings-overlay-hdr">
+              <span class="settings-overlay-title">Settings</span>
+            </div>
+            <!-- Settings content moved here from left column -->
+            <div id="settingsContent"></div>
+          </div>
           <div class="insp-wrap" id="inspWrap" role="region" aria-label="Tile inspector" aria-expanded="false">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
               <div class="insp-hdr" style="margin-bottom:0;" id="inspHdr">Tile inspector</div>
@@ -3697,6 +3720,43 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
 
   applyCapValue();
   applyLayout();
+})();
+
+// ── Settings overlay (gear button) ────────────────────────────────────────────
+(()=>{
+  const gearBtn=document.getElementById('btnSettingsGear');
+  const overlay=document.getElementById('settingsOverlay');
+  const contentEl=document.getElementById('settingsContent');
+  const template=document.getElementById('secSettingsTemplate');
+  if(!gearBtn||!overlay||!contentEl||!template)return;
+
+  // Transplant settings content from hidden template into the overlay once on init
+  while(template.firstChild)contentEl.appendChild(template.firstChild);
+  template.remove();
+
+  function openSettings(){
+    overlay.classList.add('open');
+    gearBtn.classList.add('active');
+    gearBtn.setAttribute('aria-expanded','true');
+    overlay.focus();
+    logSession('settings','open');
+  }
+  function closeSettings(){
+    overlay.classList.remove('open');
+    gearBtn.classList.remove('active');
+    gearBtn.setAttribute('aria-expanded','false');
+    gearBtn.focus();
+    logSession('settings','close');
+  }
+
+  gearBtn.addEventListener('click',()=>{
+    if(overlay.classList.contains('open'))closeSettings();else openSettings();
+  });
+
+  // Close on Escape
+  overlay.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){e.stopPropagation();closeSettings();}
+  });
 })();
 </script>
 </body>
