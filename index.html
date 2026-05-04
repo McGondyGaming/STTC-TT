@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="sttc-tt-version" content="1.16-beta01">
+<meta name="sttc-tt-version" content="1.16-beta03">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
 <title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
@@ -143,8 +143,8 @@ button.sm{padding:5px 10px;font-size:12px;border-radius:5px;}
 .msg{font-size:11px;min-height:16px;margin-top:5px;}
 .msg.ok{color:var(--ok);}
 .msg.err{color:var(--err);}
-.preview-canvas-wrap{border-radius:6px;border:1px solid var(--border);background:var(--bg2);line-height:0;}
-.preview-canvas-wrap canvas{width:100%;display:block;border-radius:6px;}
+.preview-canvas-wrap{border-radius:6px;border:1px solid var(--border);background:var(--bg2);line-height:0;overflow:hidden;}
+.preview-canvas-wrap canvas{width:100%;display:block;border-radius:6px;object-fit:contain;}
 #previewLabel{font-size:11px;color:var(--text3);text-align:center;margin-top:5px;}
 .legend{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px;}
 .li{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text2);}
@@ -3419,16 +3419,29 @@ document.getElementById('btnResetKeybinds')?.addEventListener('click',()=>{
   const layout=document.querySelector('.layout');
   if(!resizer||!layout)return;
 
-  // Restore saved split ratio (0–1, fraction for left column)
   const STORAGE_KEY='sttctt-col-ratio';
   const MIN_FRAC=0.20, MAX_FRAC=0.80;
+  const VIEWPORT_PAD=40; // gap between preview bottom and viewport bottom (px)
+
+  const previewWrap=document.getElementById('previewWrap');
+  const rightColEl=document.querySelector('.right-col');
+  const STICKY_TOP=20; // matches top:20px on .right-col
+
+  function updatePreviewHeight(){
+    if(!previewWrap||!rightColEl)return;
+    const rcW=rightColEl.getBoundingClientRect().width;
+    const maxH=window.innerHeight - STICKY_TOP - VIEWPORT_PAD;
+    const h=Math.max(80, Math.min(rcW, maxH));
+    previewWrap.style.maxHeight=h+'px';
+    const canvas=previewWrap.querySelector('canvas');
+    if(canvas){canvas.style.maxHeight=h+'px';canvas.style.width='100%';}
+  }
 
   function applyRatio(ratio){
     ratio=Math.max(MIN_FRAC,Math.min(MAX_FRAC,ratio));
-    const rightRatio=1-ratio;
-    // Express as fr units so the columns fill the available space
     layout.style.setProperty('--layout-left', ratio+'fr');
-    layout.style.setProperty('--layout-right', rightRatio+'fr');
+    layout.style.setProperty('--layout-right', (1-ratio)+'fr');
+    requestAnimationFrame(updatePreviewHeight);
   }
 
   let saved=0.5;
@@ -3442,9 +3455,8 @@ document.getElementById('btnResetKeybinds')?.addEventListener('click',()=>{
     e.preventDefault();
     dragging=true;
     startX=e.clientX;
-    // Measure current left fraction from the actual rendered widths
     const leftCol=layout.querySelector('.left-col');
-    const totalW=layout.getBoundingClientRect().width-6; // subtract resizer width
+    const totalW=layout.getBoundingClientRect().width-6;
     startRatio=leftCol?leftCol.getBoundingClientRect().width/totalW:saved;
     resizer.classList.add('dragging');
     document.body.style.cursor='col-resize';
@@ -3455,29 +3467,28 @@ document.getElementById('btnResetKeybinds')?.addEventListener('click',()=>{
     if(!dragging)return;
     const totalW=layout.getBoundingClientRect().width-6;
     if(totalW<=0)return;
-    const delta=e.clientX-startX;
-    const newRatio=startRatio+delta/totalW;
-    applyRatio(newRatio);
+    applyRatio(startRatio+(e.clientX-startX)/totalW);
   });
 
-  document.addEventListener('mouseup',e=>{
+  document.addEventListener('mouseup',()=>{
     if(!dragging)return;
     dragging=false;
     resizer.classList.remove('dragging');
     document.body.style.cursor='';
     document.body.style.userSelect='';
-    // Persist
     const leftCol=layout.querySelector('.left-col');
     const totalW=layout.getBoundingClientRect().width-6;
     const ratio=leftCol?leftCol.getBoundingClientRect().width/totalW:startRatio;
     try{localStorage.setItem(STORAGE_KEY,Math.max(MIN_FRAC,Math.min(MAX_FRAC,ratio)));}catch(e){}
   });
 
-  // Double-click to reset to 50/50
   resizer.addEventListener('dblclick',()=>{
     applyRatio(0.5);
     try{localStorage.setItem(STORAGE_KEY,0.5);}catch(e){}
   });
+
+  window.addEventListener('resize',updatePreviewHeight);
+  requestAnimationFrame(updatePreviewHeight);
 })();
 
 setActiveLandscape(0,'init');
