@@ -168,6 +168,7 @@ This tool allows you to:
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
+ - Drag handle between controls and preview panes - persists, reset on double clicks
  - Preview modes added + UI fixes
  - Show section pills only at appropriate data load
  - Increase max section pill width

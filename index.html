@@ -69,7 +69,12 @@
 body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);padding:20px;font-size:13px;line-height:1.5;}
 h1{font-size:17px;font-weight:600;margin-bottom:3px;}
 .subtitle{font-size:11px;color:var(--text3);margin-bottom:18px;}
-.layout{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;}
+.layout{display:grid;grid-template-columns:var(--layout-left,1fr) 6px var(--layout-right,1fr);gap:0;align-items:start;}
+.col-resizer{width:6px;cursor:col-resize;align-self:stretch;position:relative;z-index:10;border-radius:3px;transition:background .15s;margin:0 4px;}
+.col-resizer::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:2px;height:32px;border-radius:1px;background:var(--border2);transition:background .15s,height .15s;}
+.col-resizer:hover::after,.col-resizer.dragging::after{background:var(--accent);height:48px;}
+.left-col{min-width:260px;padding-right:7px;}
+.right-col{min-width:240px;padding-left:7px;}
 .left-col{display:flex;flex-direction:column;gap:12px;}
 .right-col{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;border-radius:10px;}
 .section{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
@@ -739,6 +744,8 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   </div>
 
 </div><!-- end left-col -->
+
+<div class="col-resizer" id="colResizer" title="Drag to resize columns" aria-hidden="true"></div>
 
 <!-- RIGHT COLUMN -->
 <div class="right-col">
@@ -3406,7 +3413,73 @@ document.getElementById('btnResetKeybinds')?.addEventListener('click',()=>{
   logSession('keybind','reset');
 });
 
-// ── Init ───────────────────────────────────────────────────────────────────────
+// ── Column resizer ─────────────────────────────────────────────────────────────
+(()=>{
+  const resizer=document.getElementById('colResizer');
+  const layout=document.querySelector('.layout');
+  if(!resizer||!layout)return;
+
+  // Restore saved split ratio (0–1, fraction for left column)
+  const STORAGE_KEY='sttctt-col-ratio';
+  const MIN_FRAC=0.20, MAX_FRAC=0.80;
+
+  function applyRatio(ratio){
+    ratio=Math.max(MIN_FRAC,Math.min(MAX_FRAC,ratio));
+    const rightRatio=1-ratio;
+    // Express as fr units so the columns fill the available space
+    layout.style.setProperty('--layout-left', ratio+'fr');
+    layout.style.setProperty('--layout-right', rightRatio+'fr');
+  }
+
+  let saved=0.5;
+  try{const v=parseFloat(localStorage.getItem(STORAGE_KEY));if(v>=MIN_FRAC&&v<=MAX_FRAC)saved=v;}catch(e){}
+  applyRatio(saved);
+
+  let startX=0,startRatio=0,dragging=false;
+
+  resizer.addEventListener('mousedown',e=>{
+    if(e.button!==0)return;
+    e.preventDefault();
+    dragging=true;
+    startX=e.clientX;
+    // Measure current left fraction from the actual rendered widths
+    const leftCol=layout.querySelector('.left-col');
+    const totalW=layout.getBoundingClientRect().width-6; // subtract resizer width
+    startRatio=leftCol?leftCol.getBoundingClientRect().width/totalW:saved;
+    resizer.classList.add('dragging');
+    document.body.style.cursor='col-resize';
+    document.body.style.userSelect='none';
+  });
+
+  document.addEventListener('mousemove',e=>{
+    if(!dragging)return;
+    const totalW=layout.getBoundingClientRect().width-6;
+    if(totalW<=0)return;
+    const delta=e.clientX-startX;
+    const newRatio=startRatio+delta/totalW;
+    applyRatio(newRatio);
+  });
+
+  document.addEventListener('mouseup',e=>{
+    if(!dragging)return;
+    dragging=false;
+    resizer.classList.remove('dragging');
+    document.body.style.cursor='';
+    document.body.style.userSelect='';
+    // Persist
+    const leftCol=layout.querySelector('.left-col');
+    const totalW=layout.getBoundingClientRect().width-6;
+    const ratio=leftCol?leftCol.getBoundingClientRect().width/totalW:startRatio;
+    try{localStorage.setItem(STORAGE_KEY,Math.max(MIN_FRAC,Math.min(MAX_FRAC,ratio)));}catch(e){}
+  });
+
+  // Double-click to reset to 50/50
+  resizer.addEventListener('dblclick',()=>{
+    applyRatio(0.5);
+    try{localStorage.setItem(STORAGE_KEY,0.5);}catch(e){}
+  });
+})();
+
 setActiveLandscape(0,'init');
 updateTHint();
 applyScheme('default');
