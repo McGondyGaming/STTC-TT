@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="sttc-tt-version" content="1.17b">
+<meta name="sttc-tt-version" content="1.17">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
 <title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
@@ -223,12 +223,13 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 /* ── Preview layout modes ──────────────────────────────────────────────────── */
 .preview-cap-on .preview-canvas-wrap canvas{max-height:var(--preview-cap,50vh);object-fit:contain;}
 /* Split: mode bar spans both cols; canvas+label left, sidebar right */
-.preview-split-on .right-col-inner{display:grid;grid-template-columns:55% 1fr;grid-template-rows:auto auto auto auto 1fr;column-gap:10px;min-height:calc(100vh - 80px);}
+.preview-split-on .right-col-inner{display:grid;grid-template-columns:55% 1fr;grid-template-rows:auto auto auto auto auto 1fr;column-gap:10px;min-height:calc(100vh - 80px);}
 .preview-split-on #previewModeBar{grid-column:1/3;grid-row:1;margin-bottom:8px;}
-.preview-split-on .preview-canvas-wrap{grid-column:1;grid-row:2;}
-.preview-split-on #heatScaleWrap{grid-column:1;grid-row:3;margin-top:4px;}
-.preview-split-on #previewLabel{grid-column:1;grid-row:4;text-align:left;align-self:start;margin-top:3px;}
-.preview-split-on #previewSidebar{grid-column:2;grid-row:2/6;overflow:visible;}
+.preview-split-on #previewCapRow{grid-column:1;grid-row:2;margin-bottom:4px;}
+.preview-split-on .preview-canvas-wrap{grid-column:1;grid-row:3;}
+.preview-split-on #heatScaleWrap{grid-column:1;grid-row:4;margin-top:4px;}
+.preview-split-on #previewLabel{grid-column:1;grid-row:5;text-align:left;align-self:start;margin-top:3px;}
+.preview-split-on #previewSidebar{grid-column:2;grid-row:2/7;overflow:visible;}
 .preview-split-on .preview-canvas-wrap canvas{max-height:none!important;}
 /* Cap + split: left col width driven by JS-computed --preview-left-w (px) */
 .preview-cap-on.preview-split-on .right-col-inner{grid-template-columns:var(--preview-left-w,55%) 1fr;}
@@ -661,10 +662,6 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
           <label class="ck-row"><input type="checkbox" id="chkPreviewSplit"> Split: sidebar alongside canvas</label>
           <label class="ck-row"><input type="checkbox" id="chkInsp2col"> Inspector: 2-column table</label>
         </div>
-        <div id="previewCapRow" style="display:none;">
-          <label class="fl" for="previewCapSlider">Max preview size</label>
-          <div class="rr"><input type="range" id="previewCapSlider" min="20" max="90" value="50" step="5" style="accent-color:var(--accent);"><span class="rv" id="previewCapOut">50</span><span style="font-size:11px;color:var(--text3);">vh</span></div>
-        </div>
       </div>
       <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px;">
         <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">Preview cursor controls</div>
@@ -774,6 +771,13 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
           <button class="scheme-btn" data-mode="nav">Navigability</button>
           <button class="scheme-btn" data-mode="heatmap">Heatmap</button>
           <button class="btn-gear" id="btnSettingsGear" title="Settings" aria-label="Open settings panel" aria-expanded="false">⚙</button>
+        </div>
+        <div id="previewCapRow" style="display:none;margin-bottom:6px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;">Size</span>
+            <input type="range" id="previewCapSlider" aria-label="Max preview size" min="20" max="90" value="75" step="5" style="flex:1;accent-color:var(--accent);">
+            <span style="font-size:11px;font-weight:700;min-width:24px;text-align:right;color:var(--text);" id="previewCapOut">75</span><span style="font-size:11px;color:var(--text3);">vh</span>
+          </div>
         </div>
         <div class="preview-canvas-wrap" style="position:relative;" id="previewWrap">
           <canvas id="cvPreview" width="128" height="128" tabindex="0" role="application" aria-label="Terrain preview. Use arrow keys to move selection, Enter or Space to inspect tile."></canvas>
