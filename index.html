@@ -798,6 +798,16 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
             <div style="position:absolute;bottom:2px;left:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">W</div>
           </div>
           <div class="cv-xhair" id="cvXhair"></div>
+          <div id="tipOverlay" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;background:var(--bg2);border-radius:6px;gap:12px;">
+            <div id="tipCategory" style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);"></div>
+            <div id="tipText" style="font-size:13px;color:var(--text);text-align:center;line-height:1.6;max-width:340px;"></div>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
+              <button id="tipPrev" class="sm" style="padding:3px 10px;font-size:14px;line-height:1.4;" aria-label="Previous tip">‹</button>
+              <span id="tipCounter" style="font-size:11px;color:var(--text3);min-width:40px;text-align:center;"></span>
+              <button id="tipNext" class="sm" style="padding:3px 10px;font-size:14px;line-height:1.4;" aria-label="Next tip">›</button>
+            </div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px;">Load a source to get started</div>
+          </div>
         </div>
         <div id="heatScaleWrap" style="display:none;margin-top:6px;">
           <div style="display:flex;align-items:center;gap:8px;">
@@ -2840,6 +2850,7 @@ function buildTiles(){
   return result;
 }
 function enableTools(){
+  window._hideTipOverlay?.();
   ['btnShiftAll','btnClamp','btnBand','btnPreview','btnReset','btnRot90CW','btnRot90CCW','btnFlipH','btnFlipV','btnExportHeightmap']
     .forEach(id=>document.getElementById(id).disabled=false);
   // Show section badges now that a source is loaded
@@ -3781,6 +3792,7 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
 
 // ── Storage transparency panel ────────────────────────────────────────────────
 const STORAGE_KEY_LABELS={
+  'sttctt-tip-index':          'Tips · last viewed tip index',
   'sttctt-col-ratio':          'Column split position',
   'sttctt-keybindings':        'Preview cursor key bindings',
   'sttctt-ui-theme':           'UI theme choice',
@@ -3825,6 +3837,95 @@ document.getElementById('btnRefreshStorage')?.addEventListener('click',()=>{
   const m=document.getElementById('msgStorage');
   if(m){m.textContent='Refreshed.';m.className='msg ok';setTimeout(()=>{if(m.textContent==='Refreshed.')m.textContent='';},1500);}
 });
+
+// ── Tips of the day ────────────────────────────────────────────────────────────
+const TIPS = [
+  { id: 1,  category: 'Getting Started',        text: 'Drop a heightmap image (PNG/BMP/JPEG) to auto-convert it to 128×128 terrain levels - darker pixels become lower ground, brighter pixels become peaks.' },
+  { id: 2,  category: 'Getting Started',        text: 'Load an entire scenario folder at once to bring in map.json, scenario.json, header.json, and your localised text file in one step.' },
+  { id: 3,  category: 'Getting Started',        text: 'Always back up your scenario folder before exporting - enable "Download .bak copy before each export" in the Export section.' },
+  { id: 4,  category: 'Source & Generation',    text: 'The procedural generator is deterministic - the same seed and settings always produce the same map.' },
+  { id: 5,  category: 'Source & Generation',    text: 'Randomize the seed for a fresh map, then fine-tune Scale and Water Level to shape the landmass before touching the advanced sliders.' },
+  { id: 6,  category: 'Source & Generation',    text: 'Lacunarity controls how jagged coastlines and ridgelines feel - lower values produce smoother, rounder terrain.' },
+  { id: 7,  category: 'Source & Generation',    text: 'Power and Gamma both redistribute level heights, but Power compresses peaks while Gamma lifts or lowers the midrange.' },
+  { id: 8,  category: 'Source & Generation',    text: 'The level range dual-slider lets you restrict generated terrain to a subset of editor levels - useful for flat urban maps or shallow water-heavy layouts.' },
+  { id: 9,  category: 'Source & Generation',    text: 'Scale mode redistributes all terrain into your chosen level range; Clamp mode generates a full distribution then clips the extremes.' },
+  { id: 10, category: 'Terrain & Edges',        text: '"Restrict to legal landscape terrains only" keeps your terrain and edge selects filtered to assets that actually exist for the chosen landscape - prevents broken references.' },
+  { id: 11, category: 'Terrain & Edges',        text: 'The Low/High terrain override tab lets you assign different surface types to valley floors and mountaintops while leaving mid-levels on the default.' },
+  { id: 12, category: 'Terrain & Edges',        text: 'Per-level terrain assignment gives you full control - useful for assigning Lava Pool to the lowest lava levels or Platform to the highest.' },
+  { id: 13, category: 'Terrain & Edges',        text: 'Edge families control which cliff wall assets the engine uses. Mismatching the edge family to your landscape can cause missing or wrong-textured cliff walls in-game.' },
+  { id: 14, category: 'Terrain & Edges',        text: 'Remapping edges replaces all cliff EdgeTypeIds - use "No change" to preserve the original edge assignments from a loaded map.json.' },
+  { id: 15, category: 'Level Tools',            text: 'Shift entire map raises or lowers all tiles by a fixed number of editor levels - useful for adjusting a generated map that\'s too flat or too peaked.' },
+  { id: 16, category: 'Level Tools',            text: 'Clamp extremes is ideal for flattening water floors to -1 and capping mountain peaks to a playable maximum without affecting mid-range terrain.' },
+  { id: 17, category: 'Level Tools',            text: 'Band shift targets only tiles at, above, or below a threshold - handy for nudging a specific altitude band without touching the rest of the map.' },
+  { id: 18, category: 'Orientation',            text: 'Rotate and Flip operations only affect the heightmap - units, decors, and triggers are not moved and will need repositioning in the in-game editor.' },
+  { id: 19, category: 'Orientation',            text: 'Enable "Show orientation indicator on preview" to keep track of which edge is north after rotations and flips.' },
+  { id: 20, category: 'Preview & Inspector',    text: 'Click any tile in the preview to inspect its Index, editor level, TerrainTypeId, tile type, edge family, and navigability in one panel.' },
+  { id: 21, category: 'Preview & Inspector',    text: 'Once a tile is selected, use Arrow keys (or your WASD bindings) to move the crosshair one tile at a time - Shift+Arrow moves five tiles.' },
+  { id: 22, category: 'Preview & Inspector',    text: 'The Navigability preview highlights cliff bases (red), slopes (purple), high ground (amber), narrow passes (green), and water (-1) at a glance.' },
+  { id: 23, category: 'Preview & Inspector',    text: 'The Heatmap preview shows how open each tile is to movement - tight red areas are bottlenecked corridors, wide blue/white areas are open ground.' },
+  { id: 24, category: 'Preview & Inspector',    text: 'Adjust the Heat Scale slider to tune the heatmap\'s sensitivity - lower values emphasise tight spots more aggressively.' },
+  { id: 25, category: 'Preview & Inspector',    text: 'Switch to Terrain Colours preview to see which TerrainTypeId will be written to each tile before you export.' },
+  { id: 26, category: 'Export & History',       text: 'Export as ZIP bundles map.json, scenario.json, and header.json into one download - named after your scenario if one is loaded.' },
+  { id: 27, category: 'Export & History',       text: 'Export rows highlight when a file has unsaved changes - a green border means that file differs from its last loaded or exported state.' },
+  { id: 28, category: 'Export & History',       text: 'The history panel shows every undoable action. Click any entry to jump directly to that point - earlier entries are undo, later entries are redo.' },
+  { id: 29, category: 'Export & History',       text: 'Enable "Write STTC-TT.json alongside exports" to save a full audit trail - seed, settings, undo history, and session log - useful for recreating a map later.' },
+  { id: 30, category: 'Export & History',       text: 'The heightmap.png export produces a greyscale PNG you can re-import as a source image - the 15 grey values map cleanly back to editor levels -1 through 13.' },
+  { id: 31, category: 'Settings & Customisation', text: 'The High Contrast height colour scheme inverts the default palette - peaks become white, deep water becomes black - useful for spotting elevation detail on complex maps.' },
+  { id: 32, category: 'Settings & Customisation', text: 'Custom height, navigability, and heatmap colour schemes are all independent - mix and match to suit your monitor or preference.' },
+  { id: 33, category: 'Settings & Customisation', text: 'Rebind the WASD preview cursor keys in Settings if they conflict with other tools - Arrow keys always work regardless of bindings.' },
+  { id: 34, category: 'Settings & Customisation', text: 'The column resizer lets you drag the divider between controls and preview. Double-click it to snap back to 50/50.' },
+  { id: 35, category: 'Settings & Customisation', text: 'Split layout mode places the inspector sidebar alongside the canvas rather than below it - useful on wide monitors.' },
+];
+
+(()=>{
+  const TIP_STORAGE_KEY='sttctt-tip-index';
+  const overlay=document.getElementById('tipOverlay');
+  const categoryEl=document.getElementById('tipCategory');
+  const textEl=document.getElementById('tipText');
+  const counterEl=document.getElementById('tipCounter');
+  const prevBtn=document.getElementById('tipPrev');
+  const nextBtn=document.getElementById('tipNext');
+  if(!overlay||!categoryEl||!textEl||!counterEl)return;
+
+  // Load persisted index; advance by 1 for returning visits
+  let tipIndex=0;
+  try{
+    const saved=localStorage.getItem(TIP_STORAGE_KEY);
+    if(saved!==null){
+      // Returning visit: advance to next tip
+      tipIndex=(parseInt(saved,10)+1)%TIPS.length;
+    }
+    // else first visit: stay at 0 (tip id 1)
+  }catch(e){}
+
+  function saveTipIndex(){
+    try{localStorage.setItem(TIP_STORAGE_KEY,tipIndex);}catch(e){}
+  }
+
+  function renderTip(){
+    const tip=TIPS[tipIndex];
+    categoryEl.textContent=tip.category;
+    textEl.textContent=tip.text;
+    counterEl.textContent=`${tipIndex+1} / ${TIPS.length}`;
+    saveTipIndex();
+  }
+
+  prevBtn.addEventListener('click',()=>{
+    tipIndex=(tipIndex-1+TIPS.length)%TIPS.length;
+    renderTip();
+  });
+  nextBtn.addEventListener('click',()=>{
+    tipIndex=(tipIndex+1)%TIPS.length;
+    renderTip();
+  });
+
+  // Expose hide function so enableTools() can call it
+  window._hideTipOverlay=()=>{
+    overlay.style.display='none';
+  };
+
+  renderTip();
+})();
 
 document.getElementById('btnClearStorage')?.addEventListener('click',()=>{
   const keys=Object.keys(STORAGE_KEY_LABELS);
