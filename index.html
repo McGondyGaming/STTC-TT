@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="sttc-tt-version" content="1.18">
+<meta name="sttc-tt-version" content="1.19">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
 <title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
@@ -1788,7 +1788,7 @@ makeDrop('dzMap','fiMap',file=>{
       folderPill.textContent=folderHint||'';
       folderPill.style.display=folderHint?'inline-flex':'none';
       activeSource='map';setActiveLandscape(detectLandscape(srcTiles),'auto');
-      invalidateHeatCache();updatePreview();enableTools();resetCompass();
+      invalidateHeatCache();updatePreview();validateLoadedMap();enableTools();resetCompass();
     }catch(err){msg.textContent='Error: '+err.message;msg.className='msg err';msg.style.display='block';}
   };
   reader.readAsText(file);
@@ -1958,7 +1958,7 @@ function loadScenarioDir(files){
     if(mapFile){
       activeSource='map';updateUndoButtons();
       setActiveLandscape(detectLandscape(srcTiles),'auto');
-      invalidateHeatCache();updatePreview();enableTools();resetCompass();
+      invalidateHeatCache();updatePreview();validateLoadedMap();enableTools();resetCompass();
     }
   }).catch(err=>{
     document.getElementById('msgScenario').textContent='Error loading folder: '+err.message;
@@ -2852,6 +2852,22 @@ function buildTiles(){
   if(srcEdgeGroups===null&&edgeGroups.length===0)delete result.EdgeGroups;
   return result;
 }
+function validateLoadedMap(){
+  if(!srcTiles)return;
+  const EDGE_BY_ID=Object.fromEntries(EDGES.map(e=>[e.id,e]));
+  const unknownTerrain=new Set(),unknownEdge=new Set();
+  srcTiles.forEach(t=>{if(t.TerrainTypeId!=null&&!T_BY_ID[t.TerrainTypeId])unknownTerrain.add(t.TerrainTypeId);});
+  if(srcEdgeGroups)srcEdgeGroups.forEach(eg=>{if(eg.EdgeTypeId!=null&&!EDGE_BY_ID[eg.EdgeTypeId])unknownEdge.add(eg.EdgeTypeId);});
+  if(unknownTerrain.size||unknownEdge.size){
+    const lines=['STTC-TT: Unknown IDs in loaded map (data tables may need updating)'];
+    if(unknownTerrain.size)lines.push('  TerrainTypeId: '+[...unknownTerrain].sort((a,b)=>a-b).join(', '));
+    if(unknownEdge.size)lines.push('  EdgeTypeId: '+[...unknownEdge].sort((a,b)=>a-b).join(', '));
+    console.warn(lines.join('\n'));
+  }else{
+    console.log('STTC-TT: All terrain and edge IDs recognised.');
+  }
+}
+
 function enableTools(){
   window._hideTipOverlay?.();
   ['btnShiftAll','btnClamp','btnBand','btnPreview','btnReset','btnRot90CW','btnRot90CCW','btnFlipH','btnFlipV','btnExportHeightmap']
