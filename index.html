@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="sttc-tt-version" content="1.18b">
+<meta name="sttc-tt-version" content="1.18c">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
 <title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
@@ -3763,13 +3763,6 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
   template.remove();
 
   function openSettings(){
-    // Close tips overlay if open
-    const tipsOverlay=document.getElementById('tipOverlay');
-    if(tipsOverlay&&tipsOverlay.style.display!=='none'){
-      tipsOverlay.style.display='none';
-      document.getElementById('btnTipsToggle')?.classList.remove('active');
-      document.getElementById('btnTipsToggle')?.setAttribute('aria-expanded','false');
-    }
     overlay.classList.add('open');
     gearBtn.classList.add('active');
     gearBtn.setAttribute('aria-expanded','true');
@@ -3946,15 +3939,7 @@ const TIPS = [
 
   // Toggle button: works both before and after a source is loaded
   toggleBtn?.addEventListener('click',()=>{
-    const nowVisible=overlay.style.display==='none';
-    // Close settings overlay if open - tips and settings shouldn't overlap
-    const settingsOverlay=document.getElementById('settingsOverlay');
-    if(nowVisible&&settingsOverlay?.classList.contains('open')){
-      settingsOverlay.classList.remove('open');
-      document.getElementById('btnSettingsGear')?.classList.remove('active');
-      document.getElementById('btnSettingsGear')?.setAttribute('aria-expanded','false');
-    }
-    setTipVisible(nowVisible);
+    setTipVisible(overlay.style.display==='none');
   });
 
   renderTip();
