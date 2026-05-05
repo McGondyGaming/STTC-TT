@@ -168,6 +168,7 @@ This tool allows you to:
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
+ - Preview size slider functions in non-split mode (regression fix)
  - Tip of the day feature dispalyed on load, hidden after a preview is loaded - toggle view using the `i` button 
  - Add Browser Storage section to settings panel
  - Adjust preview sized slider moved above preview

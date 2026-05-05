@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="sttc-tt-version" content="1.18c">
+<meta name="sttc-tt-version" content="1.18d">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
 <title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
@@ -3472,27 +3472,11 @@ document.getElementById('btnResetKeybinds')?.addEventListener('click',()=>{
 
   const STORAGE_KEY='sttctt-col-ratio';
   const MIN_FRAC=0.20, MAX_FRAC=0.80;
-  const VIEWPORT_PAD=40; // gap between preview bottom and viewport bottom (px)
-
-  const previewWrap=document.getElementById('previewWrap');
-  const rightColEl=document.querySelector('.right-col');
-  const STICKY_TOP=20; // matches top:20px on .right-col
-
-  function updatePreviewHeight(){
-    if(!previewWrap||!rightColEl)return;
-    const rcW=rightColEl.getBoundingClientRect().width;
-    const maxH=window.innerHeight - STICKY_TOP - VIEWPORT_PAD;
-    const h=Math.max(80, Math.min(rcW, maxH));
-    previewWrap.style.maxHeight=h+'px';
-    const canvas=previewWrap.querySelector('canvas');
-    if(canvas){canvas.style.maxHeight=h+'px';canvas.style.width='100%';}
-  }
 
   function applyRatio(ratio){
     ratio=Math.max(MIN_FRAC,Math.min(MAX_FRAC,ratio));
     layout.style.setProperty('--layout-left', ratio+'fr');
     layout.style.setProperty('--layout-right', (1-ratio)+'fr');
-    requestAnimationFrame(updatePreviewHeight);
   }
 
   let saved=0.32;
@@ -3538,8 +3522,14 @@ document.getElementById('btnResetKeybinds')?.addEventListener('click',()=>{
     try{localStorage.setItem(STORAGE_KEY,0.5);}catch(e){}
   });
 
-  window.addEventListener('resize',updatePreviewHeight);
-  requestAnimationFrame(updatePreviewHeight);
+  window.addEventListener('resize',()=>{
+    // Recompute split column width on resize if both cap and split are active
+    const chkC=document.getElementById('chkPreviewCap');
+    const chkS=document.getElementById('chkPreviewSplit');
+    if(chkC?.checked&&chkS?.checked){
+      document.getElementById('previewCapSlider')?.dispatchEvent(new Event('input'));
+    }
+  });
 })();
 
 setActiveLandscape(0,'init');
@@ -3699,16 +3689,20 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
 
   function applyCapValue(){
     const v=parseInt(capSlider.value);
-    const capPxVal=Math.round(window.innerHeight*v/100);
     const capOut=document.getElementById('previewCapOut');
     if(capOut)capOut.textContent=v;
     rightCol.style.setProperty('--preview-cap',v+'vh');
-    // Compute left column width for cap+split: canvas is square so left col = cap height in px,
-    // clamped so the sidebar always gets at least 180px.
-    const rcW=rightCol.getBoundingClientRect().width||rightCol.offsetWidth||600;
-    const minSidebar=180;
-    const leftW=Math.min(capPxVal, rcW-minSidebar);
-    rightCol.style.setProperty('--preview-left-w',Math.max(80,leftW)+'px');
+    // Always keep canvas responsive so the CSS max-height cap can take effect
+    const canvas=document.getElementById('cvPreview');
+    if(canvas){canvas.style.width='100%';}
+    // Split+cap: compute left column width so sidebar gets enough room
+    if(chkSplit.checked){
+      const capPxVal=Math.round(window.innerHeight*v/100);
+      const rcW=rightCol.getBoundingClientRect().width||rightCol.offsetWidth||600;
+      const minSidebar=180;
+      const leftW=Math.min(capPxVal,rcW-minSidebar);
+      rightCol.style.setProperty('--preview-left-w',Math.max(80,leftW)+'px');
+    }
     try{localStorage.setItem('sttctt-preview-cap',v);}catch(e){}
   }
 
@@ -3731,7 +3725,7 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
   chkInsp2col.addEventListener('change',applyLayout);
   capSlider.addEventListener('input',applyCapValue);
   // Recompute on resize so --preview-left-w stays correct if window is resized
-  window.addEventListener('resize',()=>{if(chkCap.checked&&chkSplit.checked)applyCapValue();});
+  window.addEventListener('resize',()=>{if(chkCap.checked)applyCapValue();});
 
   // Restore persisted prefs - new defaults: cap on @ 75, split on
   try{
