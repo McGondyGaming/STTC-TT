@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="sttc-tt-version" content="1.17">
+<meta name="sttc-tt-version" content="1.18a">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
 <title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
@@ -700,6 +700,16 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
           <button class="sm" id="btnResetKeybinds" title="Reset to WASD defaults">↺ Reset to WASD</button>
         </div>
         <div class="msg" id="msgKeybind" style="margin-top:4px;"></div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px;">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px;">Browser storage</div>
+        <div class="note" style="margin-bottom:8px;">This tool saves UI preferences locally in your browser. <strong>No data leaves your device</strong> - no accounts, no network requests, no map data stored.</div>
+        <div id="storageList" style="font-size:11px;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:8px;"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <button class="sm" id="btnRefreshStorage" title="Refresh storage list">↺ Refresh</button>
+          <button class="sm" id="btnClearStorage" title="Delete all saved preferences" style="color:var(--err);border-color:color-mix(in srgb,var(--err) 40%,var(--border2));">✕ Clear all preferences</button>
+        </div>
+        <div class="msg" id="msgStorage" style="margin-top:5px;"></div>
       </div>
   </div><!-- end secSettingsTemplate -->
 
@@ -3709,7 +3719,7 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
   // Recompute on resize so --preview-left-w stays correct if window is resized
   window.addEventListener('resize',()=>{if(chkCap.checked&&chkSplit.checked)applyCapValue();});
 
-  // Restore persisted prefs — new defaults: cap on @ 75, split on
+  // Restore persisted prefs - new defaults: cap on @ 75, split on
   try{
     const capSaved=localStorage.getItem('sttctt-preview-cap');
     capSlider.value=capSaved!==null?capSaved:'75';
@@ -3761,7 +3771,73 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
   overlay.addEventListener('keydown',e=>{
     if(e.key==='Escape'){e.stopPropagation();closeSettings();}
   });
+
+  // Refresh storage list whenever the overlay opens
+  overlay.addEventListener('transitionend',()=>{});
+  const _origOpen=openSettings;
+  // Patch openSettings to also refresh the storage list
+  gearBtn.addEventListener('click',()=>{ renderStorageList(); },{capture:false});
 })();
+
+// ── Storage transparency panel ────────────────────────────────────────────────
+const STORAGE_KEY_LABELS={
+  'sttctt-col-ratio':          'Column split position',
+  'sttctt-keybindings':        'Preview cursor key bindings',
+  'sttctt-ui-theme':           'UI theme choice',
+  'sttctt-ui-uiBg':            'Custom theme · Background',
+  'sttctt-ui-uiBg2':           'Custom theme · Surface',
+  'sttctt-ui-uiBg3':           'Custom theme · Card',
+  'sttctt-ui-uiAccent':        'Custom theme · Accent colour',
+  'sttctt-ui-uiText':          'Custom theme · Text',
+  'sttctt-ui-uiText2':         'Custom theme · Dim text',
+  'sttctt-ui-uiBorder':        'Custom theme · Border',
+  'sttctt-ui-uiOk':            'Custom theme · OK colour',
+  'sttctt-preview-cap':        'Preview size slider value',
+  'sttctt-preview-cap-on':     'Preview size cap enabled',
+  'sttctt-preview-split-on':   'Split layout enabled',
+  'sttctt-preview-insp2col':   'Inspector 2-column layout',
+};
+
+function renderStorageList(){
+  const listEl=document.getElementById('storageList');
+  if(!listEl)return;
+  const keys=Object.keys(STORAGE_KEY_LABELS);
+  const present=keys.filter(k=>{try{return localStorage.getItem(k)!==null;}catch(e){return false;}});
+  if(!present.length){
+    listEl.innerHTML='<div style="padding:8px 11px;font-size:11px;color:var(--text3);font-style:italic;">No preferences saved yet.</div>';
+    return;
+  }
+  listEl.innerHTML=present.map((k,i)=>{
+    let val='';
+    try{val=localStorage.getItem(k)||'';}catch(e){}
+    // Truncate long values (e.g. JSON keybinding objects)
+    const display=val.length>40?val.slice(0,38)+'…':val;
+    const border=i<present.length-1?`border-bottom:1px solid var(--border);`:'';
+    return `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:5px 11px;gap:8px;${border}">
+      <span style="font-size:11px;color:var(--text2);flex:1;min-width:0;">${STORAGE_KEY_LABELS[k]||k}</span>
+      <span style="font-size:10px;font-family:monospace;color:var(--text3);text-align:right;max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${val.replace(/"/g,'&quot;')}">${display}</span>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('btnRefreshStorage')?.addEventListener('click',()=>{
+  renderStorageList();
+  const m=document.getElementById('msgStorage');
+  if(m){m.textContent='Refreshed.';m.className='msg ok';setTimeout(()=>{if(m.textContent==='Refreshed.')m.textContent='';},1500);}
+});
+
+document.getElementById('btnClearStorage')?.addEventListener('click',()=>{
+  const keys=Object.keys(STORAGE_KEY_LABELS);
+  let cleared=0;
+  keys.forEach(k=>{try{if(localStorage.getItem(k)!==null){localStorage.removeItem(k);cleared++;}}catch(e){}});
+  renderStorageList();
+  const m=document.getElementById('msgStorage');
+  if(m){
+    m.textContent=cleared?`${cleared} preference${cleared!==1?'s':''} cleared. Reload the page to apply defaults.`:'Nothing to clear.';
+    m.className='msg ok';
+  }
+  logSession('storage','cleared '+cleared+' keys');
+});
 </script>
 </body>
 </html>

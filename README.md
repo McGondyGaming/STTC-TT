@@ -168,6 +168,7 @@ This tool allows you to:
    - Suggested work around: Create scenario in offical editor -> Save and close scenario -> Load `map.json` for tweaks
 
 ## Change Notes:
+ - Add Browser Storage section to settings panel
  - Adjust preview sized slider moved above preview
  - Settings moved to overlay, accessible from the gear button
  - UI split 30/70
