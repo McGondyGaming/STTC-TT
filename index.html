@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="sttc-tt-version" content="1.17">
+<meta name="sttc-tt-version" content="1.18">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
 <title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
@@ -76,7 +76,7 @@ h1{font-size:17px;font-weight:600;margin-bottom:3px;}
 .left-col{min-width:260px;padding-right:7px;}
 .right-col{min-width:240px;padding-left:7px;}
 .left-col{display:flex;flex-direction:column;gap:12px;}
-.right-col{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;border-radius:10px;}
+.right-col{position:sticky;top:20px;max-height:calc(100vh - 42px);max-height:calc(100dvh - 42px);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;border-radius:10px;}
 .section{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
 .sh{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;cursor:pointer;user-select:none;gap:8px;}
 .sh:hover{background:var(--bg2);}
@@ -223,7 +223,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 /* ── Preview layout modes ──────────────────────────────────────────────────── */
 .preview-cap-on .preview-canvas-wrap canvas{max-height:var(--preview-cap,50vh);object-fit:contain;}
 /* Split: mode bar spans both cols; canvas+label left, sidebar right */
-.preview-split-on .right-col-inner{display:grid;grid-template-columns:55% 1fr;grid-template-rows:auto auto auto auto auto 1fr;column-gap:10px;min-height:calc(100vh - 80px);}
+.preview-split-on .right-col-inner{display:grid;grid-template-columns:55% 1fr;grid-template-rows:auto auto auto auto auto 1fr;column-gap:10px;}
 .preview-split-on #previewModeBar{grid-column:1/3;grid-row:1;margin-bottom:8px;}
 .preview-split-on #previewCapRow{grid-column:1;grid-row:2;margin-bottom:4px;}
 .preview-split-on .preview-canvas-wrap{grid-column:1;grid-row:3;}
@@ -701,6 +701,16 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         </div>
         <div class="msg" id="msgKeybind" style="margin-top:4px;"></div>
       </div>
+      <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px;">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px;">Browser storage</div>
+        <div class="note" style="margin-bottom:8px;">This tool saves UI preferences locally in your browser. <strong>No data leaves your device</strong> - no accounts, no network requests, no map data stored.</div>
+        <div id="storageList" style="font-size:11px;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:8px;"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <button class="sm" id="btnRefreshStorage" title="Refresh storage list">↺ Refresh</button>
+          <button class="sm" id="btnClearStorage" title="Delete all saved preferences" style="color:var(--err);border-color:color-mix(in srgb,var(--err) 40%,var(--border2));">✕ Clear all preferences</button>
+        </div>
+        <div class="msg" id="msgStorage" style="margin-top:5px;"></div>
+      </div>
   </div><!-- end secSettingsTemplate -->
 
   <!-- HISTORY -->
@@ -770,7 +780,10 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
           <button class="scheme-btn" data-mode="terrain">Terrain</button>
           <button class="scheme-btn" data-mode="nav">Navigability</button>
           <button class="scheme-btn" data-mode="heatmap">Heatmap</button>
-          <button class="btn-gear" id="btnSettingsGear" title="Settings" aria-label="Open settings panel" aria-expanded="false">⚙</button>
+          <div style="display:flex;gap:4px;margin-left:auto;">
+            <button class="btn-gear" id="btnTipsToggle" title="Tips" aria-label="Toggle tips overlay" aria-expanded="false" style="margin-left:0;width:28px;height:28px;padding:0;text-align:center;">ℹ</button>
+            <button class="btn-gear" id="btnSettingsGear" title="Settings" aria-label="Open settings panel" aria-expanded="false" style="margin-left:0;width:28px;height:28px;padding:0;text-align:center;">⚙</button>
+          </div>
         </div>
         <div id="previewCapRow" style="display:none;margin-bottom:6px;">
           <div style="display:flex;align-items:center;gap:8px;">
@@ -788,6 +801,16 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
             <div style="position:absolute;bottom:2px;left:2px;background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.6);font-size:9px;font-weight:700;font-family:monospace;padding:1px 3px;border-radius:2px;line-height:1.4;">W</div>
           </div>
           <div class="cv-xhair" id="cvXhair"></div>
+          <div id="tipOverlay" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;background:var(--bg2);border-radius:6px;gap:12px;">
+            <div id="tipCategory" style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);"></div>
+            <div id="tipText" style="font-size:13px;color:var(--text);text-align:center;line-height:1.6;max-width:340px;"></div>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
+              <button id="tipPrev" class="sm" style="padding:3px 10px;font-size:14px;line-height:1.4;" aria-label="Previous tip">‹</button>
+              <span id="tipCounter" style="font-size:11px;color:var(--text3);min-width:40px;text-align:center;"></span>
+              <button id="tipNext" class="sm" style="padding:3px 10px;font-size:14px;line-height:1.4;" aria-label="Next tip">›</button>
+            </div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px;">Load a source to get started</div>
+          </div>
         </div>
         <div id="heatScaleWrap" style="display:none;margin-top:6px;">
           <div style="display:flex;align-items:center;gap:8px;">
@@ -2830,6 +2853,7 @@ function buildTiles(){
   return result;
 }
 function enableTools(){
+  window._hideTipOverlay?.();
   ['btnShiftAll','btnClamp','btnBand','btnPreview','btnReset','btnRot90CW','btnRot90CCW','btnFlipH','btnFlipV','btnExportHeightmap']
     .forEach(id=>document.getElementById(id).disabled=false);
   // Show section badges now that a source is loaded
@@ -3448,27 +3472,11 @@ document.getElementById('btnResetKeybinds')?.addEventListener('click',()=>{
 
   const STORAGE_KEY='sttctt-col-ratio';
   const MIN_FRAC=0.20, MAX_FRAC=0.80;
-  const VIEWPORT_PAD=40; // gap between preview bottom and viewport bottom (px)
-
-  const previewWrap=document.getElementById('previewWrap');
-  const rightColEl=document.querySelector('.right-col');
-  const STICKY_TOP=20; // matches top:20px on .right-col
-
-  function updatePreviewHeight(){
-    if(!previewWrap||!rightColEl)return;
-    const rcW=rightColEl.getBoundingClientRect().width;
-    const maxH=window.innerHeight - STICKY_TOP - VIEWPORT_PAD;
-    const h=Math.max(80, Math.min(rcW, maxH));
-    previewWrap.style.maxHeight=h+'px';
-    const canvas=previewWrap.querySelector('canvas');
-    if(canvas){canvas.style.maxHeight=h+'px';canvas.style.width='100%';}
-  }
 
   function applyRatio(ratio){
     ratio=Math.max(MIN_FRAC,Math.min(MAX_FRAC,ratio));
     layout.style.setProperty('--layout-left', ratio+'fr');
     layout.style.setProperty('--layout-right', (1-ratio)+'fr');
-    requestAnimationFrame(updatePreviewHeight);
   }
 
   let saved=0.32;
@@ -3514,8 +3522,14 @@ document.getElementById('btnResetKeybinds')?.addEventListener('click',()=>{
     try{localStorage.setItem(STORAGE_KEY,0.5);}catch(e){}
   });
 
-  window.addEventListener('resize',updatePreviewHeight);
-  requestAnimationFrame(updatePreviewHeight);
+  window.addEventListener('resize',()=>{
+    // Recompute split column width on resize if both cap and split are active
+    const chkC=document.getElementById('chkPreviewCap');
+    const chkS=document.getElementById('chkPreviewSplit');
+    if(chkC?.checked&&chkS?.checked){
+      document.getElementById('previewCapSlider')?.dispatchEvent(new Event('input'));
+    }
+  });
 })();
 
 setActiveLandscape(0,'init');
@@ -3675,16 +3689,20 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
 
   function applyCapValue(){
     const v=parseInt(capSlider.value);
-    const capPxVal=Math.round(window.innerHeight*v/100);
     const capOut=document.getElementById('previewCapOut');
     if(capOut)capOut.textContent=v;
     rightCol.style.setProperty('--preview-cap',v+'vh');
-    // Compute left column width for cap+split: canvas is square so left col = cap height in px,
-    // clamped so the sidebar always gets at least 180px.
-    const rcW=rightCol.getBoundingClientRect().width||rightCol.offsetWidth||600;
-    const minSidebar=180;
-    const leftW=Math.min(capPxVal, rcW-minSidebar);
-    rightCol.style.setProperty('--preview-left-w',Math.max(80,leftW)+'px');
+    // Always keep canvas responsive so the CSS max-height cap can take effect
+    const canvas=document.getElementById('cvPreview');
+    if(canvas){canvas.style.width='100%';}
+    // Split+cap: compute left column width so sidebar gets enough room
+    if(chkSplit.checked){
+      const capPxVal=Math.round(window.innerHeight*v/100);
+      const rcW=rightCol.getBoundingClientRect().width||rightCol.offsetWidth||600;
+      const minSidebar=180;
+      const leftW=Math.min(capPxVal,rcW-minSidebar);
+      rightCol.style.setProperty('--preview-left-w',Math.max(80,leftW)+'px');
+    }
     try{localStorage.setItem('sttctt-preview-cap',v);}catch(e){}
   }
 
@@ -3707,9 +3725,9 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
   chkInsp2col.addEventListener('change',applyLayout);
   capSlider.addEventListener('input',applyCapValue);
   // Recompute on resize so --preview-left-w stays correct if window is resized
-  window.addEventListener('resize',()=>{if(chkCap.checked&&chkSplit.checked)applyCapValue();});
+  window.addEventListener('resize',()=>{if(chkCap.checked)applyCapValue();});
 
-  // Restore persisted prefs — new defaults: cap on @ 75, split on
+  // Restore persisted prefs - new defaults: cap on @ 75, split on
   try{
     const capSaved=localStorage.getItem('sttctt-preview-cap');
     capSlider.value=capSaved!==null?capSaved:'75';
@@ -3761,7 +3779,178 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
   overlay.addEventListener('keydown',e=>{
     if(e.key==='Escape'){e.stopPropagation();closeSettings();}
   });
+
+  // Refresh storage list whenever the overlay opens
+  overlay.addEventListener('transitionend',()=>{});
+  const _origOpen=openSettings;
+  // Patch openSettings to also refresh the storage list
+  gearBtn.addEventListener('click',()=>{ renderStorageList(); },{capture:false});
 })();
+
+// ── Storage transparency panel ────────────────────────────────────────────────
+const STORAGE_KEY_LABELS={
+  'sttctt-tip-index':          'Tips · last viewed tip index',
+  'sttctt-col-ratio':          'Column split position',
+  'sttctt-keybindings':        'Preview cursor key bindings',
+  'sttctt-ui-theme':           'UI theme choice',
+  'sttctt-ui-uiBg':            'Custom theme · Background',
+  'sttctt-ui-uiBg2':           'Custom theme · Surface',
+  'sttctt-ui-uiBg3':           'Custom theme · Card',
+  'sttctt-ui-uiAccent':        'Custom theme · Accent colour',
+  'sttctt-ui-uiText':          'Custom theme · Text',
+  'sttctt-ui-uiText2':         'Custom theme · Dim text',
+  'sttctt-ui-uiBorder':        'Custom theme · Border',
+  'sttctt-ui-uiOk':            'Custom theme · OK colour',
+  'sttctt-preview-cap':        'Preview size slider value',
+  'sttctt-preview-cap-on':     'Preview size cap enabled',
+  'sttctt-preview-split-on':   'Split layout enabled',
+  'sttctt-preview-insp2col':   'Inspector 2-column layout',
+};
+
+function renderStorageList(){
+  const listEl=document.getElementById('storageList');
+  if(!listEl)return;
+  const keys=Object.keys(STORAGE_KEY_LABELS);
+  const present=keys.filter(k=>{try{return localStorage.getItem(k)!==null;}catch(e){return false;}});
+  if(!present.length){
+    listEl.innerHTML='<div style="padding:8px 11px;font-size:11px;color:var(--text3);font-style:italic;">No preferences saved yet.</div>';
+    return;
+  }
+  listEl.innerHTML=present.map((k,i)=>{
+    let val='';
+    try{val=localStorage.getItem(k)||'';}catch(e){}
+    // Truncate long values (e.g. JSON keybinding objects)
+    const display=val.length>40?val.slice(0,38)+'…':val;
+    const border=i<present.length-1?`border-bottom:1px solid var(--border);`:'';
+    return `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:5px 11px;gap:8px;${border}">
+      <span style="font-size:11px;color:var(--text2);flex:1;min-width:0;">${STORAGE_KEY_LABELS[k]||k}</span>
+      <span style="font-size:10px;font-family:monospace;color:var(--text3);text-align:right;max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${val.replace(/"/g,'&quot;')}">${display}</span>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('btnRefreshStorage')?.addEventListener('click',()=>{
+  renderStorageList();
+  const m=document.getElementById('msgStorage');
+  if(m){m.textContent='Refreshed.';m.className='msg ok';setTimeout(()=>{if(m.textContent==='Refreshed.')m.textContent='';},1500);}
+});
+
+// ── Tips of the day ────────────────────────────────────────────────────────────
+const TIPS = [
+  { id: 1,  category: 'Getting Started',        text: 'Drop a heightmap image (PNG/BMP/JPEG) to auto-convert it to 128×128 terrain levels - darker pixels become lower ground, brighter pixels become peaks.' },
+  { id: 2,  category: 'Getting Started',        text: 'Load an entire scenario folder at once to bring in map.json, scenario.json, header.json, and your localised text file in one step.' },
+  { id: 3,  category: 'Getting Started',        text: 'Always back up your scenario folder before exporting - enable "Download .bak copy before each export" in the Export section.' },
+  { id: 4,  category: 'Source & Generation',    text: 'The procedural generator is deterministic - the same seed and settings always produce the same map.' },
+  { id: 5,  category: 'Source & Generation',    text: 'Randomize the seed for a fresh map, then fine-tune Scale and Water Level to shape the landmass before touching the advanced sliders.' },
+  { id: 6,  category: 'Source & Generation',    text: 'Lacunarity controls how jagged coastlines and ridgelines feel - lower values produce smoother, rounder terrain.' },
+  { id: 7,  category: 'Source & Generation',    text: 'Power and Gamma both redistribute level heights, but Power compresses peaks while Gamma lifts or lowers the midrange.' },
+  { id: 8,  category: 'Source & Generation',    text: 'The level range dual-slider lets you restrict generated terrain to a subset of editor levels - useful for flat urban maps or shallow water-heavy layouts.' },
+  { id: 9,  category: 'Source & Generation',    text: 'Scale mode redistributes all terrain into your chosen level range; Clamp mode generates a full distribution then clips the extremes.' },
+  { id: 10, category: 'Terrain & Edges',        text: '"Restrict to legal landscape terrains only" keeps your terrain and edge selects filtered to assets that actually exist for the chosen landscape - prevents broken references.' },
+  { id: 11, category: 'Terrain & Edges',        text: 'The Low/High terrain override tab lets you assign different surface types to valley floors and mountaintops while leaving mid-levels on the default.' },
+  { id: 12, category: 'Terrain & Edges',        text: 'Per-level terrain assignment gives you full control - useful for assigning Lava Pool to the lowest lava levels or Platform to the highest.' },
+  { id: 13, category: 'Terrain & Edges',        text: 'Edge families control which cliff wall assets the engine uses. Mismatching the edge family to your landscape can cause missing or wrong-textured cliff walls in-game.' },
+  { id: 14, category: 'Terrain & Edges',        text: 'Remapping edges replaces all cliff EdgeTypeIds - use "No change" to preserve the original edge assignments from a loaded map.json.' },
+  { id: 15, category: 'Level Tools',            text: 'Shift entire map raises or lowers all tiles by a fixed number of editor levels - useful for adjusting a generated map that\'s too flat or too peaked.' },
+  { id: 16, category: 'Level Tools',            text: 'Clamp extremes is ideal for flattening water floors to -1 and capping mountain peaks to a playable maximum without affecting mid-range terrain.' },
+  { id: 17, category: 'Level Tools',            text: 'Band shift targets only tiles at, above, or below a threshold - handy for nudging a specific altitude band without touching the rest of the map.' },
+  { id: 18, category: 'Orientation',            text: 'Rotate and Flip operations only affect the heightmap - units, decors, and triggers are not moved and will need repositioning in the in-game editor.' },
+  { id: 19, category: 'Orientation',            text: 'Enable "Show orientation indicator on preview" to keep track of which edge is north after rotations and flips.' },
+  { id: 20, category: 'Preview & Inspector',    text: 'Click any tile in the preview to inspect its Index, editor level, TerrainTypeId, tile type, edge family, and navigability in one panel.' },
+  { id: 21, category: 'Preview & Inspector',    text: 'Once a tile is selected, use Arrow keys (or your WASD bindings) to move the crosshair one tile at a time - Shift+Arrow moves five tiles.' },
+  { id: 22, category: 'Preview & Inspector',    text: 'The Navigability preview highlights cliff bases (red), slopes (purple), high ground (amber), narrow passes (green), and water (-1) at a glance.' },
+  { id: 23, category: 'Preview & Inspector',    text: 'The Heatmap preview shows how open each tile is to movement - tight red areas are bottlenecked corridors, wide blue/white areas are open ground.' },
+  { id: 24, category: 'Preview & Inspector',    text: 'Adjust the Heat Scale slider to tune the heatmap\'s sensitivity - lower values emphasise tight spots more aggressively.' },
+  { id: 25, category: 'Preview & Inspector',    text: 'Switch to Terrain Colours preview to see which TerrainTypeId will be written to each tile before you export.' },
+  { id: 26, category: 'Export & History',       text: 'Export as ZIP bundles map.json, scenario.json, and header.json into one download - named after your scenario if one is loaded.' },
+  { id: 27, category: 'Export & History',       text: 'Export rows highlight when a file has unsaved changes - a green border means that file differs from its last loaded or exported state.' },
+  { id: 28, category: 'Export & History',       text: 'The history panel shows every undoable action. Click any entry to jump directly to that point - earlier entries are undo, later entries are redo.' },
+  { id: 29, category: 'Export & History',       text: 'Enable "Write STTC-TT.json alongside exports" to save a full audit trail - seed, settings, undo history, and session log - useful for recreating a map later.' },
+  { id: 30, category: 'Export & History',       text: 'The heightmap.png export produces a greyscale PNG you can re-import as a source image - the 15 grey values map cleanly back to editor levels -1 through 13.' },
+  { id: 31, category: 'Settings & Customisation', text: 'The High Contrast height colour scheme inverts the default palette - peaks become white, deep water becomes black - useful for spotting elevation detail on complex maps.' },
+  { id: 32, category: 'Settings & Customisation', text: 'Custom height, navigability, and heatmap colour schemes are all independent - mix and match to suit your monitor or preference.' },
+  { id: 33, category: 'Settings & Customisation', text: 'Rebind the WASD preview cursor keys in Settings if they conflict with other tools - Arrow keys always work regardless of bindings.' },
+  { id: 34, category: 'Settings & Customisation', text: 'The column resizer lets you drag the divider between controls and preview. Double-click it to snap back to 50/50.' },
+  { id: 35, category: 'Settings & Customisation', text: 'Split layout mode places the inspector sidebar alongside the canvas rather than below it - useful on wide monitors.' },
+];
+
+(()=>{
+  const TIP_STORAGE_KEY='sttctt-tip-index';
+  const overlay=document.getElementById('tipOverlay');
+  const categoryEl=document.getElementById('tipCategory');
+  const textEl=document.getElementById('tipText');
+  const counterEl=document.getElementById('tipCounter');
+  const prevBtn=document.getElementById('tipPrev');
+  const nextBtn=document.getElementById('tipNext');
+  if(!overlay||!categoryEl||!textEl||!counterEl)return;
+
+  // Load persisted index; advance by 1 for returning visits
+  let tipIndex=0;
+  try{
+    const saved=localStorage.getItem(TIP_STORAGE_KEY);
+    if(saved!==null){
+      // Returning visit: advance to next tip
+      tipIndex=(parseInt(saved,10)+1)%TIPS.length;
+    }
+    // else first visit: stay at 0 (tip id 1)
+  }catch(e){}
+
+  function saveTipIndex(){
+    try{localStorage.setItem(TIP_STORAGE_KEY,tipIndex);}catch(e){}
+  }
+
+  function renderTip(){
+    const tip=TIPS[tipIndex];
+    categoryEl.textContent=tip.category;
+    textEl.textContent=tip.text;
+    counterEl.textContent=`${tipIndex+1} / ${TIPS.length}`;
+    saveTipIndex();
+  }
+
+  prevBtn.addEventListener('click',()=>{
+    tipIndex=(tipIndex-1+TIPS.length)%TIPS.length;
+    renderTip();
+  });
+  nextBtn.addEventListener('click',()=>{
+    tipIndex=(tipIndex+1)%TIPS.length;
+    renderTip();
+  });
+
+  const toggleBtn=document.getElementById('btnTipsToggle');
+
+  function setTipVisible(visible){
+    overlay.style.display=visible?'flex':'none';
+    if(toggleBtn){
+      toggleBtn.classList.toggle('active',visible);
+      toggleBtn.setAttribute('aria-expanded',visible?'true':'false');
+    }
+  }
+
+  // Expose hide function so enableTools() can call it (hides on first source load)
+  window._hideTipOverlay=()=>{
+    setTipVisible(false);
+  };
+
+  // Toggle button: works both before and after a source is loaded
+  toggleBtn?.addEventListener('click',()=>{
+    setTipVisible(overlay.style.display==='none');
+  });
+
+  renderTip();
+})();
+
+document.getElementById('btnClearStorage')?.addEventListener('click',()=>{
+  const keys=Object.keys(STORAGE_KEY_LABELS);
+  let cleared=0;
+  keys.forEach(k=>{try{if(localStorage.getItem(k)!==null){localStorage.removeItem(k);cleared++;}}catch(e){}});
+  renderStorageList();
+  const m=document.getElementById('msgStorage');
+  if(m){
+    m.textContent=cleared?`${cleared} preference${cleared!==1?'s':''} cleared. Reload the page to apply defaults.`:'Nothing to clear.';
+    m.className='msg ok';
+  }
+  logSession('storage','cleared '+cleared+' keys');
+});
 </script>
 </body>
 </html>
