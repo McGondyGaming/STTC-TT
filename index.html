@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="sttc-tt-version" content="1.18d">
+<meta name="sttc-tt-version" content="1.18e">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
 <title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
@@ -76,7 +76,7 @@ h1{font-size:17px;font-weight:600;margin-bottom:3px;}
 .left-col{min-width:260px;padding-right:7px;}
 .right-col{min-width:240px;padding-left:7px;}
 .left-col{display:flex;flex-direction:column;gap:12px;}
-.right-col{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;border-radius:10px;}
+.right-col{position:sticky;top:20px;max-height:calc(100vh - 42px);max-height:calc(100dvh - 42px);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;border-radius:10px;}
 .section{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
 .sh{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;cursor:pointer;user-select:none;gap:8px;}
 .sh:hover{background:var(--bg2);}
@@ -223,7 +223,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 /* ── Preview layout modes ──────────────────────────────────────────────────── */
 .preview-cap-on .preview-canvas-wrap canvas{max-height:var(--preview-cap,50vh);object-fit:contain;}
 /* Split: mode bar spans both cols; canvas+label left, sidebar right */
-.preview-split-on .right-col-inner{display:grid;grid-template-columns:55% 1fr;grid-template-rows:auto auto auto auto auto 1fr;column-gap:10px;min-height:calc(100vh - 80px);}
+.preview-split-on .right-col-inner{display:grid;grid-template-columns:55% 1fr;grid-template-rows:auto auto auto auto auto 1fr;column-gap:10px;}
 .preview-split-on #previewModeBar{grid-column:1/3;grid-row:1;margin-bottom:8px;}
 .preview-split-on #previewCapRow{grid-column:1;grid-row:2;margin-bottom:4px;}
 .preview-split-on .preview-canvas-wrap{grid-column:1;grid-row:3;}
