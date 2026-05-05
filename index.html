@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="sttc-tt-version" content="1.18a">
+<meta name="sttc-tt-version" content="1.18b">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
 <title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
@@ -780,7 +780,10 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
           <button class="scheme-btn" data-mode="terrain">Terrain</button>
           <button class="scheme-btn" data-mode="nav">Navigability</button>
           <button class="scheme-btn" data-mode="heatmap">Heatmap</button>
-          <button class="btn-gear" id="btnSettingsGear" title="Settings" aria-label="Open settings panel" aria-expanded="false">⚙</button>
+          <div style="display:flex;gap:4px;margin-left:auto;">
+            <button class="btn-gear" id="btnTipsToggle" title="Tips" aria-label="Toggle tips overlay" aria-expanded="false" style="margin-left:0;width:28px;height:28px;padding:0;text-align:center;">ℹ</button>
+            <button class="btn-gear" id="btnSettingsGear" title="Settings" aria-label="Open settings panel" aria-expanded="false" style="margin-left:0;width:28px;height:28px;padding:0;text-align:center;">⚙</button>
+          </div>
         </div>
         <div id="previewCapRow" style="display:none;margin-bottom:6px;">
           <div style="display:flex;align-items:center;gap:8px;">
@@ -3760,6 +3763,13 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
   template.remove();
 
   function openSettings(){
+    // Close tips overlay if open
+    const tipsOverlay=document.getElementById('tipOverlay');
+    if(tipsOverlay&&tipsOverlay.style.display!=='none'){
+      tipsOverlay.style.display='none';
+      document.getElementById('btnTipsToggle')?.classList.remove('active');
+      document.getElementById('btnTipsToggle')?.setAttribute('aria-expanded','false');
+    }
     overlay.classList.add('open');
     gearBtn.classList.add('active');
     gearBtn.setAttribute('aria-expanded','true');
@@ -3919,10 +3929,33 @@ const TIPS = [
     renderTip();
   });
 
-  // Expose hide function so enableTools() can call it
+  const toggleBtn=document.getElementById('btnTipsToggle');
+
+  function setTipVisible(visible){
+    overlay.style.display=visible?'flex':'none';
+    if(toggleBtn){
+      toggleBtn.classList.toggle('active',visible);
+      toggleBtn.setAttribute('aria-expanded',visible?'true':'false');
+    }
+  }
+
+  // Expose hide function so enableTools() can call it (hides on first source load)
   window._hideTipOverlay=()=>{
-    overlay.style.display='none';
+    setTipVisible(false);
   };
+
+  // Toggle button: works both before and after a source is loaded
+  toggleBtn?.addEventListener('click',()=>{
+    const nowVisible=overlay.style.display==='none';
+    // Close settings overlay if open - tips and settings shouldn't overlap
+    const settingsOverlay=document.getElementById('settingsOverlay');
+    if(nowVisible&&settingsOverlay?.classList.contains('open')){
+      settingsOverlay.classList.remove('open');
+      document.getElementById('btnSettingsGear')?.classList.remove('active');
+      document.getElementById('btnSettingsGear')?.setAttribute('aria-expanded','false');
+    }
+    setTipVisible(nowVisible);
+  });
 
   renderTip();
 })();
