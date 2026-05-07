@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="sttc-tt-version" content="1.19c">
+<meta name="sttc-tt-version" content="1.19d">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
 <title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
@@ -70,7 +70,7 @@ body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);pad
 h1{font-size:17px;font-weight:600;margin-bottom:3px;}
 .subtitle{font-size:11px;color:var(--text3);margin-bottom:18px;}
 .layout{display:grid;grid-template-columns:var(--layout-left,1fr) 6px var(--layout-right,1fr);gap:0;align-items:start;}
-.col-resizer{width:6px;cursor:col-resize;align-self:stretch;position:relative;z-index:10;border-radius:3px;transition:background .15s;margin:0 4px;}
+.col-resizer{width:12px;cursor:col-resize;align-self:stretch;position:relative;z-index:10;border-radius:3px;transition:background .15s;margin:0 1px;}
 .col-resizer::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:2px;height:32px;border-radius:1px;background:var(--border2);transition:background .15s,height .15s;}
 .col-resizer:hover::after,.col-resizer.dragging::after{background:var(--accent);height:48px;}
 .left-col{min-width:260px;padding-right:7px;}
@@ -236,8 +236,8 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 .preview-resizer::after{
   content:'';display:block;border-radius:1px;background:var(--border2);transition:background .15s,width .15s,height .15s;
 }
-.preview-resizer.v{height:6px;width:100%;margin:4px 0;}
-.preview-resizer.h{width:6px;align-self:stretch;margin:0 4px;}
+.preview-resizer.v{height:12px;width:100%;margin:1px 0;}
+.preview-resizer.h{width:12px;align-self:stretch;margin:0 1px;}
 .preview-resizer.v::after{width:32px;height:2px;}
 .preview-resizer.h::after{height:32px;width:2px;}
 .preview-resizer:hover::after,.preview-resizer.dragging::after{background:var(--accent);}
@@ -251,7 +251,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 
 .preview-cap-on .preview-canvas-wrap canvas{max-height:var(--preview-cap,55vh);object-fit:contain;}
 /* Split: mode bar spans both cols; canvas+label left, sidebar right */
-.preview-split-on .right-col-inner{display:grid;grid-template-columns:var(--preview-left-w,55%) 6px 1fr;grid-template-rows:auto auto auto auto auto 1fr;column-gap:0;}
+.preview-split-on .right-col-inner{display:grid;grid-template-columns:var(--preview-left-w,55%) 12px 1fr;grid-template-rows:auto auto auto auto auto 1fr;column-gap:0;}
 .preview-split-on #previewModeBar{grid-column:1/4;grid-row:1;margin-bottom:8px;}
 .preview-split-on #previewCapRow{display:none!important;}
 .preview-split-on .preview-canvas-wrap{grid-column:1;grid-row:2/7;}
@@ -263,7 +263,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 .preview-split-on #previewSidebar{grid-column:3;grid-row:2/7;overflow:visible;}
 .preview-split-on .preview-canvas-wrap canvas{max-height:none!important;width:100%;}
 /* Cap + split: left col width driven by JS-computed --preview-left-w (px) */
-.preview-cap-on.preview-split-on .right-col-inner{grid-template-columns:var(--preview-left-w,55%) 6px 1fr;}
+.preview-cap-on.preview-split-on .right-col-inner{grid-template-columns:var(--preview-left-w,55%) 12px 1fr;}
 .preview-cap-on.preview-split-on .preview-canvas-wrap canvas{max-height:var(--preview-cap,50vh)!important;}
 /* Compact sidebar stats in split mode */
 .preview-split-on .stat{padding:5px 7px;}
@@ -3793,12 +3793,12 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
     el.addEventListener('dblclick',()=>{
       if(isSplit()){capHPx=getDefaultHPx();}else{capVPx=getDefaultVPx();}
       applyCapValue();
-      try{localStorage.setItem(isSplit()?CAP_H_KEY:CAP_V_KEY,isSplit()?capHPx:capVPx);}catch(e){}
+      try{localStorage.setItem(isSplit()?CAP_H_KEY:CAP_V_KEY,Math.round(isSplit()?capHPx:capVPx));}catch(e){}
     });
   }
 
   function commitSave(){
-    try{localStorage.setItem(CAP_V_KEY,capVPx);localStorage.setItem(CAP_H_KEY,capHPx);}catch(e){}
+    try{localStorage.setItem(CAP_V_KEY,Math.round(capVPx));localStorage.setItem(CAP_H_KEY,Math.round(capHPx));}catch(e){}
   }
 
   makeResizer(resizerV,
