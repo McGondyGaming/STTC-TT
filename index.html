@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="sttc-tt-version" content="1.19a">
+<meta name="sttc-tt-version" content="1.19b">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
 <title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
@@ -220,19 +220,49 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 .keybind-btn{min-width:36px;font-family:monospace;font-size:12px;font-weight:700;letter-spacing:.03em;}
 .keybind-btn.capturing{background:color-mix(in srgb,var(--warn) 18%,var(--bg3));border-color:var(--warn);color:var(--warn);animation:kb-pulse 0.9s ease-in-out infinite;}
 @keyframes kb-pulse{0%,100%{opacity:1;}50%{opacity:.55;}}
-/* ── Preview layout modes ──────────────────────────────────────────────────── */
-.preview-cap-on .preview-canvas-wrap canvas{max-height:var(--preview-cap,50vh);object-fit:contain;}
+/* ── Preview resizer ──────────────────────────────────────────────────────── */
+.preview-resizer{
+  background:transparent;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  cursor:row-resize;
+  transition:background .15s;
+  border-radius:3px;
+  flex-shrink:0;
+  user-select:none;
+  touch-action:none;
+}
+.preview-resizer::after{
+  content:'';display:block;border-radius:1px;background:var(--border2);transition:background .15s,width .15s,height .15s;
+}
+.preview-resizer.v{height:6px;width:100%;margin:4px 0;}
+.preview-resizer.h{width:6px;align-self:stretch;margin:0 4px;}
+.preview-resizer.v::after{width:32px;height:2px;}
+.preview-resizer.h::after{height:32px;width:2px;}
+.preview-resizer:hover::after,.preview-resizer.dragging::after{background:var(--accent);}
+.preview-resizer.v:hover::after,.preview-resizer.v.dragging::after{width:48px;}
+.preview-resizer.h:hover::after,.preview-resizer.h.dragging::after{height:48px;}
+.preview-cap-on .preview-resizer{display:flex;}
+/* Split mode: resizer becomes horizontal (between canvas-col and sidebar-col) */
+.preview-split-on .preview-resizer.v{display:none;}
+.preview-split-on .preview-resizer.h{display:flex;}
+
+.preview-cap-on .preview-canvas-wrap canvas{max-height:var(--preview-cap,55vh);object-fit:contain;}
 /* Split: mode bar spans both cols; canvas+label left, sidebar right */
-.preview-split-on .right-col-inner{display:grid;grid-template-columns:55% 1fr;grid-template-rows:auto auto auto auto auto 1fr;column-gap:10px;}
-.preview-split-on #previewModeBar{grid-column:1/3;grid-row:1;margin-bottom:8px;}
-.preview-split-on #previewCapRow{grid-column:1;grid-row:2;margin-bottom:4px;}
-.preview-split-on .preview-canvas-wrap{grid-column:1;grid-row:3;}
-.preview-split-on #heatScaleWrap{grid-column:1;grid-row:4;margin-top:4px;}
-.preview-split-on #previewLabel{grid-column:1;grid-row:5;text-align:left;align-self:start;margin-top:3px;}
-.preview-split-on #previewSidebar{grid-column:2;grid-row:2/7;overflow:visible;}
-.preview-split-on .preview-canvas-wrap canvas{max-height:none!important;}
+.preview-split-on .right-col-inner{display:grid;grid-template-columns:var(--preview-left-w,55%) 6px 1fr;grid-template-rows:auto auto auto auto auto 1fr;column-gap:0;}
+.preview-split-on #previewModeBar{grid-column:1/4;grid-row:1;margin-bottom:8px;}
+.preview-split-on #previewCapRow{display:none!important;}
+.preview-split-on .preview-canvas-wrap{grid-column:1;grid-row:2/7;}
+.preview-split-on .preview-resizer.h{grid-column:2;grid-row:2/7;cursor:col-resize;}
+.preview-split-on .preview-resizer.h::after{width:2px;height:32px;}
+.preview-split-on .preview-resizer.h:hover::after,.preview-split-on .preview-resizer.h.dragging::after{height:48px;}
+.preview-split-on #heatScaleWrap{display:none!important;}
+.preview-split-on #previewLabel{display:none!important;}
+.preview-split-on #previewSidebar{grid-column:3;grid-row:2/7;overflow:visible;}
+.preview-split-on .preview-canvas-wrap canvas{max-height:none!important;width:100%;}
 /* Cap + split: left col width driven by JS-computed --preview-left-w (px) */
-.preview-cap-on.preview-split-on .right-col-inner{grid-template-columns:var(--preview-left-w,55%) 1fr;}
+.preview-cap-on.preview-split-on .right-col-inner{grid-template-columns:var(--preview-left-w,55%) 6px 1fr;}
 .preview-cap-on.preview-split-on .preview-canvas-wrap canvas{max-height:var(--preview-cap,50vh)!important;}
 /* Compact sidebar stats in split mode */
 .preview-split-on .stat{padding:5px 7px;}
@@ -658,7 +688,7 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">Preview layout</div>
         <div class="note" style="margin-bottom:8px;">Options combine freely.</div>
         <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;">
-          <label class="ck-row"><input type="checkbox" id="chkPreviewCap"> Adjust preview size</label>
+          <label class="ck-row"><input type="checkbox" id="chkPreviewCap"> Resize preview with drag handle</label>
           <label class="ck-row"><input type="checkbox" id="chkPreviewSplit"> Split: sidebar alongside canvas</label>
           <label class="ck-row"><input type="checkbox" id="chkInsp2col"> Inspector: 2-column table</label>
         </div>
@@ -781,17 +811,11 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
           <button class="scheme-btn" data-mode="nav">Navigability</button>
           <button class="scheme-btn" data-mode="heatmap">Heatmap</button>
           <div style="display:flex;gap:4px;margin-left:auto;">
-            <button class="btn-gear" id="btnTipsToggle" title="Tips" aria-label="Toggle tips overlay" aria-expanded="false" style="margin-left:0;width:28px;height:28px;padding:0;text-align:center;">ℹ</button>
+            <button class="btn-gear active" id="btnTipsToggle" title="Tips" aria-label="Toggle tips overlay" aria-expanded="true" style="margin-left:0;width:28px;height:28px;padding:0;text-align:center;">ℹ</button>
             <button class="btn-gear" id="btnSettingsGear" title="Settings" aria-label="Open settings panel" aria-expanded="false" style="margin-left:0;width:28px;height:28px;padding:0;text-align:center;">⚙</button>
           </div>
         </div>
-        <div id="previewCapRow" style="display:none;margin-bottom:6px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;">Size</span>
-            <input type="range" id="previewCapSlider" aria-label="Max preview size" min="20" max="90" value="75" step="5" style="flex:1;accent-color:var(--accent);">
-            <span style="font-size:11px;font-weight:700;min-width:24px;text-align:right;color:var(--text);" id="previewCapOut">75</span><span style="font-size:11px;color:var(--text3);">vh</span>
-          </div>
-        </div>
+        <div id="previewCapRow" style="display:none;"></div>
         <div class="preview-canvas-wrap" style="position:relative;" id="previewWrap">
           <canvas id="cvPreview" width="128" height="128" tabindex="0" role="application" aria-label="Terrain preview. Use arrow keys to move selection, Enter or Space to inspect tile."></canvas>
           <div id="orientOverlay" style="display:none;position:absolute;inset:0;pointer-events:none;">
@@ -812,6 +836,9 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
             <div style="font-size:10px;color:var(--text3);margin-top:2px;">Load a source to get started</div>
           </div>
         </div>
+        <!-- Preview resizers: .v = vertical (below canvas, stacks sidebar under); .h = horizontal (splits canvas|sidebar side by side) -->
+        <div class="preview-resizer v" id="previewResizerV" title="Drag to resize preview" aria-hidden="true"></div>
+        <div class="preview-resizer h" id="previewResizerH" title="Drag to resize preview" aria-hidden="true"></div>
         <div id="heatScaleWrap" style="display:none;margin-top:6px;">
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;">Heat scale</span>
@@ -3487,7 +3514,7 @@ document.getElementById('btnResetKeybinds')?.addEventListener('click',()=>{
   if(!resizer||!layout)return;
 
   const STORAGE_KEY='sttctt-col-ratio';
-  const MIN_FRAC=0.20, MAX_FRAC=0.80;
+  const MIN_FRAC=0.30, MAX_FRAC=0.70;
 
   function applyRatio(ratio){
     ratio=Math.max(MIN_FRAC,Math.min(MAX_FRAC,ratio));
@@ -3530,21 +3557,17 @@ document.getElementById('btnResetKeybinds')?.addEventListener('click',()=>{
     const leftCol=layout.querySelector('.left-col');
     const totalW=layout.getBoundingClientRect().width-6;
     const ratio=leftCol?leftCol.getBoundingClientRect().width/totalW:startRatio;
-    try{localStorage.setItem(STORAGE_KEY,Math.max(MIN_FRAC,Math.min(MAX_FRAC,ratio)));}catch(e){}
+    try{localStorage.setItem(STORAGE_KEY,parseFloat(Math.max(MIN_FRAC,Math.min(MAX_FRAC,ratio)).toFixed(2)));}catch(e){}
   });
 
   resizer.addEventListener('dblclick',()=>{
     applyRatio(0.5);
-    try{localStorage.setItem(STORAGE_KEY,0.5);}catch(e){}
+    try{localStorage.setItem(STORAGE_KEY,'0.50');}catch(e){}
   });
 
   window.addEventListener('resize',()=>{
-    // Recompute split column width on resize if both cap and split are active
-    const chkC=document.getElementById('chkPreviewCap');
-    const chkS=document.getElementById('chkPreviewSplit');
-    if(chkC?.checked&&chkS?.checked){
-      document.getElementById('previewCapSlider')?.dispatchEvent(new Event('input'));
-    }
+    // Recompute split column width on resize if cap is active
+    // (handled by preview layout block's own resize listener)
   });
 })();
 
@@ -3696,39 +3719,56 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
 (()=>{
   const rightCol=document.querySelector('.right-col');
   if(!rightCol)return;
-  const capSlider=document.getElementById('previewCapSlider');
   const capRow=document.getElementById('previewCapRow');
   const chkCap=document.getElementById('chkPreviewCap');
   const chkSplit=document.getElementById('chkPreviewSplit');
   const chkInsp2col=document.getElementById('chkInsp2col');
   const inspRowsEl=document.getElementById('inspRows');
+  const resizerV=document.getElementById('previewResizerV');
+  const resizerH=document.getElementById('previewResizerH');
+  const previewWrap=document.getElementById('previewWrap');
+  const previewSidebar=document.getElementById('previewSidebar');
+
+  // Persisted size: px for vertical (canvas height), px for horizontal (canvas width)
+  const CAP_V_KEY='sttctt-preview-cap-vh';
+  const CAP_H_KEY='sttctt-preview-cap-hw';
+  const MIN_PX=80;
+
+  function getDefaultVPx(){return Math.round(window.innerHeight*0.55);}
+  function getDefaultHPx(){
+    const rcW=rightCol.getBoundingClientRect().width||600;
+    return Math.round(rcW*0.55);
+  }
+
+  let capVPx=getDefaultVPx();
+  let capHPx=getDefaultHPx();
+
+  try{const v=parseInt(localStorage.getItem(CAP_V_KEY));if(v>=MIN_PX)capVPx=v;}catch(e){}
+  try{const v=parseInt(localStorage.getItem(CAP_H_KEY));if(v>=MIN_PX)capHPx=v;}catch(e){}
 
   function applyCapValue(){
-    const v=parseInt(capSlider.value);
-    const capOut=document.getElementById('previewCapOut');
-    if(capOut)capOut.textContent=v;
-    rightCol.style.setProperty('--preview-cap',v+'vh');
-    // Always keep canvas responsive so the CSS max-height cap can take effect
-    const canvas=document.getElementById('cvPreview');
-    if(canvas){canvas.style.width='100%';}
-    // Split+cap: compute left column width so sidebar gets enough room
-    if(chkSplit.checked){
-      const capPxVal=Math.round(window.innerHeight*v/100);
-      const rcW=rightCol.getBoundingClientRect().width||rightCol.offsetWidth||600;
-      const minSidebar=180;
-      const leftW=Math.min(capPxVal,rcW-minSidebar);
-      rightCol.style.setProperty('--preview-left-w',Math.max(80,leftW)+'px');
+    if(!chkCap.checked){
+      rightCol.style.removeProperty('--preview-cap');
+      rightCol.style.removeProperty('--preview-left-w');
+      return;
     }
-    try{localStorage.setItem('sttctt-preview-cap',v);}catch(e){}
+    if(chkSplit.checked){
+      // Horizontal: set --preview-left-w in px (canvas column width)
+      const rcW=rightCol.getBoundingClientRect().width||600;
+      const clamped=Math.max(MIN_PX,Math.min(rcW-MIN_PX-6,capHPx));
+      rightCol.style.setProperty('--preview-left-w',clamped+'px');
+    }else{
+      // Vertical: set --preview-cap in px (canvas max-height)
+      const clamped=Math.max(MIN_PX,capVPx);
+      rightCol.style.setProperty('--preview-cap',clamped+'px');
+    }
   }
 
   function applyLayout(){
     rightCol.classList.toggle('preview-cap-on',chkCap.checked);
     rightCol.classList.toggle('preview-split-on',chkSplit.checked);
     if(inspRowsEl)inspRowsEl.classList.toggle('insp-2col',chkInsp2col.checked);
-    capRow.style.display=chkCap.checked?'block':'none';
-    // Re-apply cap value so --preview-left-w is current when split is toggled
-    if(chkCap.checked)applyCapValue();
+    applyCapValue();
     try{
       localStorage.setItem('sttctt-preview-cap-on',chkCap.checked?'1':'0');
       localStorage.setItem('sttctt-preview-split-on',chkSplit.checked?'1':'0');
@@ -3739,24 +3779,76 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
   chkCap.addEventListener('change',applyLayout);
   chkSplit.addEventListener('change',applyLayout);
   chkInsp2col.addEventListener('change',applyLayout);
-  capSlider.addEventListener('input',applyCapValue);
-  // Recompute on resize so --preview-left-w stays correct if window is resized
-  window.addEventListener('resize',()=>{if(chkCap.checked)applyCapValue();});
 
-  // Restore persisted prefs - new defaults: cap on @ 75, split on
+  // ── Resizer drag ───────────────────────────────────────────────────────────
+  function makeResizer(el,getStart,onMove,onEnd){
+    let startPos=0,startVal=0,dragging=false;
+    el.addEventListener('pointerdown',e=>{
+      if(e.button!==0)return;
+      e.preventDefault();el.setPointerCapture(e.pointerId);
+      dragging=true;startPos=chkSplit.checked?e.clientX:e.clientY;startVal=getStart();
+      el.classList.add('dragging');
+    });
+    el.addEventListener('pointermove',e=>{
+      if(!dragging)return;
+      onMove(startVal,chkSplit.checked?e.clientX-startPos:e.clientY-startPos);
+    });
+    el.addEventListener('pointerup',e=>{
+      if(!dragging)return;dragging=false;el.classList.remove('dragging');
+      onEnd();
+    });
+    el.addEventListener('dblclick',()=>{
+      // Reset to default
+      if(chkSplit.checked){capHPx=getDefaultHPx();}else{capVPx=getDefaultVPx();}
+      applyCapValue();
+      try{
+        if(chkSplit.checked)localStorage.setItem(CAP_H_KEY,capHPx);
+        else localStorage.setItem(CAP_V_KEY,capVPx);
+      }catch(e){}
+    });
+  }
+
+  function commitSave(){
+    try{
+      localStorage.setItem(CAP_V_KEY,capVPx);
+      localStorage.setItem(CAP_H_KEY,capHPx);
+    }catch(e){}
+  }
+
+  // Vertical resizer: drag down = taller canvas
+  makeResizer(resizerV,
+    ()=>capVPx,
+    (start,delta)=>{
+      capVPx=Math.max(MIN_PX,start+delta);
+      applyCapValue();
+    },
+    commitSave
+  );
+
+  // Horizontal resizer: drag right = wider canvas column
+  makeResizer(resizerH,
+    ()=>capHPx,
+    (start,delta)=>{
+      const rcW=rightCol.getBoundingClientRect().width||600;
+      capHPx=Math.max(MIN_PX,Math.min(rcW-MIN_PX-6,start+delta));
+      applyCapValue();
+    },
+    commitSave
+  );
+
+  window.addEventListener('resize',()=>{applyCapValue();});
+
+  // Restore persisted prefs
   try{
-    const capSaved=localStorage.getItem('sttctt-preview-cap');
-    capSlider.value=capSaved!==null?capSaved:'75';
     const capOn=localStorage.getItem('sttctt-preview-cap-on');
     chkCap.checked=capOn!==null?capOn==='1':true;
     const splitOn=localStorage.getItem('sttctt-preview-split-on');
     chkSplit.checked=splitOn!==null?splitOn==='1':true;
     chkInsp2col.checked=localStorage.getItem('sttctt-preview-insp2col')==='1';
   }catch(e){
-    capSlider.value='75';chkCap.checked=true;chkSplit.checked=true;
+    chkCap.checked=true;chkSplit.checked=true;
   }
 
-  applyCapValue();
   applyLayout();
 })();
 
