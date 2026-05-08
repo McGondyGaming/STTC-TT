@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="sttc-tt-version" content="1.18">
+<meta name="sttc-tt-version" content="1.19a">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="An advanced terrain tool for Starship Troopers: Terran Command. Create and edit heightmaps, visualise terrain features, and export for use in the in-game editor.">
 <title>STTC-TT - Starship Troopers: Terran Command Terrain Tool</title>
@@ -70,7 +70,7 @@ body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);pad
 h1{font-size:17px;font-weight:600;margin-bottom:3px;}
 .subtitle{font-size:11px;color:var(--text3);margin-bottom:18px;}
 .layout{display:grid;grid-template-columns:var(--layout-left,1fr) 6px var(--layout-right,1fr);gap:0;align-items:start;}
-.col-resizer{width:6px;cursor:col-resize;align-self:stretch;position:relative;z-index:10;border-radius:3px;transition:background .15s;margin:0 4px;}
+.col-resizer{width:12px;cursor:col-resize;align-self:start;position:sticky;top:20px;height:calc(100vh - 42px);height:calc(100dvh - 42px);z-index:10;border-radius:3px;transition:background .15s;margin:0 1px;}
 .col-resizer::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:2px;height:32px;border-radius:1px;background:var(--border2);transition:background .15s,height .15s;}
 .col-resizer:hover::after,.col-resizer.dragging::after{background:var(--accent);height:48px;}
 .left-col{min-width:260px;padding-right:7px;}
@@ -220,24 +220,57 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
 .keybind-btn{min-width:36px;font-family:monospace;font-size:12px;font-weight:700;letter-spacing:.03em;}
 .keybind-btn.capturing{background:color-mix(in srgb,var(--warn) 18%,var(--bg3));border-color:var(--warn);color:var(--warn);animation:kb-pulse 0.9s ease-in-out infinite;}
 @keyframes kb-pulse{0%,100%{opacity:1;}50%{opacity:.55;}}
-/* ── Preview layout modes ──────────────────────────────────────────────────── */
-.preview-cap-on .preview-canvas-wrap canvas{max-height:var(--preview-cap,50vh);object-fit:contain;}
+/* ── Preview resizer ──────────────────────────────────────────────────────── */
+.preview-resizer{
+  background:transparent;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  cursor:row-resize;
+  transition:background .15s;
+  border-radius:3px;
+  flex-shrink:0;
+  user-select:none;
+  touch-action:none;
+}
+.preview-resizer::after{
+  content:'';display:block;border-radius:1px;background:var(--border2);transition:background .15s,width .15s,height .15s;
+}
+.preview-resizer.v{height:12px;width:100%;margin:1px 0;}
+.preview-resizer.h{width:12px;align-self:stretch;margin:0 1px;}
+.preview-resizer.v::after{width:32px;height:2px;}
+.preview-resizer.h::after{height:32px;width:2px;}
+.preview-resizer:hover::after,.preview-resizer.dragging::after{background:var(--accent);}
+.preview-resizer.v:hover::after,.preview-resizer.v.dragging::after{width:48px;}
+.preview-resizer.h:hover::after,.preview-resizer.h.dragging::after{height:48px;}
+/* Show correct resizer per mode: vertical bar in stacked, horizontal bar in split */
+.preview-cap-on .preview-resizer.v{display:flex;}
+.preview-cap-on .preview-resizer.h{display:none;}
+.preview-cap-on.preview-split-on .preview-resizer.v{display:none;}
+.preview-cap-on.preview-split-on .preview-resizer.h{display:flex;}
+
+.preview-cap-on .preview-canvas-wrap canvas{max-height:var(--preview-cap,55vh);object-fit:contain;}
 /* Split: mode bar spans both cols; canvas+label left, sidebar right */
-.preview-split-on .right-col-inner{display:grid;grid-template-columns:55% 1fr;grid-template-rows:auto auto auto auto auto 1fr;column-gap:10px;}
-.preview-split-on #previewModeBar{grid-column:1/3;grid-row:1;margin-bottom:8px;}
-.preview-split-on #previewCapRow{grid-column:1;grid-row:2;margin-bottom:4px;}
-.preview-split-on .preview-canvas-wrap{grid-column:1;grid-row:3;}
-.preview-split-on #heatScaleWrap{grid-column:1;grid-row:4;margin-top:4px;}
-.preview-split-on #previewLabel{grid-column:1;grid-row:5;text-align:left;align-self:start;margin-top:3px;}
-.preview-split-on #previewSidebar{grid-column:2;grid-row:2/7;overflow:visible;}
-.preview-split-on .preview-canvas-wrap canvas{max-height:none!important;}
+.preview-split-on .right-col-inner{display:grid;grid-template-columns:var(--preview-left-w,55%) 12px 1fr;grid-template-rows:auto auto auto auto auto 1fr;column-gap:0;}
+.preview-split-on #previewModeBar{grid-column:1/4;grid-row:1;margin-bottom:8px;}
+.preview-split-on #previewCapRow{display:none!important;}
+.preview-split-on .preview-canvas-wrap{grid-column:1;grid-row:2;align-self:start;}
+.preview-split-on .preview-resizer.h{grid-column:2;grid-row:2/7;cursor:col-resize;}
+.preview-split-on .preview-resizer.h::after{width:2px;height:32px;}
+.preview-split-on .preview-resizer.h:hover::after,.preview-split-on .preview-resizer.h.dragging::after{height:48px;}
+.preview-split-on #heatScaleWrap{display:none!important;}
+.preview-split-on #previewLabel{display:none!important;}
+.preview-split-on #previewSidebar{grid-column:3;grid-row:2/7;overflow:visible;}
+.preview-split-on .preview-canvas-wrap canvas{max-height:none!important;width:100%;height:auto;}
 /* Cap + split: left col width driven by JS-computed --preview-left-w (px) */
-.preview-cap-on.preview-split-on .right-col-inner{grid-template-columns:var(--preview-left-w,55%) 1fr;}
-.preview-cap-on.preview-split-on .preview-canvas-wrap canvas{max-height:var(--preview-cap,50vh)!important;}
+.preview-cap-on.preview-split-on .right-col-inner{grid-template-columns:var(--preview-left-w,55%) 12px 1fr;}
+.preview-cap-on.preview-split-on .preview-canvas-wrap canvas{max-height:none!important;}
 /* Compact sidebar stats in split mode */
 .preview-split-on .stat{padding:5px 7px;}
 .preview-split-on .stat-l{font-size:9px;}
 .preview-split-on .stat-v{font-size:13px;}
+/* Give the sidebar a small left gap in split mode so the resizer handle is easy to grab */
+.preview-split-on #previewSidebar{padding-left:6px;}
 /* ── Settings overlay (slides over right-col sidebar, canvas untouched) ── */
 .settings-overlay{
   display:none;position:absolute;top:0;left:0;right:0;bottom:0;
@@ -246,6 +279,8 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
   scrollbar-width:thin;scrollbar-color:var(--border2) transparent;
   padding:14px 15px;
   animation:settingsFadeIn .15s ease;
+  box-sizing:border-box;
+  min-width:0;max-width:100%;
 }
 .settings-overlay.open{display:block;}
 @keyframes settingsFadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
@@ -658,7 +693,6 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
         <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;">Preview layout</div>
         <div class="note" style="margin-bottom:8px;">Options combine freely.</div>
         <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;">
-          <label class="ck-row"><input type="checkbox" id="chkPreviewCap"> Adjust preview size</label>
           <label class="ck-row"><input type="checkbox" id="chkPreviewSplit"> Split: sidebar alongside canvas</label>
           <label class="ck-row"><input type="checkbox" id="chkInsp2col"> Inspector: 2-column table</label>
         </div>
@@ -781,17 +815,11 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
           <button class="scheme-btn" data-mode="nav">Navigability</button>
           <button class="scheme-btn" data-mode="heatmap">Heatmap</button>
           <div style="display:flex;gap:4px;margin-left:auto;">
-            <button class="btn-gear" id="btnTipsToggle" title="Tips" aria-label="Toggle tips overlay" aria-expanded="false" style="margin-left:0;width:28px;height:28px;padding:0;text-align:center;">ℹ</button>
+            <button class="btn-gear active" id="btnTipsToggle" title="Tips" aria-label="Toggle tips overlay" aria-expanded="true" style="margin-left:0;width:28px;height:28px;padding:0;text-align:center;">ℹ</button>
             <button class="btn-gear" id="btnSettingsGear" title="Settings" aria-label="Open settings panel" aria-expanded="false" style="margin-left:0;width:28px;height:28px;padding:0;text-align:center;">⚙</button>
           </div>
         </div>
-        <div id="previewCapRow" style="display:none;margin-bottom:6px;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;">Size</span>
-            <input type="range" id="previewCapSlider" aria-label="Max preview size" min="20" max="90" value="75" step="5" style="flex:1;accent-color:var(--accent);">
-            <span style="font-size:11px;font-weight:700;min-width:24px;text-align:right;color:var(--text);" id="previewCapOut">75</span><span style="font-size:11px;color:var(--text3);">vh</span>
-          </div>
-        </div>
+        <div id="previewCapRow" style="display:none;"></div>
         <div class="preview-canvas-wrap" style="position:relative;" id="previewWrap">
           <canvas id="cvPreview" width="128" height="128" tabindex="0" role="application" aria-label="Terrain preview. Use arrow keys to move selection, Enter or Space to inspect tile."></canvas>
           <div id="orientOverlay" style="display:none;position:absolute;inset:0;pointer-events:none;">
@@ -812,6 +840,9 @@ pre{font-size:11px;background:var(--bg2);border-radius:7px;padding:10px;white-sp
             <div style="font-size:10px;color:var(--text3);margin-top:2px;">Load a source to get started</div>
           </div>
         </div>
+        <!-- Preview resizers: .v = vertical (below canvas, stacks sidebar under); .h = horizontal (splits canvas|sidebar side by side) -->
+        <div class="preview-resizer v" id="previewResizerV" title="Drag to resize preview" aria-hidden="true"></div>
+        <div class="preview-resizer h" id="previewResizerH" title="Drag to resize preview" aria-hidden="true"></div>
         <div id="heatScaleWrap" style="display:none;margin-top:6px;">
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;">Heat scale</span>
@@ -1788,7 +1819,7 @@ makeDrop('dzMap','fiMap',file=>{
       folderPill.textContent=folderHint||'';
       folderPill.style.display=folderHint?'inline-flex':'none';
       activeSource='map';setActiveLandscape(detectLandscape(srcTiles),'auto');
-      invalidateHeatCache();updatePreview();enableTools();resetCompass();
+      invalidateHeatCache();updatePreview();validateLoadedMap();enableTools();resetCompass();
     }catch(err){msg.textContent='Error: '+err.message;msg.className='msg err';msg.style.display='block';}
   };
   reader.readAsText(file);
@@ -1958,7 +1989,7 @@ function loadScenarioDir(files){
     if(mapFile){
       activeSource='map';updateUndoButtons();
       setActiveLandscape(detectLandscape(srcTiles),'auto');
-      invalidateHeatCache();updatePreview();enableTools();resetCompass();
+      invalidateHeatCache();updatePreview();validateLoadedMap();enableTools();resetCompass();
     }
   }).catch(err=>{
     document.getElementById('msgScenario').textContent='Error loading folder: '+err.message;
@@ -2852,6 +2883,22 @@ function buildTiles(){
   if(srcEdgeGroups===null&&edgeGroups.length===0)delete result.EdgeGroups;
   return result;
 }
+function validateLoadedMap(){
+  if(!srcTiles)return;
+  const EDGE_BY_ID=Object.fromEntries(EDGES.map(e=>[e.id,e]));
+  const unknownTerrain=new Set(),unknownEdge=new Set();
+  srcTiles.forEach(t=>{if(t.TerrainTypeId!=null&&!T_BY_ID[t.TerrainTypeId])unknownTerrain.add(t.TerrainTypeId);});
+  if(srcEdgeGroups)srcEdgeGroups.forEach(eg=>{if(eg.EdgeTypeId!=null&&!EDGE_BY_ID[eg.EdgeTypeId])unknownEdge.add(eg.EdgeTypeId);});
+  if(unknownTerrain.size||unknownEdge.size){
+    const lines=['STTC-TT: Unknown IDs in loaded map (data tables may need updating)'];
+    if(unknownTerrain.size)lines.push('  TerrainTypeId: '+[...unknownTerrain].sort((a,b)=>a-b).join(', '));
+    if(unknownEdge.size)lines.push('  EdgeTypeId: '+[...unknownEdge].sort((a,b)=>a-b).join(', '));
+    console.warn(lines.join('\n'));
+  }else{
+    console.log('STTC-TT: All terrain and edge IDs recognised.');
+  }
+}
+
 function enableTools(){
   window._hideTipOverlay?.();
   ['btnShiftAll','btnClamp','btnBand','btnPreview','btnReset','btnRot90CW','btnRot90CCW','btnFlipH','btnFlipV','btnExportHeightmap']
@@ -3471,7 +3518,7 @@ document.getElementById('btnResetKeybinds')?.addEventListener('click',()=>{
   if(!resizer||!layout)return;
 
   const STORAGE_KEY='sttctt-col-ratio';
-  const MIN_FRAC=0.20, MAX_FRAC=0.80;
+  const MIN_FRAC=0.30, MAX_FRAC=0.70;
 
   function applyRatio(ratio){
     ratio=Math.max(MIN_FRAC,Math.min(MAX_FRAC,ratio));
@@ -3514,21 +3561,16 @@ document.getElementById('btnResetKeybinds')?.addEventListener('click',()=>{
     const leftCol=layout.querySelector('.left-col');
     const totalW=layout.getBoundingClientRect().width-6;
     const ratio=leftCol?leftCol.getBoundingClientRect().width/totalW:startRatio;
-    try{localStorage.setItem(STORAGE_KEY,Math.max(MIN_FRAC,Math.min(MAX_FRAC,ratio)));}catch(e){}
+    try{localStorage.setItem(STORAGE_KEY,parseFloat(Math.max(MIN_FRAC,Math.min(MAX_FRAC,ratio)).toFixed(2)));}catch(e){}
   });
 
   resizer.addEventListener('dblclick',()=>{
     applyRatio(0.5);
-    try{localStorage.setItem(STORAGE_KEY,0.5);}catch(e){}
+    try{localStorage.setItem(STORAGE_KEY,'0.50');}catch(e){}
   });
 
   window.addEventListener('resize',()=>{
-    // Recompute split column width on resize if both cap and split are active
-    const chkC=document.getElementById('chkPreviewCap');
-    const chkS=document.getElementById('chkPreviewSplit');
-    if(chkC?.checked&&chkS?.checked){
-      document.getElementById('previewCapSlider')?.dispatchEvent(new Event('input'));
-    }
+    // Preview layout block handles its own resize
   });
 })();
 
@@ -3680,67 +3722,112 @@ document.getElementById('btnResetAllUI')?.addEventListener('click',()=>{
 (()=>{
   const rightCol=document.querySelector('.right-col');
   if(!rightCol)return;
-  const capSlider=document.getElementById('previewCapSlider');
-  const capRow=document.getElementById('previewCapRow');
-  const chkCap=document.getElementById('chkPreviewCap');
   const chkSplit=document.getElementById('chkPreviewSplit');
   const chkInsp2col=document.getElementById('chkInsp2col');
   const inspRowsEl=document.getElementById('inspRows');
+  const resizerV=document.getElementById('previewResizerV');
+  const resizerH=document.getElementById('previewResizerH');
+
+  // Resizer is always active - class is set permanently
+  rightCol.classList.add('preview-cap-on');
+
+  // Persisted size: px for vertical (canvas max-height), px for horizontal (canvas col width)
+  const CAP_V_KEY='sttctt-preview-cap-vh';
+  const CAP_H_KEY='sttctt-preview-cap-hw';
+  const MIN_PX=80;
+
+  function getDefaultVPx(){return Math.round(window.innerHeight*0.55);}
+  function getDefaultHPx(){
+    const rcW=rightCol.getBoundingClientRect().width||600;
+    return Math.round(rcW*0.55);
+  }
+
+  let capVPx=getDefaultVPx();
+  let capHPx=getDefaultHPx();
+
+  try{const v=parseInt(localStorage.getItem(CAP_V_KEY));if(v>=MIN_PX)capVPx=v;}catch(e){}
+  try{const v=parseInt(localStorage.getItem(CAP_H_KEY));if(v>=MIN_PX)capHPx=v;}catch(e){}
+
+  function isSplit(){return chkSplit.checked;}
 
   function applyCapValue(){
-    const v=parseInt(capSlider.value);
-    const capOut=document.getElementById('previewCapOut');
-    if(capOut)capOut.textContent=v;
-    rightCol.style.setProperty('--preview-cap',v+'vh');
-    // Always keep canvas responsive so the CSS max-height cap can take effect
-    const canvas=document.getElementById('cvPreview');
-    if(canvas){canvas.style.width='100%';}
-    // Split+cap: compute left column width so sidebar gets enough room
-    if(chkSplit.checked){
-      const capPxVal=Math.round(window.innerHeight*v/100);
-      const rcW=rightCol.getBoundingClientRect().width||rightCol.offsetWidth||600;
-      const minSidebar=180;
-      const leftW=Math.min(capPxVal,rcW-minSidebar);
-      rightCol.style.setProperty('--preview-left-w',Math.max(80,leftW)+'px');
+    if(isSplit()){
+      const rcW=rightCol.getBoundingClientRect().width||600;
+      const clamped=Math.max(MIN_PX,Math.min(rcW-MIN_PX-6,capHPx));
+      rightCol.style.setProperty('--preview-left-w',clamped+'px');
+    }else{
+      rightCol.style.setProperty('--preview-cap',Math.max(MIN_PX,capVPx)+'px');
     }
-    try{localStorage.setItem('sttctt-preview-cap',v);}catch(e){}
   }
 
   function applyLayout(){
-    rightCol.classList.toggle('preview-cap-on',chkCap.checked);
     rightCol.classList.toggle('preview-split-on',chkSplit.checked);
     if(inspRowsEl)inspRowsEl.classList.toggle('insp-2col',chkInsp2col.checked);
-    capRow.style.display=chkCap.checked?'block':'none';
-    // Re-apply cap value so --preview-left-w is current when split is toggled
-    if(chkCap.checked)applyCapValue();
+    applyCapValue();
     try{
-      localStorage.setItem('sttctt-preview-cap-on',chkCap.checked?'1':'0');
       localStorage.setItem('sttctt-preview-split-on',chkSplit.checked?'1':'0');
       localStorage.setItem('sttctt-preview-insp2col',chkInsp2col.checked?'1':'0');
     }catch(e){}
   }
 
-  chkCap.addEventListener('change',applyLayout);
   chkSplit.addEventListener('change',applyLayout);
   chkInsp2col.addEventListener('change',applyLayout);
-  capSlider.addEventListener('input',applyCapValue);
-  // Recompute on resize so --preview-left-w stays correct if window is resized
-  window.addEventListener('resize',()=>{if(chkCap.checked)applyCapValue();});
 
-  // Restore persisted prefs - new defaults: cap on @ 75, split on
+  // ── Resizer drag ───────────────────────────────────────────────────────────
+  function makeResizer(el,getStart,onMove,onEnd){
+    let startPos=0,startVal=0,dragging=false;
+    el.addEventListener('pointerdown',e=>{
+      if(e.button!==0)return;
+      e.preventDefault();el.setPointerCapture(e.pointerId);
+      dragging=true;startPos=isSplit()?e.clientX:e.clientY;startVal=getStart();
+      el.classList.add('dragging');
+    });
+    el.addEventListener('pointermove',e=>{
+      if(!dragging)return;
+      onMove(startVal,isSplit()?e.clientX-startPos:e.clientY-startPos);
+    });
+    el.addEventListener('pointerup',()=>{
+      if(!dragging)return;dragging=false;el.classList.remove('dragging');
+      onEnd();
+    });
+    el.addEventListener('dblclick',()=>{
+      if(isSplit()){capHPx=getDefaultHPx();}else{capVPx=getDefaultVPx();}
+      applyCapValue();
+      try{localStorage.setItem(isSplit()?CAP_H_KEY:CAP_V_KEY,Math.round(isSplit()?capHPx:capVPx));}catch(e){}
+    });
+  }
+
+  function commitSave(){
+    try{localStorage.setItem(CAP_V_KEY,Math.round(capVPx));localStorage.setItem(CAP_H_KEY,Math.round(capHPx));}catch(e){}
+  }
+
+  makeResizer(resizerV,
+    ()=>capVPx,
+    (start,delta)=>{capVPx=Math.max(MIN_PX,start+delta);applyCapValue();},
+    commitSave
+  );
+
+  makeResizer(resizerH,
+    ()=>capHPx,
+    (start,delta)=>{
+      const rcW=rightCol.getBoundingClientRect().width||600;
+      capHPx=Math.max(MIN_PX,Math.min(rcW-MIN_PX-6,start+delta));
+      applyCapValue();
+    },
+    commitSave
+  );
+
+  window.addEventListener('resize',()=>{applyCapValue();});
+
+  // Restore persisted prefs
   try{
-    const capSaved=localStorage.getItem('sttctt-preview-cap');
-    capSlider.value=capSaved!==null?capSaved:'75';
-    const capOn=localStorage.getItem('sttctt-preview-cap-on');
-    chkCap.checked=capOn!==null?capOn==='1':true;
     const splitOn=localStorage.getItem('sttctt-preview-split-on');
     chkSplit.checked=splitOn!==null?splitOn==='1':true;
     chkInsp2col.checked=localStorage.getItem('sttctt-preview-insp2col')==='1';
   }catch(e){
-    capSlider.value='75';chkCap.checked=true;chkSplit.checked=true;
+    chkSplit.checked=true;
   }
 
-  applyCapValue();
   applyLayout();
 })();
 
@@ -3801,8 +3888,8 @@ const STORAGE_KEY_LABELS={
   'sttctt-ui-uiText2':         'Custom theme · Dim text',
   'sttctt-ui-uiBorder':        'Custom theme · Border',
   'sttctt-ui-uiOk':            'Custom theme · OK colour',
-  'sttctt-preview-cap':        'Preview size slider value',
-  'sttctt-preview-cap-on':     'Preview size cap enabled',
+  'sttctt-preview-cap-vh':     'Preview resizer · canvas height (px, stacked mode)',
+  'sttctt-preview-cap-hw':     'Preview resizer · canvas width (px, split mode)',
   'sttctt-preview-split-on':   'Split layout enabled',
   'sttctt-preview-insp2col':   'Inspector 2-column layout',
 };
